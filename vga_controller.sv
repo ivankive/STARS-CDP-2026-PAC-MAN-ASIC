@@ -21,6 +21,7 @@
     logic [9:0] h_count;
     logic [8:0] v_count;
     logic [1:0] tile_data;
+    logic pixel_clock;
     
     // test values
     assign h_count = 10'd3;
@@ -34,21 +35,46 @@
       .tile_data(tile_data)
     );
     
+    clk_divider cd_test (hz100, reset, pixel_clock);
+    
     // connect to outputs
     assign red   = rgb[2];
     assign green = rgb[1];
     assign blue  = rgb[0];
+    assign pixel_clock = left[1];
 
     
   endmodule
+  
+  module clk_divider(input logic MHz100, rst, output logic pixel_clk);
+    logic [1:0] clk_div;
+    
+    always_ff @(posedge MHz100 or posedge rst) begin
+      if(rst)
+        clk_div <= 0;
+      else
+        clk_div <= clk_div + 1;
+    end
+    
+    assign pixel_clk = clk_div[1];
+  
+  endmodule
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   module draw_tile(
     output logic [2:0]rgb,      //pixel color
     input logic [9:0]h_count,   //Horizontal Display Counter (max value is 640px)
     input logic [8:0]v_count,    //Vertical Display Counter (maxvalue is 480px)
-    input logic [1:0] tile_data //TEMPORARILY IT CODE SHOULD KNOW WHAT TILE IT IS FROM h_count and v_count... Tile Data (blank, wall, pellet, power pellet)
+    input logic [1:0] tile_data //Tile Data (blank, wall, pellet, power pellet)
   );
-
   //variables
   logic black_left, black_bottom;
   logic [4:0] tile_y;     // 0-27 Y tiles
