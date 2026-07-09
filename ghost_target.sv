@@ -1,11 +1,17 @@
 `timescale 1ns/1ps
 
 module ghost_target #(
-    parameter int GRID_WIDTH  = 28,
-    parameter int GRID_HEIGHT = 31,
+    parameter logic [5:0] GRID_MAX_X = 6'd27,
+    parameter logic [5:0] GRID_MAX_Y = 6'd30,
 
     parameter logic [5:0] CAGE_X = 6'd14,
-    parameter logic [5:0] CAGE_Y = 6'd15
+    parameter logic [5:0] CAGE_Y = 6'd15,
+
+    parameter logic [5:0] BLINKY_SCATTER_X = 6'd26,
+    parameter logic [5:0] BLINKY_SCATTER_Y = 6'd1,
+
+    parameter logic [5:0] PINKY_SCATTER_X  = 6'd1,
+    parameter logic [5:0] PINKY_SCATTER_Y  = 6'd1
 )(
     input  logic [1:0] ghost_state,
     input  logic [1:0] ghost_id,
@@ -14,14 +20,11 @@ module ghost_target #(
     input  logic [5:0] pacman_y,
     input  logic [1:0] pacman_dir,
 
-    input  logic [5:0] ghost_x,
-    input  logic [5:0] ghost_y,
-
     output logic [5:0] target_x,
     output logic [5:0] target_y
 );
 
-    // Ghost FSM state encodings
+    // Ghost states
     localparam logic [1:0] G_CAGED      = 2'd0;
     localparam logic [1:0] G_SCATTER    = 2'd1;
     localparam logic [1:0] G_CHASE      = 2'd2;
@@ -33,8 +36,68 @@ module ghost_target #(
     localparam logic [1:0] GHOST_INKY   = 2'd2;
     localparam logic [1:0] GHOST_CLYDE  = 2'd3;
 
+    // Directions
+    localparam logic [1:0] DIR_UP    = 2'd0;
+    localparam logic [1:0] DIR_DOWN  = 2'd1;
+    localparam logic [1:0] DIR_LEFT  = 2'd2;
+    localparam logic [1:0] DIR_RIGHT = 2'd3;
+
+    logic [5:0] pinky_x;
+    logic [5:0] pinky_y;
+
+    // Pinky targets 4 tiles ahead of Pac-Man, saturated at maze edges.
     always_comb begin
-        // Safe default 
+        pinky_x = pacman_x;
+        pinky_y = pacman_y;
+
+        case (pacman_dir)
+
+            DIR_UP: begin
+                pinky_x = pacman_x;
+
+                if (pacman_y >= 6'd4)
+                    pinky_y = pacman_y - 6'd4;
+                else
+                    pinky_y = 6'd0;
+            end
+
+            DIR_DOWN: begin
+                pinky_x = pacman_x;
+
+                if (pacman_y <= (GRID_MAX_Y - 6'd4))
+                    pinky_y = pacman_y + 6'd4;
+                else
+                    pinky_y = GRID_MAX_Y;
+            end
+
+            DIR_LEFT: begin
+                if (pacman_x >= 6'd4)
+                    pinky_x = pacman_x - 6'd4;
+                else
+                    pinky_x = 6'd0;
+
+                pinky_y = pacman_y;
+            end
+
+            DIR_RIGHT: begin
+                if (pacman_x <= (GRID_MAX_X - 6'd4))
+                    pinky_x = pacman_x + 6'd4;
+                else
+                    pinky_x = GRID_MAX_X;
+
+                pinky_y = pacman_y;
+            end
+
+            default: begin
+                pinky_x = pacman_x;
+                pinky_y = pacman_y;
+            end
+
+        endcase
+    end
+
+    // Main target selector
+    always_comb begin
         target_x = CAGE_X;
         target_y = CAGE_Y;
 
@@ -48,28 +111,24 @@ module ghost_target #(
             G_SCATTER: begin
                 case (ghost_id)
 
-                    // Top-right corner
                     GHOST_BLINKY: begin
-                        target_x = GRID_WIDTH - 2;
-                        target_y = 6'd1;
+                        target_x = BLINKY_SCATTER_X;
+                        target_y = BLINKY_SCATTER_Y;
                     end
 
-                    // Top-left corner
                     GHOST_PINKY: begin
-                        target_x = 6'd1;
-                        target_y = 6'd1;
+                        target_x = PINKY_SCATTER_X;
+                        target_y = PINKY_SCATTER_Y;
                     end
 
-                    // Bottom-right corner
                     GHOST_INKY: begin
-                        target_x = GRID_WIDTH - 2;
-                        target_y = GRID_HEIGHT - 2;
+                        target_x = INKY_SCATTER_X;
+                        target_y = INKY_SCATTER_Y;
                     end
 
-                    // Bottom-left corner
                     GHOST_CLYDE: begin
-                        target_x = 6'd1;
-                        target_y = GRID_HEIGHT - 2;
+                        target_x = CLYDE_SCATTER_X;
+                        target_y = CLYDE_SCATTER_Y;
                     end
 
                     default: begin
@@ -81,34 +140,30 @@ module ghost_target #(
             end
 
             G_CHASE: begin
-                case(ghost_id)
+                case (ghost_id)
+
                     GHOST_BLINKY: begin
                         target_x = pacman_x;
                         target_y = pacman_y;
                     end
 
-                    GHOST_PINKY: begin 
-                        if(pacman_dir == 1'b0) begin
-                            target_x = pacman_x + 3'b100;
-                        end else if(pacman_dir == 2'b10) begin
-                            target_x = pacman_x - 3'b100;
-                        end else if(pacman_dir == 2'b01) begin
-                            target_y = pacman_y + 3'b100;
-                        end else begin
-                            target_y = pacman_y - 3'b100;
-                        end
+                    GHOST_PINKY: begin
+                        target_x = pinky_x;
+                        target_y = pinky_y;
                     end
 
                     default: begin
-                        target_x = CAGE_X;
-                        target_y = CAGE_Y;
+                        target_x = pacman_x;
+                        target_y = pacman_y;
                     end
+
                 endcase
             end
 
-            G_FRIGHTENED: begin //is basically ignored since frightened movement is random and is controlled in movement, not as target
-                target_x = ghost_x;
-                target_y = ghost_y;
+            // Movement module ignores target during frightened mode.
+            G_FRIGHTENED: begin
+                target_x = pacman_x;
+                target_y = pacman_y;
             end
 
             default: begin
