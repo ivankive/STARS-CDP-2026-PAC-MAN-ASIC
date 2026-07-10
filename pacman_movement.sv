@@ -1,5 +1,3 @@
-`default_nettype none
-
 module pacman_movement (
     input logic clk,
     input logic reset,
@@ -8,7 +6,7 @@ module pacman_movement (
     output logic [5:0] ypos
 );
 
-    logic [0:35][0:27] maze;
+    logic [27:0] maze [0:35];
 
     initial begin
         $readmemb("maze.mem", maze);
@@ -23,59 +21,96 @@ module pacman_movement (
     } dir_t;
 
     dir_t dir;
+    dir_t next_dir;
+    dir_t store_dir;
+
+    logic [4:0] next_xpos;
+    logic [5:0] next_ypos;
 
     // counter for clock divider
     logic [4:0] count;
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
-            xpos <= 0;
-            ypos <= 0;
-            dir <= RIGHT;
+            xpos  <= 1;
+            ypos  <= 4;
+            dir   <= RIGHT;
             count <= 0;
         end
         else begin
-
-            // last button pressed determines direction
-            if (pb[3])
-                dir <= UP;
-            else if (pb[2])
-                dir <= RIGHT;
-            else if (pb[1])
-                dir <= DOWN;
-            else if (pb[0])
-                dir <= LEFT;
-
-            // move every 19 cycles
             if (count == 19) begin
                 count <= 0;
-
-                case (dir)
-
-                    UP:
-                        if (maze[ypos-1][xpos] == 1)
-                            ypos <= ypos - 1;
-
-                    DOWN:
-                        if (maze[ypos+1][xpos] == 1)
-                            ypos <= ypos + 1;
-
-                    LEFT:
-                        if (maze[ypos][xpos-1] == 1)
-                            xpos <= xpos - 1;
-
-                    RIGHT:
-                        if (maze[ypos][xpos+1] == 1)
-                            xpos <= xpos + 1;
-
-                endcase
+                dir <= next_dir;
+                xpos <= next_xpos;
+                ypos <= next_ypos;
             end
-            else
+            else begin
                 count <= count + 1;
+            end
         end
     end
 
-endmodule
+    always_comb begin
+        store_dir = dir;
+        if (pb[0])
+            store_dir = UP;
+        else if (pb[1])
+            store_dir = RIGHT;
+        else if (pb[2])
+            store_dir = DOWN;
+        else if (pb[3])
+            store_dir = LEFT;
+    end
+
+    always_comb begin
+        next_dir = dir;
+        case (store_dir)
+
+            UP:
+                if (maze[ypos-1][xpos] == 1)
+                    next_dir = store_dir;
+
+            DOWN:
+                if (maze[ypos+1][xpos] == 1)
+                    next_dir = store_dir;
+
+            LEFT:
+                if (maze[ypos][xpos-1] == 1)
+                    next_dir = store_dir;
+
+            RIGHT:
+                if (maze[ypos][xpos+1] == 1)
+                    next_dir = store_dir;
+
+            default: ;
+
+        endcase
+    end
+    
+    always_comb begin
+        next_ypos = ypos;
+        next_xpos = xpos;
+        case (dir)
+
+            UP:
+                if (maze[ypos-1][xpos] == 1)
+                    next_ypos = ypos - 1;
+
+            DOWN:
+                if (maze[ypos+1][xpos] == 1)
+                    next_ypos = ypos + 1;
+
+            LEFT:
+                if (maze[ypos][xpos-1] == 1)
+                    next_xpos = xpos - 1;
+
+            RIGHT:
+                if (maze[ypos][xpos+1] == 1)
+                    next_xpos = xpos + 1;
+            
+            default: ;
+        endcase
+    end
 
 endmodule
 
