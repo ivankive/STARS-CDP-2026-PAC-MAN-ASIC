@@ -36,8 +36,17 @@ module pacman_movement (
             ypos  <= 4;
             dir   <= RIGHT;
             count <= 0;
+            store_dir <= RIGHT;
         end
         else begin
+            if (pb[0])
+                store_dir <= UP;
+            else if (pb[1])
+                store_dir <= RIGHT;
+            else if (pb[2])
+                store_dir <= DOWN;
+            else if (pb[3])
+                store_dir <= LEFT;
             if (count == 19) begin
                 count <= 0;
                 dir <= next_dir;
@@ -48,18 +57,6 @@ module pacman_movement (
                 count <= count + 1;
             end
         end
-    end
-
-    always_comb begin
-        store_dir = dir;
-        if (pb[0])
-            store_dir = UP;
-        else if (pb[1])
-            store_dir = RIGHT;
-        else if (pb[2])
-            store_dir = DOWN;
-        else if (pb[3])
-            store_dir = LEFT;
     end
 
     always_comb begin
@@ -90,7 +87,7 @@ module pacman_movement (
     always_comb begin
         next_ypos = ypos;
         next_xpos = xpos;
-        case (dir)
+        case (next_dir)
 
             UP:
                 if (maze[ypos-1][xpos] == 1)
