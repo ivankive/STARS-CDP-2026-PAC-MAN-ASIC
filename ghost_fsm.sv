@@ -96,7 +96,6 @@ module ghost_fsm (
         end
     end
 
-    // Decoded outputs
     always_comb begin
         ghost_can_move       = (state != G_CAGED);
         dangerous_to_pacman  = (state == G_SCATTER) || (state == G_CHASE);
