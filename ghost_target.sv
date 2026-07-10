@@ -1,27 +1,27 @@
 `timescale 1ns/1ps
 
 module ghost_target #(
-    parameter logic [5:0] GRID_MAX_X = 6'd27,
-    parameter logic [5:0] GRID_MAX_Y = 6'd30,
+    parameter int X_W = 6,
+    parameter int Y_W = 6,
 
-    parameter logic [5:0] CAGE_X = 6'd14,
-    parameter logic [5:0] CAGE_Y = 6'd15,
+    parameter logic [X_W-1:0] GRID_MAX_X = 6'd27,
+    parameter logic [Y_W-1:0] GRID_MAX_Y = 6'd30,
 
-    parameter logic [5:0] BLINKY_SCATTER_X = 6'd26,
-    parameter logic [5:0] BLINKY_SCATTER_Y = 6'd1,
-
-    parameter logic [5:0] PINKY_SCATTER_X  = 6'd1,
-    parameter logic [5:0] PINKY_SCATTER_Y  = 6'd1
+    parameter logic [X_W-1:0] CAGE_X = 6'd14,
+    parameter logic [Y_W-1:0] CAGE_Y = 6'd17
 )(
-    input  logic [1:0] ghost_state,
-    input  logic [1:0] ghost_id,
+    input  logic [1:0]     ghost_state,
+    input  logic           ghost_id,
 
-    input  logic [5:0] pacman_x,
-    input  logic [5:0] pacman_y,
-    input  logic [1:0] pacman_dir,
+    input  logic [X_W-1:0] ghost_x,
+    input  logic [Y_W-1:0] ghost_y,
 
-    output logic [5:0] target_x,
-    output logic [5:0] target_y
+    input  logic [X_W-1:0] pacman_x,
+    input  logic [Y_W-1:0] pacman_y,
+    input  logic [1:0]     pacman_dir,
+
+    output logic [X_W-1:0] target_x,
+    output logic [Y_W-1:0] target_y
 );
 
     // Ghost states
@@ -31,10 +31,8 @@ module ghost_target #(
     localparam logic [1:0] G_FRIGHTENED = 2'd3;
 
     // Ghost IDs
-    localparam logic [1:0] GHOST_BLINKY = 2'd0;
-    localparam logic [1:0] GHOST_PINKY  = 2'd1;
-    localparam logic [1:0] GHOST_INKY   = 2'd2;
-    localparam logic [1:0] GHOST_CLYDE  = 2'd3;
+    localparam logic GHOST_BLINKY = 1'b0;
+    localparam logic GHOST_PINKY  = 1'b1;
 
     // Directions
     localparam logic [1:0] DIR_UP    = 2'd0;
@@ -42,10 +40,16 @@ module ghost_target #(
     localparam logic [1:0] DIR_LEFT  = 2'd2;
     localparam logic [1:0] DIR_RIGHT = 2'd3;
 
-    logic [5:0] pinky_x;
-    logic [5:0] pinky_y;
+    // Scatter corners
+    localparam logic [X_W-1:0] BLINKY_SCATTER_X = GRID_MAX_X;
+    localparam logic [Y_W-1:0] BLINKY_SCATTER_Y = 6'd0;
 
-    // Pinky targets 4 tiles ahead of Pac-Man, saturated at maze edges.
+    localparam logic [X_W-1:0] PINKY_SCATTER_X  = 6'd0;
+    localparam logic [Y_W-1:0] PINKY_SCATTER_Y  = 6'd0;
+
+    logic [X_W-1:0] pinky_x;
+    logic [Y_W-1:0] pinky_y;
+
     always_comb begin
         pinky_x = pacman_x;
         pinky_y = pacman_y;
@@ -53,8 +57,6 @@ module ghost_target #(
         case (pacman_dir)
 
             DIR_UP: begin
-                pinky_x = pacman_x;
-
                 if (pacman_y >= 6'd4)
                     pinky_y = pacman_y - 6'd4;
                 else
@@ -62,8 +64,6 @@ module ghost_target #(
             end
 
             DIR_DOWN: begin
-                pinky_x = pacman_x;
-
                 if (pacman_y <= (GRID_MAX_Y - 6'd4))
                     pinky_y = pacman_y + 6'd4;
                 else
@@ -75,8 +75,6 @@ module ghost_target #(
                     pinky_x = pacman_x - 6'd4;
                 else
                     pinky_x = 6'd0;
-
-                pinky_y = pacman_y;
             end
 
             DIR_RIGHT: begin
@@ -84,8 +82,6 @@ module ghost_target #(
                     pinky_x = pacman_x + 6'd4;
                 else
                     pinky_x = GRID_MAX_X;
-
-                pinky_y = pacman_y;
             end
 
             default: begin
@@ -96,7 +92,6 @@ module ghost_target #(
         endcase
     end
 
-    // Main target selector
     always_comb begin
         target_x = CAGE_X;
         target_y = CAGE_Y;
@@ -110,7 +105,6 @@ module ghost_target #(
 
             G_SCATTER: begin
                 case (ghost_id)
-
                     GHOST_BLINKY: begin
                         target_x = BLINKY_SCATTER_X;
                         target_y = BLINKY_SCATTER_Y;
@@ -121,27 +115,15 @@ module ghost_target #(
                         target_y = PINKY_SCATTER_Y;
                     end
 
-                    GHOST_INKY: begin
-                        target_x = INKY_SCATTER_X;
-                        target_y = INKY_SCATTER_Y;
-                    end
-
-                    GHOST_CLYDE: begin
-                        target_x = CLYDE_SCATTER_X;
-                        target_y = CLYDE_SCATTER_Y;
-                    end
-
                     default: begin
                         target_x = CAGE_X;
                         target_y = CAGE_Y;
                     end
-
                 endcase
             end
 
             G_CHASE: begin
                 case (ghost_id)
-
                     GHOST_BLINKY: begin
                         target_x = pacman_x;
                         target_y = pacman_y;
@@ -156,14 +138,12 @@ module ghost_target #(
                         target_x = pacman_x;
                         target_y = pacman_y;
                     end
-
                 endcase
             end
 
-            // Movement module ignores target during frightened mode.
             G_FRIGHTENED: begin
-                target_x = pacman_x;
-                target_y = pacman_y;
+                target_x = ghost_x;
+                target_y = ghost_y;
             end
 
             default: begin
