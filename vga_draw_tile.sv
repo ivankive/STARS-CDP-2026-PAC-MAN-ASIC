@@ -1,19 +1,19 @@
 module draw_tile(
-    output logic [2:0]  rgb,       //pixel color
     input logic  [9:0]  h_count,   //Horizontal Display Counter (max value is 640px)
-    input logic  [9:0]  v_count    //Vertical Display Counter (maxvalue is 480px)
+    input logic  [9:0]  v_count,   //Vertical Display Counter (maxvalue is 480px)
+    output logic [2:0]  rgb       //pixel color
   );
   //variables
-  logic black_left, black_bottom;
+  logic black_right, black_bottom;
   logic [4:0] tile_y;           // 0-27 Y tiles
-  logic [5:0] tile_x;           // 0-35 X tiles
+  logic [4:0] tile_x;           // 0-35 X tiles
   logic [2:0] pixel_x, pixel_y; //0-7 pixels in tiles
-  logic [9:0] tile_addr;
   logic [1:0] tile_data;
   
   //determine whether pixel is in the map
-  assign black_left   = ((h_count >= 416) && (h_count < 640) && (v_count >= 0)   && (v_count < 480));
-  assign black_bottom = ((h_count >= 0)   && (h_count < 640) && (v_count >= 192) && (v_count < 480));
+  assign black_right   = ((h_count >= 224));
+  assign black_bottom = ((v_count >= (288+24)) && (v_count < 480));
+  assign black_top    = ((v_count >= 0)   && (v_count < 24));
   
   //determine tile location and pixel position in tile
   assign tile_y = v_count[7:3]; //quotient
@@ -21,19 +21,20 @@ module draw_tile(
   assign pixel_y = v_count[2:0]; //remainder
   assign pixel_x = h_count[2:0];
   
-  assign tile_data = 2'b11;
-  //determine tile_data
-    //assign tile_addr = 27 * tile_y + tile_x
-    //get tile data
+  //----------------------------
+  // PULL FROM MAZE_RAM (Not implemented yet)
+  //---------------------------- 
+  assign tile_data = 2'b11; //temporary placeholder
   
   //pixel generator for tile
   always_comb begin
     //draw black if not on map
-    if (black_left)
+    if (black_right)
       rgb = 3'b000;
     else if (black_bottom)
       rgb = 3'b000;
-  
+    else if (black_top)
+      rgb = 3'b000;
     //draw blue wall if applicable
     else if (tile_data == 2'b01) begin // wall
       rgb = 3'b001;
@@ -59,12 +60,13 @@ module draw_tile(
           rgb = 3'b000;
         else
           rgb = 3'b111;
-  
-      end else
+      end 
+    else
         rgb = 3'b000;
     end
   
     else
       rgb = 3'b000; // blank
   end
-  endmodule
+
+endmodule

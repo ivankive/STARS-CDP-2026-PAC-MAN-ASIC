@@ -5,8 +5,7 @@ module vga_counter (
     output logic hsync,
     output logic vsync,
     output logic [9:0] hcount,
-    output logic [9:0] vcount,
-    output logic video_on
+    output logic [9:0] vcount
 );
 
     //------------------------------------------------------------
@@ -75,17 +74,5 @@ module vga_counter (
         else
             vsync = 1;
     end
-
-    //------------------------------------------------------------
-    // Visible Area
-    //------------------------------------------------------------
-
-    assign video_on =
-        (hcount < H_VISIBLE) &&
-        (vcount < V_VISIBLE);
-
-    //------------------------------------------------------------
-    // RGB Output (8 Vertical Color Bars)
-    //------------------------------------------------------------
 
 endmodule
