@@ -1,6 +1,7 @@
 module vga_draw_text(
     input logic  [9:0] h_count,    //Horizontal Display Counter (max value is 640px)
     input logic  [9:0] v_count,    //Vertical Display Counter (maxvalue is 480px)
+    input logic        video_on,   //video on signal from vga_counter
     input logic  [2:0] input_rgb,  //pixel color from draw_tile
     output logic [2:0] output_rgb  //pixel color
   );

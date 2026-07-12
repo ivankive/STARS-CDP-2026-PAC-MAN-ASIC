@@ -18,13 +18,15 @@ module top (
   // Your code goes here...
   logic [9:0] hcount, vcount;
   logic [4:0] pacman_x, pacman_y;
+  logic [1:0] pacman_dir;
 
   pacman_movement pacman_controller(
-    .clk  (hz100),
-    .reset(reset),
-    .pb   ({pb[3],pb[2],pb[1],pb[6]}),
-    .xpos (pacman_x),
-    .ypos (pacman_y)
+    .clk       (hz100),
+    .reset     (reset),
+    .pb        ({pb[3],pb[2],pb[1],pb[6]}),
+    .xpos      (pacman_x),
+    .ypos      (pacman_y),
+    .direction (pacman_dir)
   );
 
   vga_controller_top vga_controller(
@@ -35,6 +37,7 @@ module top (
     .vsync    (left[4]),
     .pacman_x (pacman_x),
     .pacman_y (pacman_y)
+    .pacman_dir(pacman_dir)
   );
 
   

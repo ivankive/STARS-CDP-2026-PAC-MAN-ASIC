@@ -1,8 +1,10 @@
 module vga_draw_sprite(
     input logic  [9:0] h_count,    //Horizontal Display Counter (max value is 640px)
     input logic  [9:0] v_count,    //Vertical Display Counter (maxvalue is 480px)
+    input logic        video_on,   //video on signal from vga_counter
     input logic  [4:0] pacman_x,   //pacman tile x position
     input logic  [4:0] pacman_y,   //pacman tile y position
+    input logic  [1:0] pacman_dir, //pacman direction
     input logic  [2:0] input_rgb,  //pixel color from draw_tile
     output logic [2:0] output_rgb  //pixel color
   );
@@ -10,7 +12,7 @@ module vga_draw_sprite(
   logic [4:0] tile_y;           // 0-27 Y tiles
   logic [4:0] tile_x;           // 0-35 X tiles
   logic [2:0] pixel_x, pixel_y; //0-7 pixels in tiles
-  logic draw_pacman;
+  logic draw_pacman, draw_circle;
   
   //determine tile location and pixel position of VGA
   assign tile_y = v_count[7:3]+24; //quotient
@@ -24,8 +26,16 @@ module vga_draw_sprite(
   //pixel generator for tile
   always_comb begin
     //draw black if not on map
-    if (draw_pacman)
-      output_rgb = 3'b110;
+    if (draw_pacman && video_on) begin
+        if (pacman_dir == 2'b00)      //up?
+          output_rgb = 3'b100;
+        else if (pacman_dir == 2'b01) //down?
+          output_rgb = 3'b010;
+        else if (pacman_dir == 2'b10) //left?
+          output_rgb = 3'b011;
+        else                          //right?
+          output_rgb = 3'b110;
+    end
     else
       output_rgb = input_rgb;
   end

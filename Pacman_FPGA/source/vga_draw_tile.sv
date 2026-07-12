@@ -1,7 +1,8 @@
 module vga_draw_tile(
-    input logic  [9:0]  h_count,   //Horizontal Display Counter (max value is 640px)
-    input logic  [9:0]  v_count,   //Vertical Display Counter (maxvalue is 480px)
-    output logic [2:0]  output_rgb       //pixel color
+    input logic  [9:0] h_count,   //Horizontal Display Counter (max value is 640px)
+    input logic  [9:0] v_count,   //Vertical Display Counter (maxvalue is 480px)
+    input logic        video_on,   //video on signal from vga_counter
+    output logic [2:0] output_rgb  //pixel color
   );
   //variables
   logic black_right, black_bottom, black_top;
@@ -60,6 +61,8 @@ module vga_draw_tile(
   
   //pixel generator for tile
   always_comb begin
+    //draw black if not on map
+
     if (tile_data == 2'b01) begin // wall
       output_rgb = 3'b001;
     end
@@ -86,11 +89,11 @@ module vga_draw_tile(
           output_rgb = 3'b111;
       end 
     else
-        output_rgb = 3'b000;
+        output_rgb = 3'b000; //black
     end
-  
-    else
-      output_rgb = 3'b000; // blank
+    
+    if (~video_on)
+      output_rgb = 3'b000;
   end
 
 endmodule

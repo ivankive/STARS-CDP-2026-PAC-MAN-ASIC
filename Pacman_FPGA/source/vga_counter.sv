@@ -5,7 +5,8 @@ module vga_counter (
     output logic hsync,
     output logic vsync,
     output logic [9:0] hcount,
-    output logic [9:0] vcount
+    output logic [9:0] vcount,
+    output logic video_on
 );
 
     //------------------------------------------------------------
@@ -74,5 +75,7 @@ module vga_counter (
         else
             vsync = 1;
     end
+
+    assign video_on = (hcount < H_VISIBLE) && (vcount < V_VISIBLE);
 
 endmodule

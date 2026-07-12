@@ -3,7 +3,8 @@ module pacman_movement (
     input logic reset,
     input logic [3:0] pb,
     output logic [4:0] xpos, 
-    output logic [4:0] ypos
+    output logic [4:0] ypos,
+    output logic [1:0] direction
 );
 
     logic [27:0] maze [0:30];
@@ -139,5 +140,7 @@ module pacman_movement (
             default: ;
         endcase
     end
+
+    assign direction = store_dir;
 
 endmodule

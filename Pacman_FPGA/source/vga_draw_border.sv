@@ -1,6 +1,7 @@
 module vga_draw_border(
     input logic  [9:0] h_count,    //Horizontal Display Counter (max value is 640px)
     input logic  [9:0] v_count,    //Vertical Display Counter (maxvalue is 480px)
+    input logic        video_on,   //video on signal from vga_counter
     input logic  [2:0] input_rgb,  //pixel color from draw_sprite
     output logic [2:0] output_rgb  //pixel color
   );
@@ -17,7 +18,9 @@ module vga_draw_border(
   //pixel generator for tile
   always_comb begin
     //draw black if not on map
-    if (black_right)
+    if (~video_on)
+      output_rgb = 3'b000;
+    else if (black_right)
       output_rgb = 3'b000;
     else if (black_bottom)
       output_rgb = 3'b000;
