@@ -1,59 +1,82 @@
-module initial_maze_rom #(
-    parameter int GRID_W = 28,
-    parameter int GRID_H = 36,
-    parameter int X_W = 6,
-    parameter int Y_W = 6,
-    parameter string INIT_FILE = "maze.mem",
-    parameter logic WALL_BIT = 1'b1
+module initial_maze_rom (
+    // Port A: reload or Pac-Man movement
+    input  logic [4:0] x_a,
+    input  logic [4:0] y_a,
+    output logic [1:0] tile_a,
+    output logic       can_move_a,
 
-)(
-    input  logic clk,
-    input  logic reset,
-
-    // Port A: Pac-Man movement checker
-
-    input  logic [X_W-1:0] pac_x,
-    input  logic [Y_W-1:0] pac_y,
-    output logic           pac_is_wall,
-    output logic           pac_can_move,
- 
-    // Port B: Ghost movement checker
-
-    input  logic [X_W-1:0] ghost_x,
-    input  logic [Y_W-1:0] ghost_y,
-    output logic           ghost_is_wall,
-    output logic           ghost_can_move
+    // Port B: ghost movement
+    input  logic [4:0] x_b,
+    input  logic [4:0] y_b,
+    output logic [1:0] tile_b,
+    output logic       can_move_b
 );
 
-    logic [GRID_W-1:0] maze_rows [0:GRID_H-1];
-    initial begin
-        $readmemb(INIT_FILE, maze_rows);
-    end
+    localparam logic [1:0] WALL_TILE = 2'b01;
 
-    function automatic logic get_tile_bit;
-        input logic [X_W-1:0] x;
-        input logic [Y_W-1:0] y;
+    function automatic logic [55:0] row_data;
+        input logic [4:0] y;
         begin
-            if ((x >= GRID_W) || (y >= GRID_H)) begin
-                get_tile_bit = WALL_BIT;
-            end else begin
-                get_tile_bit = maze_rows[y][GRID_W - 1 - x];
-            end
+            case (y)
+                5'd0:  row_data = 56'b01010101010101010101010101010101010101010101010101010101;
+                5'd1:  row_data = 56'b01101010101010101010101010010110101010101010101010101001;
+                5'd2:  row_data = 56'b01100101010110010101010110010110010101010110010101011001;
+                5'd3:  row_data = 56'b01110101010110010101010110010110010101010110010101011101;
+                5'd4:  row_data = 56'b01100101010110010101010110010110010101010110010101011001;
+                5'd5:  row_data = 56'b01101010101010101010101010101010101010101010101010101001;
+                5'd6:  row_data = 56'b01100101010110010110010101010101010110010110010101011001;
+                5'd7:  row_data = 56'b01100101010110010110010101010101010110010110010101011001;
+                5'd8:  row_data = 56'b01101010101010010110101010010110101010010110101010101001;
+                5'd9:  row_data = 56'b01010101010110010101010100010100010101010110010101010101;
+                5'd10: row_data = 56'b01010101010110010101010100010100010101010110010101010101;
+                5'd11: row_data = 56'b01010101010110010100000000000000000000010110010101010101;
+                5'd12: row_data = 56'b01010101010110010100010101000001010100010110010101010101;
+                5'd13: row_data = 56'b01010101010110010100010000000000000100010110010101010101;
+                5'd14: row_data = 56'b00000000000010000000010000000000000100000010000000000000;
+                5'd15: row_data = 56'b01010101010110010100010000000000000100010110010101010101;
+                5'd16: row_data = 56'b01010101010110010100010101010101010100010110010101010101;
+                5'd17: row_data = 56'b01010101010110010100000000000000000000010110010101010101;
+                5'd18: row_data = 56'b01010101010110010100010101010101010100010110010101010101;
+                5'd19: row_data = 56'b01010101010110010100010101010101010100010110010101010101;
+                5'd20: row_data = 56'b01101010101010101010101010010110101010101010101010101001;
+                5'd21: row_data = 56'b01100101010110010101010110010110010101010110010101011001;
+                5'd22: row_data = 56'b01100101010110010101010110010110010101010110010101011001;
+                5'd23: row_data = 56'b01111010010110101010101010000010101010101010010110101101;
+                5'd24: row_data = 56'b01010110010110010110010101010101010110010110010110010101;
+                5'd25: row_data = 56'b01010110010110010110010101010101010110010110010110010101;
+                5'd26: row_data = 56'b01101010101010010110101010010110101010010110101010101001;
+                5'd27: row_data = 56'b01100101010101010101010110010110010101010101010101011001;
+                5'd28: row_data = 56'b01100101010101010101010110010110010101010101010101011001;
+                5'd29: row_data = 56'b01101010101010101010101010101010101010101010101010101001;
+                5'd30: row_data = 56'b01010101010101010101010101010101010101010101010101010101;
+            endcase
         end
     endfunction
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            pac_is_wall   <= 1'b1;
-            pac_can_move  <= 1'b0;
-            ghost_is_wall <= 1'b1;
-            ghost_can_move <= 1'b0;
-
-        end else begin
-            pac_is_wall   <= (get_tile_bit(pac_x, pac_y) == WALL_BIT);
-            pac_can_move  <= (get_tile_bit(pac_x, pac_y) != WALL_BIT);
-            ghost_is_wall <= (get_tile_bit(ghost_x, ghost_y) == WALL_BIT);
-            ghost_can_move <= (get_tile_bit(ghost_x, ghost_y) != WALL_BIT);
+    function automatic logic [5:0] bit_hi;
+        input logic [4:0] x;
+        begin
+            bit_hi = 6'd55 - ({1'b0, x} << 1);
         end
+    endfunction
+
+    function automatic logic [1:0] tile_from_xy;
+        input logic [4:0] x;
+        input logic [4:0] y;
+        begin
+            if ((x < 5'd28) && (y < 5'd31))
+                tile_from_xy = row_data(y)[bit_hi(x) -: 2];
+            else
+                tile_from_xy = WALL_TILE;
+        end
+    endfunction
+
+    always_comb begin
+        tile_a = tile_from_xy(x_a, y_a);
+        tile_b = tile_from_xy(x_b, y_b);
+
+        can_move_a = (tile_a != WALL_TILE);
+        can_move_b = (tile_b != WALL_TILE);
     end
+
 endmodule

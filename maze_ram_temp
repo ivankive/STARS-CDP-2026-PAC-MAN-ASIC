@@ -18,37 +18,33 @@ module maze_ram (
     input  logic       write_en,
     output logic [1:0] rdata_central,
 
-    // Initial maze ROM interface
-    output logic [9:0] rom_addr,
+    // Initial maze ROM interface, asynchronous x/y read
+    output logic [4:0] rom_x,
+    output logic [4:0] rom_y,
     input  logic [1:0] rom_data
 );
 
     localparam logic [1:0] PATH_TILE = 2'b00;
     localparam logic [1:0] WALL_TILE = 2'b01;
 
-    localparam logic [9:0] LAST_ADDR = 10'd867;
-
     logic [55:0] maze_rows [0:30];
 
     typedef enum logic [1:0] {
         R_IDLE,
-        R_WAIT_ROM,
         R_WRITE_TILE,
         R_DONE
     } reload_state_t;
 
     reload_state_t state;
 
-    logic [9:0] load_addr;
-    logic [9:0] rom_addr_reg;
-
     logic [4:0] load_x;
     logic [4:0] load_y;
 
     logic reload_write;
-
-    assign rom_addr     = rom_addr_reg;
     assign reload_write = (state == R_WRITE_TILE);
+
+    assign rom_x = load_x;
+    assign rom_y = load_y;
 
     function automatic logic in_bounds;
         input logic [4:0] x;
@@ -65,48 +61,33 @@ module maze_ram (
         end
     endfunction
 
-    // Reload FSM: initial ROM -> live row-packed Maze RAM
+    // Reload FSM: async initial ROM -> live row-packed Maze RAM
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
-            state        <= R_IDLE;
-            load_addr    <= 10'd0;
-            rom_addr_reg <= 10'd0;
-            load_x       <= 5'd0;
-            load_y       <= 5'd0;
-            map_loaded   <= 1'b0;
+            state      <= R_IDLE;
+            load_x     <= 5'd0;
+            load_y     <= 5'd0;
+            map_loaded <= 1'b0;
         end else begin
             if (map_rst) begin
-                state        <= R_WAIT_ROM;
-                load_addr    <= 10'd0;
-                rom_addr_reg <= 10'd0;
-                load_x       <= 5'd0;
-                load_y       <= 5'd0;
-                map_loaded   <= 1'b0;
+                state      <= R_WRITE_TILE;
+                load_x     <= 5'd0;
+                load_y     <= 5'd0;
+                map_loaded <= 1'b0;
             end else begin
                 case (state)
 
                     R_IDLE: begin
                     end
 
-                    R_WAIT_ROM: begin
-                        state <= R_WRITE_TILE;
-                    end
-
                     R_WRITE_TILE: begin
-                        if (load_addr == LAST_ADDR) begin
+                        if ((load_x == 5'd27) && (load_y == 5'd30)) begin
                             state <= R_DONE;
+                        end else if (load_x == 5'd27) begin
+                            load_x <= 5'd0;
+                            load_y <= load_y + 5'd1;
                         end else begin
-                            load_addr    <= load_addr + 10'd1;
-                            rom_addr_reg <= load_addr + 10'd1;
-
-                            if (load_x == 5'd27) begin
-                                load_x <= 5'd0;
-                                load_y <= load_y + 5'd1;
-                            end else begin
-                                load_x <= load_x + 5'd1;
-                            end
-
-                            state <= R_WAIT_ROM;
+                            load_x <= load_x + 5'd1;
                         end
                     end
 
@@ -136,7 +117,7 @@ module maze_ram (
             rdata_vga <= WALL_TILE;
         end
     end
-    
+
     // Port B: Central Control read/write or reload write
     always_ff @(posedge clk) begin
         if (reload_write) begin
