@@ -8,12 +8,6 @@ module vga_counter (
     output logic [9:0] vcount,
     output logic video_on
 );
-
-    //------------------------------------------------------------
-    // VGA Timing for ~12 MHz Pixel Clock
-    // Approx. 320x480 @60Hz (each pixel can be doubled horizontally)
-    //------------------------------------------------------------
-
     localparam H_VISIBLE = 640;
     localparam H_FRONT   = 16;
     localparam H_SYNC    = 96;
@@ -26,10 +20,7 @@ module vga_counter (
     localparam V_BACK    = 33;
     localparam V_TOTAL   = 525;
 
-    //------------------------------------------------------------
     // Horizontal & Vertical Counters
-    //------------------------------------------------------------
-
     always_ff @(posedge clk or posedge rst) begin
         if (rst) begin
             hcount <= 0;
@@ -52,10 +43,7 @@ module vga_counter (
         end
     end
 
-    //------------------------------------------------------------
     // HSYNC (Active Low)
-    //------------------------------------------------------------
-
     always_comb begin
         if ((hcount >= H_VISIBLE + H_FRONT) &&
             (hcount < H_VISIBLE + H_FRONT + H_SYNC))
@@ -64,10 +52,7 @@ module vga_counter (
             hsync = 1;
     end
 
-    //------------------------------------------------------------
     // VSYNC (Active Low)
-    //------------------------------------------------------------
-
     always_comb begin
         if ((vcount >= V_VISIBLE + V_FRONT) &&
             (vcount < V_VISIBLE + V_FRONT + V_SYNC))
