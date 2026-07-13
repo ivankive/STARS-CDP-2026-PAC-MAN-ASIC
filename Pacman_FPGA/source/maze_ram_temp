@@ -106,7 +106,13 @@ module maze_ram (
     end
 
     // Port A: VGA read-only
-    always_ff @(posedge clk) begin
+    assign rdata_vga = in_bound(x_vga, y_vga)? maze_rows [y_vga][(6'd55 - x_vga*2) -:2]: WALL_TILE;
+    
+    
+    
+    
+    
+    /* always_ff @(posedge clk) begin
         if (reload_write && (x_vga == load_x) && (y_vga == load_y)) begin
             rdata_vga <= rom_data;
         end else if (map_loaded && write_en && (x_vga == x_central) && (y_vga == y_central)) begin
@@ -115,8 +121,7 @@ module maze_ram (
             rdata_vga <= maze_rows[y_vga][bit_hi(x_vga) -: 2];
         end else begin
             rdata_vga <= WALL_TILE;
-        end
-    end
+        end */
 
     // Port B: Central Control read/write or reload write
     always_ff @(posedge clk) begin
