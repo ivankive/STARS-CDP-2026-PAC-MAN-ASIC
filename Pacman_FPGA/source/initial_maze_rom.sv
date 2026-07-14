@@ -1,5 +1,3 @@
-`timescale 1ns/1ps
-
 module initial_maze_rom (
     // Port A: reload or Pac-Man movement
     input  logic [4:0] x_a,
@@ -13,6 +11,7 @@ module initial_maze_rom (
     output logic [1:0] tile_b,
     output logic       can_move_b
 );
+    logic [1:0] comb_tile_a, comb_tile_b;
 
     localparam logic [1:0] PATH_TILE  = 2'b00;
     localparam logic [1:0] WALL_TILE  = 2'b01;
@@ -63,30 +62,33 @@ module initial_maze_rom (
         end
     endfunction
 
-    function automatic logic [5:0] bit_hi;
-        input logic [4:0] x;
-        begin
-            bit_hi = 6'd55 - ({1'b0, x} << 1);
-        end
-    endfunction
-
-    function automatic logic [1:0] tile_from_xy;
-        input logic [4:0] x;
-        input logic [4:0] y;
-        begin
-            if (in_bounds(x, y))
-                tile_from_xy = maze[y][bit_hi(x) -: 2];
-            else
-                tile_from_xy = WALL_TILE;
-        end
-    endfunction
-
     always_comb begin
-        tile_a = tile_from_xy(x_a, y_a);
-        tile_b = tile_from_xy(x_b, y_b);
+        comb_tile_a = maze[y_a][(6'd55 - x_a*2) -: 2];
+        comb_tile_b = maze[y_b][(6'd55 - x_b*2) -: 2];
 
-        can_move_a = (tile_a != WALL_TILE);
-        can_move_b = (tile_b != WALL_TILE);
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            tile_a     <= WALL_TILE;
+            tile_b     <= WALL_TILE;
+            can_move_a <= 1'b0;
+            can_move_b <= 1'b0;
+        end else begin
+            if (in_bounds(x_a, y_a)) begin
+                tile_a     <= comb_tile_a;
+                can_move_a <= (comb_tile_a != WALL_TILE);
+            end else begin
+                tile_a     <= WALL_TILE;
+                can_move_a <= 1'b0;
+            end
+
+            if (in_bounds(x_b, y_b)) begin
+                tile_b     <= comb_tile_b;
+                can_move_b <= (comb_tile_b != WALL_TILE);
+            end else begin
+                tile_b     <= WALL_TILE;
+                can_move_b <= 1'b0;
+            end
+        end
     end
 
 endmodule
