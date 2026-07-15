@@ -43,7 +43,7 @@ module vga_controller_top(
             vcount_d   <= 10'd0;
             hsync_d    <= 1'b1;
             vsync_d    <= 1'b1;
-            video_o_d <= 1'b0;
+            video_on_d <= 1'b0;
         end else begin
             hcount_d   <= hcount_raw;
             vcount_d   <= vcount_raw;
@@ -59,6 +59,7 @@ module vga_controller_top(
     vga_draw_tile draw_tile (
         .h_count_raw (hcount_raw),
         .v_count_raw (vcount_raw),
+        .video_on_raw(video_on_raw),
         .h_count_d   (hcount_d),
         .v_count_d   (vcount_d),
         .video_on_d  (video_on_d),

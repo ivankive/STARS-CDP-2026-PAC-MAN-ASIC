@@ -23,8 +23,7 @@ module vga_draw_tile(
   //variables
   logic black_right, black_bottom, black_top;
   logic [4:0] tile_x_raw, tile_y_raw;
-  logic [2:0] pixel_x_d, [2:0] pixel_y_d;
-  logic [1:0] tile_data;
+  logic [2:0] pixel_x_d, pixel_y_d;
   
   //determine tile location and pixel position in tile
   assign tile_x_raw = h_count_raw[7:3];
@@ -34,12 +33,14 @@ module vga_draw_tile(
 
   assign in_map_raw = video_on_raw && (tile_x_raw < 5'd28) && (tile_y_raw < 5'd31);
 
-  if (in_map_raw) begin
-    x_vga = tile_x_raw;
-    y_vga = tile_y_raw;
-  end else begin
-    x_vga = 5'd0;
-    y_vga = 5'd0;
+  always_comb begin
+    if (in_map_raw) begin
+      x_vga = tile_x_raw;
+      y_vga = tile_y_raw;
+    end else begin
+      x_vga = 5'd0;
+      y_vga = 5'd0;
+    end
   end
 
   assign in_map_d = video_on_d && ((h_count_d[7:3]) < 5'd28) && ((v_count_d[7:3] + 5'd24) < 5'd31);
@@ -54,7 +55,7 @@ module vga_draw_tile(
         2'b0: begin 
           output_rgb = 3'b000;
         end
-        2;b01: begin
+        2'b01: begin
           output_rgb = 3'b001;
         end
         2'b10: begin
@@ -64,7 +65,7 @@ module vga_draw_tile(
             output_rgb = 3'b000;
           end
         end
-        2b'11: begin
+        2'b11: begin
           if ((pixel_x_d > 3'd0) && (pixel_x_d < 3'd7) && (pixel_y_d > 3'd0) && (pixel_y_d < 3'd7)) begin
             if ((pixel_x_d == 3'd1 || pixel_x_d == 3'd6) && (pixel_y_d == 3'd1 || pixel_y_d == 3'd6)) begin
               output_rgb = 3'b000;

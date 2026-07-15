@@ -3,16 +3,20 @@ module top (
   // I/O ports
   input  logic hz100, reset,
   input  logic [20:0] pb,
-  output logic [7:0] left, right,
-         ss7, ss6, ss5, ss4, ss3, ss2, ss1, ss0,
+  output logic [7:0] left, right, ss7, ss6, ss5, ss4, ss3, ss2, ss1, ss0,
   output logic red, green, blue,
+
+  // UART ports
+  output logic [7:0] txdata,
+  input  logic [7:0] rxdata,
+  output logic txclk, rxclk,
+  input  logic txready, rxready
 );
   logic [9:0] hcount, vcount;
 
   // Game state
   logic [1:0] game_state;
   logic       map_loaded;
-  logic       map_rst_pulse;
 
   // pacman
   logic [4:0] pacman_x, pacman_y;
@@ -23,7 +27,7 @@ module top (
   logic       pac_rom_can_move;
 
   //RAM VGA read port
-  logic [4:0] x_vga, y_vga,
+  logic [4:0] x_vga, y_vga;
   logic [1:0] rdata_vga;
 
   //RAM Central read/write port
@@ -45,8 +49,8 @@ module top (
   logic [1:0] tile_b;
   logic       ghost_rom_can_move;
 
-  assign rom_x_a = (game_state == STARTING) ? reload_rom_x : pac_rom_x;
-  assign rom_y_a = (game_state == STARTING) ? reload_rom_y : pac_rom_y;
+  assign rom_x_a = (game_state == 2'b0) ? reload_rom_x : pac_rom_x;
+  assign rom_y_a = (game_state == 2'b0) ? reload_rom_y : pac_rom_y;
   assign reload_rom_data = rom_tile_a;
   assign pac_rom_can_move = rom_can_move_a;
 
@@ -60,33 +64,41 @@ module top (
   assign write_en  = 1'b0;
 
   pacman_movement pacman_controller(
-    .clk       (hz100),
-    .reset     (reset),
-    .pb        ({pb[3],pb[2],pb[1],pb[6]}),
-    .xpos      (pacman_x),
-    .ypos      (pacman_y),
-    .direction (pacman_dir)
+    .clk          (hz100),
+    .reset        (reset),
+    .enable       ((game_state == 2'b01) && map_loaded),
+    .pb           ({pb[3], pb[2], pb[1], pb[6]}),
+    .rom_x        (pac_rom_x),
+    .rom_y        (pac_rom_y),
+    .rom_can_move (pac_rom_can_move),
+    .xpos         (pacman_x),
+    .ypos         (pacman_y),
+    .direction    (pacman_dir)
   );
 
   vga_controller_top vga_controller(
-    .pixel_clk(hz100),
-    .rst      (reset),
-    .rgb      ({right[3:1]}),
-    .hsync    (left[3]),
-    .vsync    (left[4]),
-    .pacman_x (pacman_x),
-    .pacman_y (pacman_y)
-    .pacman_dir(pacman_dir)
+    .pixel_clk  (hz100),
+    .rst        (reset),
+    .rgb        ({right[3:1]}),
+    .hsync      (left[3]),
+    .vsync      (left[4]),
+    .x_vga      (x_vga),
+    .y_vga      (y_vga),
+    .rdata_vga  (rdata_vga),
+    .map_loaded (map_loaded),
+    .pacman_x   (pacman_x),
+    .pacman_y   (pacman_y),
+    .pacman_dir (pacman_dir)
   );
 
   game_fsm game_fsm(
-    .clk          (clk),
+    .clk          (hz100),
     .reset        (reset),
     .map_rst      (1'b0),
     .reload_done  (map_loaded),
     .lives        (2'd3),
     .game_state   (game_state)
-  )
+  );
 
   maze_ram_temp maze_ram(
     .clk            (hz100),
@@ -103,7 +115,7 @@ module top (
     .rom_x          (reload_rom_x),
     .rom_y          (reload_rom_y),
     .rom_data       (reload_rom_data)
-  )
+  );
 
   initial_maze_rom maze_rom(
     .x_a        (rom_x_a),
@@ -114,8 +126,6 @@ module top (
     .y_b        (ghost_rom_y),
     .tile_b     (tile_b),
     .can_move_b (ghost_rom_can_move)
-  )
-
-  
+  );
 
 endmodule

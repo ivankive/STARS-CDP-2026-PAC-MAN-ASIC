@@ -1,6 +1,4 @@
-`timescale 1ns/1ps
-
-module maze_ram (
+module maze_ram_temp (
     input  logic       clk,
     input  logic       reset,
 
@@ -106,7 +104,7 @@ module maze_ram (
             end else if (map_loaded && write_en && in_bounds(x_vga, y_vga) && (x_vga == x_central) && (y_vga == y_central)) begin
                 rdata_vga <= PATH_TILE; //bypass
             end else if (in_bounds(x_vga, y_vga)) begin
-                rdata_vga <= maze_rows[y_vga][(6'd55 - x*2) -: 2];
+                rdata_vga <= maze_rows[y_vga][(6'd55 - x_vga*2) -: 2];
             end else begin
                 rdata_vga <= WALL_TILE;
             end
@@ -119,14 +117,14 @@ module maze_ram (
             rdata_central <= WALL_TILE;
         end else begin
             if (reload_write) begin
-                maze_rows[load_y][(6'd55 - x*2) -: 2] <= rom_data;
+                maze_rows[load_y][(6'd55 - load_x*2) -: 2] <= rom_data;
                 rdata_central <= WALL_TILE;
             end else if (map_loaded) begin
                 if (write_en && in_bounds(x_central, y_central)) begin
-                    maze_rows[y_central][(6'd55 - x*2) -: 2] <= PATH_TILE;
+                    maze_rows[y_central][(6'd55 - x_central*2) -: 2] <= PATH_TILE;
                     rdata_central <= PATH_TILE;
                 end else if (in_bounds(x_central, y_central)) begin
-                    rdata_central <= maze_rows[y_central][(6'd55 - x*2) -: 2];
+                    rdata_central <= maze_rows[y_central][(6'd55 - x_central*2) -: 2];
                 end else begin
                     rdata_central <= WALL_TILE;
                 end
