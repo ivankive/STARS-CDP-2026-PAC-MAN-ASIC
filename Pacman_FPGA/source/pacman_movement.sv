@@ -1,12 +1,13 @@
 module pacman_movement (
-    input logic clk,
-    input logic reset,
-    input logic [3:0] pb,
+    input  logic clk,
+    input  logic reset,
+    input  logic [3:0] pb,
+    input  logic pac_can_move_right, pac_can_move_left, pac_can_move_up, pac_can_move_down,
     output logic [4:0] xpos, 
     output logic [4:0] ypos,
     output logic [1:0] direction
 );
-
+/*
     logic [27:0] maze [0:30];
 
     initial begin
@@ -42,6 +43,7 @@ module pacman_movement (
         maze[29] = 28'b0111111111111111111111111110;
         maze[30] = 28'b0000000000000000000000000000;
     end
+    */
       
     // direction enums
     typedef enum logic [1:0] {
@@ -96,19 +98,19 @@ module pacman_movement (
         case (store_dir)
 
             UP:
-                if (maze[ypos-1][xpos] == 1)
+                if (pac_can_move_down)//maze[ypos-1][xpos] == 1)
                     next_dir = store_dir;
 
             DOWN:
-                if (maze[ypos+1][xpos] == 1)
+                if (pac_can_move_up)//maze[ypos+1][xpos] == 1)
                     next_dir = store_dir;
 
             LEFT:
-                if (maze[ypos][xpos-1] == 1)
+                if (pac_can_move_left)//maze[ypos][xpos-1] == 1)
                     next_dir = store_dir;
 
             RIGHT:
-                if (maze[ypos][xpos+1] == 1)
+                if (pac_can_move_right)//maze[ypos][xpos+1] == 1)
                     next_dir = store_dir;
 
             default: ;
@@ -122,15 +124,15 @@ module pacman_movement (
         case (next_dir)
 
             UP:
-                if (maze[ypos-1][xpos] == 1)
+                if (pac_can_move_up)//maze[ypos-1][xpos] == 1)
                     next_ypos = ypos - 1;
 
             DOWN:
-                if (maze[ypos+1][xpos] == 1)
+                if (pac_can_move_down)//maze[ypos+1][xpos] == 1)
                     next_ypos = ypos + 1;
 
             LEFT:
-                if (maze[ypos][xpos-1] == 1)
+                if ()//maze[ypos][xpos-1] == 1)
                     next_xpos = xpos - 1;
 
             RIGHT:

@@ -57,7 +57,7 @@ module vga_draw_tile(
 
   // this says grab the height and then grab the  x tile , multiply it by 2 and starting at bit tile_x*2, take 2 bits going up. 
     // this notation was given by claude
-  assign tile_data = maze[tile_y][tile_x*2 +: 2]; 
+  assign tile_data = maze[tile_y][(6'd55 - tile_x*2) +: 2]; 
   
   //pixel generator for tile
   always_comb begin
