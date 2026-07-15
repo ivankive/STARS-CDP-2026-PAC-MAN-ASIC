@@ -98,11 +98,11 @@ module pacman_movement (
         case (store_dir)
 
             UP:
-                if (pac_can_move_down)//maze[ypos-1][xpos] == 1)
+                if (pac_can_move_up)//maze[ypos-1][xpos] == 1)
                     next_dir = store_dir;
 
             DOWN:
-                if (pac_can_move_up)//maze[ypos+1][xpos] == 1)
+                if (pac_can_move_down)//maze[ypos+1][xpos] == 1)
                     next_dir = store_dir;
 
             LEFT:
@@ -113,7 +113,7 @@ module pacman_movement (
                 if (pac_can_move_right)//maze[ypos][xpos+1] == 1)
                     next_dir = store_dir;
 
-            default: ;
+            //default: ;
 
         endcase
     end
@@ -132,17 +132,17 @@ module pacman_movement (
                     next_ypos = ypos + 1;
 
             LEFT:
-                if ()//maze[ypos][xpos-1] == 1)
-                    next_xpos = xpos - 1;
+                if (pac_can_move_left)//maze[ypos][xpos-1] == 1)
+                    next_xpos = (xpos == 5'd0)? 5'd27 : xpos - 1;
 
             RIGHT:
-                if (maze[ypos][xpos+1] == 1)
-                    next_xpos = xpos + 1;
+                if (pac_can_move_right)//maze[ypos][xpos+1] == 1)
+                    next_xpos = (xpos == 5'd27)? 5'd0 : xpos + 1;
             
-            default: ;
+            //default: ;
         endcase
     end
 
-    assign direction = store_dir;
+    assign direction = dir;
 
 endmodule

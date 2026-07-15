@@ -14,10 +14,7 @@ module maze_rom (
     // Port C: RAM Reload
     input  logic [4:0] x_c,
     input  logic [4:0] y_c,
-    output logic [1:0] tile_c,
-
-
-);
+    output logic [1:0] tile_c);
 
     localparam logic [1:0] PATH_TILE  = 2'b00;
     localparam logic [1:0] WALL_TILE  = 2'b01;
@@ -77,11 +74,12 @@ module maze_rom (
     function automatic logic [1:0] tile_from_xy;
         input logic [4:0] x;
         input logic [4:0] y;
+        logic [55:0] row; 
         begin
-            if (in_bounds(x, y))
-                row = maze_row(y)
-                tile_form_xy = row[(6'd55 - tile_x*2) -: 2];
-            else
+            if (in_bounds(x, y)) begin
+                row = maze_row(y);
+                tile_from_xy = row[(6'd55 - x*2) -: 2];
+            end else
                 tile_from_xy = WALL_TILE;
         end
     endfunction
@@ -89,10 +87,8 @@ module maze_rom (
     always_comb begin
         tile_a = tile_from_xy(x_a, y_a);
         tile_b = tile_from_xy(x_b, y_b);
-        tile_c = tile_from_xy(x_c, y_b);
+        tile_c = tile_from_xy(x_c, y_c);
 
-        can_move_a = (tile_a != WALL_TILE);
-        can_move_b = (tile_b != WALL_TILE);
     end
 
 
@@ -100,7 +96,13 @@ module maze_rom (
         input logic [4:0]x;
         input logic [4:0]y; 
 
-        can_move_left = (tile_form_xy((x - 5'b1), y) != WALL_TILE); 
+        if (x == 5'd0 && y == 5'd14 ) // to wrap around tunnel
+
+        can_move_left = 1'b1;
+
+        else
+
+        can_move_left = (tile_from_xy((x - 5'b1), y) != WALL_TILE); 
 
     endfunction
 
@@ -109,7 +111,13 @@ module maze_rom (
         input logic [4:0]x;
         input logic [4:0]y; 
 
-        can_move_left = (tile_form_xy((x + 5'b1), y) != WALL_TILE); 
+        if(x == 5'd27 && y == 5'd14 )// to wrap around tunnel
+
+        can_move_right = 1'b1;
+
+        else
+
+        can_move_right = (tile_from_xy((x + 5'b1), y) != WALL_TILE); 
 
     endfunction
 
@@ -118,7 +126,7 @@ module maze_rom (
         input logic [4:0]x;
         input logic [4:0]y; 
 
-        can_move_left = (tile_form_xy(x, y + 5'b1) != WALL_TILE); 
+        can_move_up = (tile_from_xy(x, y - 5'b1) != WALL_TILE); 
 
     endfunction
 
@@ -127,7 +135,8 @@ module maze_rom (
         input logic [4:0]x;
         input logic [4:0]y; 
 
-        can_move_left = (tile_form_xy(x, y - 5'b1) != WALL_TILE); 
+        can_move_down = (tile_from_xy(x, y + 5'b1) != WALL_TILE)
+             && !((y == 5'd11) && (x == 5'd13 || x == 5'd14));  // to not be able to move inside th ghost cage 
 
     endfunction
 

@@ -28,13 +28,55 @@ module vga_draw_sprite(
     //draw black if not on map
     if (draw_pacman && video_on) begin
         if (pacman_dir == 2'b00)      //up?
-          output_rgb = 3'b100;
-        else if (pacman_dir == 2'b01) //down?
-          output_rgb = 3'b010;
-        else if (pacman_dir == 2'b10) //left?
-          output_rgb = 3'b011;
+          casez (pixel_y)
+            3'd0 : output_rgb = (pixel_x == 3'd0 || pixel_x == 3'd7)?  3'b110 : 3'b000;
+            3'd1 : output_rgb = (pixel_x < 2 || pixel_x > 5)?          3'b110 : 3'b000;
+            3'd2 : output_rgb = (pixel_x < 2 || pixel_x > 5)?          3'b110 : 3'b000;
+            3'd3 : output_rgb = (pixel_x < 3 || pixel_x > 4)?          3'b110 : 3'b000;
+            3'd4 : output_rgb =                                        3'b110         ;
+            3'd5 : output_rgb =                                        3'b110         ;
+            3'd6 : output_rgb =                                        3'b110         ;
+            3'd7 : output_rgb = (pixel_x != 3'd0 || pixel_x != 3'd7)?  3'b110 : 3'b000;
+          endcase
+
+        else if (pacman_dir == 2'b01) //left?
+         casez (pixel_y)
+            3'd0 : output_rgb = (pixel_x != 3'd7)?  3'b110 :3'b000;
+            3'd1 : output_rgb = (pixel_x != 3'd0)?  3'b110: 3'b000;
+            3'd2 : output_rgb = (pixel_x > 3'd2 )?  3'b110: 3'b000;
+            3'd3 : output_rgb = (pixel_x > 3'd3 )?  3'b110: 3'b000;
+            3'd4 : output_rgb = (pixel_x > 3'd3 )?  3'b110: 3'b000;
+            3'd5 : output_rgb = (pixel_x > 3'd2 )?  3'b110: 3'b000;
+            3'd6 : output_rgb = (pixel_x != 3'd0)?  3'b110: 3'b000;
+            3'd7 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+          endcase
+
+
+        else if (pacman_dir == 2'b10) //down?
+          casez (pixel_y)
+            3'd0 : output_rgb = (pixel_x != 3'd0 || pixel_x != 3'd7)?  3'b110 : 3'b000;
+            3'd1 : output_rgb =                                        3'b110         ;
+            3'd2 : output_rgb =                                        3'b110         ;
+            3'd3 : output_rgb =                                        3'b110         ;
+            3'd4 : output_rgb = (pixel_x < 3 || pixel_x > 4)?          3'b110 : 3'b000;
+            3'd5 : output_rgb = (pixel_x < 2 || pixel_x > 5)?          3'b110 : 3'b000;
+            3'd6 : output_rgb = (pixel_x < 2 || pixel_x > 5)?          3'b110 : 3'b000;
+            3'd7 : output_rgb = (pixel_x == 3'd0 || pixel_x == 3'd7)?  3'b110 : 3'b000;
+          endcase
+
+        
+        
         else                          //right?
-          output_rgb = 3'b110;
+          casez (pixel_y)
+            3'd0 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+            3'd1 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+            3'd2 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+            3'd3 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+            3'd4 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+            3'd5 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+            3'd6 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+            3'd7 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+          endcase
     end
     else
       output_rgb = input_rgb;

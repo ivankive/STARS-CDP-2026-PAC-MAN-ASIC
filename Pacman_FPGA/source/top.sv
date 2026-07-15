@@ -22,14 +22,14 @@ module top (
   logic [4:0] pacman_x, pacman_y;
   logic [1:0] pacman_dir;
   logic pac_can_move_right, pac_can_move_left, pac_can_move_up, pac_can_move_down;
-  logic tile_a, tile_b, tile_c;
+  logic [1:0] tile_a, tile_b, tile_c;
 
   logic [4:0] ghost_x, ghost_y;
   logic ghost_can_move_right, ghost_can_move_left, ghost_can_move_up, ghost_can_move_down;
 
   logic [4:0] x_c, y_c;
 
-  maze_rom ROM(
+  maze_rom Read_only_memory(
     .x_a(pacman_x),
     .y_a(pacman_y),
     .tile_a(tile_a),
@@ -49,8 +49,7 @@ module top (
     .x_c(x_c),
     .y_c(y_c),
     .tile_c(tile_c)
-
-  );
+    );
 
   pacman_movement pacman_controller(
     .clk       (hz100),

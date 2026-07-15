@@ -1,8 +1,8 @@
 module vga_draw_tile(
-    input logic  [9:0] h_count,   //Horizontal Display Counter (max value is 640px)
-    input logic  [9:0] v_count,   //Vertical Display Counter (maxvalue is 480px)
-    input logic        video_on,   //video on signal from vga_counter
-    output logic [2:0] output_rgb  //pixel color
+    input logic  [9:0]  h_count,   //Horizontal Display Counter (max value is 640px)
+    input logic  [9:0]  v_count,   //Vertical Display Counter (maxvalue is 480px)
+    input logic         video_on,   //Video on/off signal
+    output logic [2:0]  output_rgb       //pixel color
   );
   //variables
   logic black_right, black_bottom, black_top;
@@ -17,15 +17,17 @@ module vga_draw_tile(
   assign tile_x = h_count[7:3];
   assign pixel_y = v_count[2:0]; //remainder
   assign pixel_x = h_count[2:0];
+
+ 
   
   //----------------------------
   // PULL FROM MAZE_RAM (Not implemented yet) USES tile_x and tile_y
   //---------------------------- 
   initial begin
     maze[0]  = {28{2'b01}};
-    maze[1]  = 56'b01_11_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_11_01;
+    maze[1]  = 56'b01_10_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_10_01;
     maze[2]  = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
-    maze[3]  = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
+    maze[3]  = 56'b01_11_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_11_01;
     maze[4]  = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
     maze[5]  = 56'b01_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_01;
     maze[6]  = 56'b01_10_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_10_01;
@@ -45,24 +47,21 @@ module vga_draw_tile(
     maze[20] = 56'b01_10_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_10_01;
     maze[21] = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
     maze[22] = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
-    maze[23] = 56'b01_10_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_10_01;
+    maze[23] = 56'b01_11_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_11_01;
     maze[24] = 56'b01_01_01_10_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_10_01_01_01;
     maze[25] = 56'b01_01_01_10_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_10_01_01_01;
     maze[26] = 56'b01_10_10_10_10_10_10_01_01_10_10_10_10_01_01_10_10_10_10_01_01_10_10_10_10_10_10_01;
     maze[27] = 56'b01_10_01_01_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_01_01_10_01;
     maze[28] = 56'b01_10_01_01_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_01_01_10_01;
-    maze[29] = 56'b01_11_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_11_01;
+    maze[29] = 56'b01_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_01;
     maze[30] = {28{2'b01}};
   end //hardcoded map
-
   // this says grab the height and then grab the  x tile , multiply it by 2 and starting at bit tile_x*2, take 2 bits going up. 
     // this notation was given by claude
-  assign tile_data = maze[tile_y][(6'd55 - tile_x*2) +: 2]; 
-  
+  assign tile_data = maze[tile_y][(6'd55 - tile_x*2) -: 2]; 
+
   //pixel generator for tile
   always_comb begin
-    //draw black if not on map
-
     if (tile_data == 2'b01) begin // wall
       output_rgb = 3'b001;
     end
@@ -89,11 +88,11 @@ module vga_draw_tile(
           output_rgb = 3'b111;
       end 
     else
-        output_rgb = 3'b000; //black
+        output_rgb = 3'b000;
     end
-    
-    if (~video_on)
-      output_rgb = 3'b000;
+
+    else
+      output_rgb = 3'b000; // blank
   end
 
 endmodule
