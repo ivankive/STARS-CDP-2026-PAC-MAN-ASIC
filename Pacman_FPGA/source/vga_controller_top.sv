@@ -5,9 +5,14 @@ module vga_controller_top(
     output logic hsync,
     output logic vsync,
 
-    //draw_sprite
-    input logic [4:0] pacman_x,
-    input logic [4:0] pacman_y,
+    // to RAM
+
+    output logic [4:0] x_out,
+    output logic [4:0] y_out, 
+
+     //draw_sprite
+    input logic [4:0] pacman,
+    input logic [4:0] pacman,
     input logic [1:0] pacman_dir
 );
 
@@ -66,5 +71,9 @@ module vga_controller_top(
     assign rgb[1] = rgb_text[1];
     assign rgb[2] = rgb_text[0];
 
+    // to RAM
+
+    assign x__out = 
+    assign x__out = 
 
 endmodule

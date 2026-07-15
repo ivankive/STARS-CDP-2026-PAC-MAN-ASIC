@@ -18,16 +18,59 @@ module top (
   // Your code goes here...
   logic [9:0] hcount, vcount;
 
+//ROM Signals
 
   logic [4:0] pacman_x, pacman_y;
   logic [1:0] pacman_dir;
   logic pac_can_move_right, pac_can_move_left, pac_can_move_up, pac_can_move_down;
-  logic [1:0] tile_a, tile_b, tile_c;
+  logic [1:0] tile_a, tile_b, tile_RAM;
 
   logic [4:0] ghost_x, ghost_y;
   logic ghost_can_move_right, ghost_can_move_left, ghost_can_move_up, ghost_can_move_down;
 
   logic [4:0] x_c, y_c;
+
+
+  //RAM Signals
+
+    logic       map_rst,
+    logic       map_loaded,
+
+    //Port A: VGA read only 
+    logic [4:0] x_vga,
+    logic [4:0] y_vga,
+    logic [1:0] rdata_vga,
+
+
+    // Port B: Central Control read/write
+
+
+    // Initial maze ROM interface, asynchronous x/y read
+    //logic [4:0] x_c,
+    //logic [4:0] y_c,
+    //logic [1:0] tile_c
+
+
+  maze_ram RAM(
+
+    .clk(hz100),
+    .reset(reset),
+
+    .map_rst(map_rst),
+    .map_loaded(map_loaded),
+
+    // Port A: VGA read-only
+
+
+    // Port B: Central Control read/write
+
+
+    // Initial maze ROM interface, asynchronous x/y read
+    .rom_x(x_c),
+    .rom_y(y_c),
+    .rom_data(tile_c)
+
+  );
 
   maze_rom Read_only_memory(
     .x_a(pacman_x),

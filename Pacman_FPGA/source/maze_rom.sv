@@ -14,7 +14,7 @@ module maze_rom (
     // Port C: RAM Reload
     input  logic [4:0] x_c,
     input  logic [4:0] y_c,
-    output logic [1:0] tile_c);
+    output logic [1:0] tile_RAM);
 
     localparam logic [1:0] PATH_TILE  = 2'b00;
     localparam logic [1:0] WALL_TILE  = 2'b01;
@@ -87,7 +87,7 @@ module maze_rom (
     always_comb begin
         tile_a = tile_from_xy(x_a, y_a);
         tile_b = tile_from_xy(x_b, y_b);
-        tile_c = tile_from_xy(x_c, y_c);
+        tile_RAM = tile_from_xy(x_c, y_c);
 
     end
 
