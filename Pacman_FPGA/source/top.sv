@@ -9,25 +9,29 @@ module top (
 );
   logic [9:0] hcount, vcount;
 
+  // Game state
+  logic [1:0] game_state;
+  logic       map_loaded;
+  logic       map_rst_pulse;
+
+  // pacman
   logic [4:0] pacman_x, pacman_y;
   logic [1:0] pacman_dir;
-  logic [1:0]  game_state;
-  logic       map_loaded;
 
   logic [4:0] pac_rom_x;
   logic [4:0] pac_rom_y;
   logic       pac_rom_can_move;
 
-  //RAM read for VGA
+  //RAM VGA read port
   logic [4:0] x_vga, y_vga,
   logic [1:0] rdata_vga;
 
-  //RAM write/read for collision
+  //RAM Central read/write port
   logic [4:0] x_central, y_central;
   logic       write_en;
   logic [1:0] rdata_central;
 
-  //RAM reading ROM
+  //RAM ROM write port; shared with Central
   logic [4:0] reload_rom_x, reload_rom_y;
   logic [1:0] reload_rom_data;
 
@@ -43,6 +47,17 @@ module top (
 
   assign rom_x_a = (game_state == STARTING) ? reload_rom_x : pac_rom_x;
   assign rom_y_a = (game_state == STARTING) ? reload_rom_y : pac_rom_y;
+  assign reload_rom_data = rom_tile_a;
+  assign pac_rom_can_move = rom_can_move_a;
+
+  // ghost unused for now
+  assign ghost_rom_x = 5'd0;
+  assign ghost_rom_y = 5'd0;
+
+  // central ram port unused for now
+  assign x_central = 5'd0;
+  assign y_central = 5'd0;
+  assign write_en  = 1'b0;
 
   pacman_movement pacman_controller(
     .clk       (hz100),

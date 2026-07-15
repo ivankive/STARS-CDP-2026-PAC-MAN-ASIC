@@ -1,99 +1,84 @@
 module vga_draw_tile(
-    input logic  [9:0] h_count,   //Horizontal Display Counter (max value is 640px)
-    input logic  [9:0] v_count,   //Vertical Display Counter (maxvalue is 480px)
-    input logic        video_on,   //video on signal from vga_counter
-    output logic [2:0] output_rgb  //pixel color
-  );
+  input  logic       map_loaded,
+
+  // requests tile to RAM
+  input  logic [9:0] h_count_raw,
+  input  logic [9:0] v_count_raw,
+  input logic        video_on_raw,
+
+  // draw delayed tile given from RAM
+  input  logic [9:0] h_count_d,
+  input  logic [9:0] v_count_d,
+  input  logic       video_on_d,
+
+  // RAM VGA port
+  output logic [4:0] x_vga,
+  output logic [4:0] y_vga,
+  input  logic [1:0] tile_data,
+  output logic [2:0] output_rgb
+);
+  logic in_map_raw;
+  logic in_map_d;
+
   //variables
   logic black_right, black_bottom, black_top;
-  logic [4:0] tile_y;           // 0-27 Y tiles
-  logic [4:0] tile_x;           // 0-31 X tiles
-  logic [2:0] pixel_x, pixel_y; //0-7 pixels in tiles
+  logic [4:0] tile_x_raw, tile_y_raw;
+  logic [2:0] pixel_x_d, [2:0] pixel_y_d;
   logic [1:0] tile_data;
-  logic [55:0]maze [0:30]; // 31 rows of 56 bits (28 tiles) for maze data
   
   //determine tile location and pixel position in tile
-  assign tile_y = v_count[7:3] + 24; //quotient
-  assign tile_x = h_count[7:3];
-  assign pixel_y = v_count[2:0]; //remainder
-  assign pixel_x = h_count[2:0];
-  
-  //----------------------------
-  // PULL FROM MAZE_RAM (Not implemented yet) USES tile_x and tile_y
-  //---------------------------- 
-  initial begin
-    maze[0]  = {28{2'b01}};
-    maze[1]  = 56'b01_11_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_11_01;
-    maze[2]  = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
-    maze[3]  = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
-    maze[4]  = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
-    maze[5]  = 56'b01_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_01;
-    maze[6]  = 56'b01_10_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_10_01;
-    maze[7]  = 56'b01_10_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_10_01;
-    maze[8]  = 56'b01_10_10_10_10_10_10_01_01_10_10_10_10_01_01_10_10_10_10_01_01_10_10_10_10_10_10_01;
-    maze[9]  = 56'b01_01_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_01_01;
-    maze[10] = 56'b01_01_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_01_01;
-    maze[11] = 56'b01_01_01_01_01_01_10_01_01_10_10_10_10_10_10_10_10_10_10_01_01_10_01_01_01_01_01_01;
-    maze[12] = 56'b01_01_01_01_01_01_10_01_01_10_01_01_01_00_00_01_01_01_10_01_01_10_01_01_01_01_01_01;
-    maze[13] = 56'b01_01_01_01_01_01_10_01_01_10_01_00_00_00_00_00_00_01_10_01_01_10_01_01_01_01_01_01;
-    maze[14] = 56'b00_00_00_00_00_00_10_10_10_10_01_00_00_00_00_00_00_01_10_10_10_10_00_00_00_00_00_00;
-    maze[15] = 56'b01_01_01_01_01_01_10_01_01_10_01_00_00_00_00_00_00_01_10_01_01_10_01_01_01_01_01_01;
-    maze[16] = 56'b01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01;
-    maze[17] = 56'b01_01_01_01_01_01_10_01_01_10_10_10_10_10_10_10_10_10_10_01_01_10_01_01_01_01_01_01;
-    maze[18] = 56'b01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01;
-    maze[19] = 56'b01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01;
-    maze[20] = 56'b01_10_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_10_01;
-    maze[21] = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
-    maze[22] = 56'b01_10_01_01_01_01_10_01_01_01_01_01_10_01_01_10_01_01_01_01_01_10_01_01_01_01_10_01;
-    maze[23] = 56'b01_10_10_10_01_01_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_01_01_10_10_10_01;
-    maze[24] = 56'b01_01_01_10_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_10_01_01_01;
-    maze[25] = 56'b01_01_01_10_01_01_10_01_01_10_01_01_01_01_01_01_01_01_10_01_01_10_01_01_10_01_01_01;
-    maze[26] = 56'b01_10_10_10_10_10_10_01_01_10_10_10_10_01_01_10_10_10_10_01_01_10_10_10_10_10_10_01;
-    maze[27] = 56'b01_10_01_01_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_01_01_10_01;
-    maze[28] = 56'b01_10_01_01_01_01_01_01_01_01_01_01_10_01_01_10_01_01_01_01_01_01_01_01_01_01_10_01;
-    maze[29] = 56'b01_11_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_10_11_01;
-    maze[30] = {28{2'b01}};
-  end //hardcoded map
+  assign tile_x_raw = h_count_raw[7:3];
+  assign tile_y_raw = v_count_raw[7:3] + 5'd24;
+  assign pixel_y_d = v_count_d[2:0]; //remainder
+  assign pixel_x_d = h_count_d[2:0];
 
-  // this says grab the height and then grab the  x tile , multiply it by 2 and starting at bit tile_x*2, take 2 bits going up. 
-    // this notation was given by claude
-  assign tile_data = maze[tile_y][tile_x*2 +: 2]; 
+  assign in_map_raw = video_on_raw && (tile_x_raw < 5'd28) && (tile_y_raw < 5'd31);
+
+  if (in_map_raw) begin
+    x_vga = tile_x_raw;
+    y_vga = tile_y_raw;
+  end else begin
+    x_vga = 5'd0;
+    y_vga = 5'd0;
+  end
+
+  assign in_map_d = video_on_d && ((h_count_d[7:3]) < 5'd28) && ((v_count_d[7:3] + 5'd24) < 5'd31);
   
   //pixel generator for tile
   always_comb begin
-    //draw black if not on map
-
-    if (tile_data == 2'b01) begin // wall
-      output_rgb = 3'b001;
-    end
-    
-    //draw 2 by 2 white square in center if applicable
-    else if (tile_data == 2'b10) begin // pellet
-      if ((pixel_x == 3 || pixel_x == 4) &&
-          (pixel_y == 3 || pixel_y == 4))
-        output_rgb = 3'b111;
-      else
-        output_rgb = 3'b000;
-    end
-  
-    //draw 6 by 6 white square with black corners if applicable 
-    else if (tile_data == 2'b11) begin // power pellet
-      if (pixel_x > 0 && pixel_x < 7 &&
-          pixel_y > 0 && pixel_y < 7) begin
-  
-        // black corners
-        if ((pixel_x == 1 || pixel_x == 6) &&
-            (pixel_y == 1 || pixel_y == 6))
-          output_rgb = 3'b000;
-        else
-          output_rgb = 3'b111;
-      end 
-    else
-        output_rgb = 3'b000; //black
-    end
-    
-    if (~video_on)
+    output_rgb = 3'b000;
+    if (!video_on_d || !map_loaded || !in_map_d) begin
       output_rgb = 3'b000;
+    end else begin
+      case (tile_data)
+        2'b0: begin 
+          output_rgb = 3'b000;
+        end
+        2;b01: begin
+          output_rgb = 3'b001;
+        end
+        2'b10: begin
+          if ((pixel_x_d == 3'd3 || pixel_x_d == 3'd4) && (pixel_y_d == 3'd3 || pixel_y_d == 3'd4)) begin
+            output_rgb = 3'b111;
+          end else begin
+            output_rgb = 3'b000;
+          end
+        end
+        2b'11: begin
+          if ((pixel_x_d > 3'd0) && (pixel_x_d < 3'd7) && (pixel_y_d > 3'd0) && (pixel_y_d < 3'd7)) begin
+            if ((pixel_x_d == 3'd1 || pixel_x_d == 3'd6) && (pixel_y_d == 3'd1 || pixel_y_d == 3'd6)) begin
+              output_rgb = 3'b000;
+            end else begin
+              output_rgb = 3'b111;
+            end
+          end else begin
+            output_rgb = 3'b000;
+          end
+        end
+        default: begin
+          output_rgb = 3'b000;
+        end
+      endcase
+    end
   end
-
 endmodule

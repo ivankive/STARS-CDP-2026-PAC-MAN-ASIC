@@ -27,10 +27,9 @@ module vga_counter (
             vcount <= 0;
         end
         else begin
-
             if (hcount == H_TOTAL-1) begin
                 hcount <= 0;
-
+                
                 if (vcount == V_TOTAL-1)
                     vcount <= 0;
                 else

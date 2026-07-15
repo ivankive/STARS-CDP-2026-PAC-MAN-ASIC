@@ -62,33 +62,18 @@ module initial_maze_rom (
         end
     endfunction
 
+    function automatic logic [1:0] tile_from_xy(input logic [4:0] x, input logic [4:0] y);
+        if (in_bounds(x, y))
+            tile_from_xy = maze[y][(6'd55 - x*2) -: 2];
+        else
+            tile_from_xy = WALL_TILE;
+    endfunction
+
     always_comb begin
-        comb_tile_a = maze[y_a][(6'd55 - x_a*2) -: 2];
-        comb_tile_b = maze[y_b][(6'd55 - x_b*2) -: 2];
+        tile_a = tile_from_xy(x_a, y_a);
+        tile_b = tile_from_xy(x_b, y_b);
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            tile_a     <= WALL_TILE;
-            tile_b     <= WALL_TILE;
-            can_move_a <= 1'b0;
-            can_move_b <= 1'b0;
-        end else begin
-            if (in_bounds(x_a, y_a)) begin
-                tile_a     <= comb_tile_a;
-                can_move_a <= (comb_tile_a != WALL_TILE);
-            end else begin
-                tile_a     <= WALL_TILE;
-                can_move_a <= 1'b0;
-            end
-
-            if (in_bounds(x_b, y_b)) begin
-                tile_b     <= comb_tile_b;
-                can_move_b <= (comb_tile_b != WALL_TILE);
-            end else begin
-                tile_b     <= WALL_TILE;
-                can_move_b <= 1'b0;
-            end
-        end
+        can_move_a = (tile_a != WALL_TILE);
+        can_move_b = (tile_b != WALL_TILE);
     end
-
 endmodule
