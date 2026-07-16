@@ -113,7 +113,11 @@ module pacman_movement (
                     end
 
                     S_CHECK_FORWARD: begin
-                        if (rom_can_move) begin
+                        if (xpos == 5'd0 && ypos == 5'd14 && dir == LEFT)
+                            xpos <= 5'd27;
+                        else if (xpos == 5'd27 && ypos == 5'd14 && dir == RIGHT)
+                            xpos <= 5'd0;
+                        else if (rom_can_move) begin
                             xpos <= rom_x;
                             ypos <= rom_y;
                         end
