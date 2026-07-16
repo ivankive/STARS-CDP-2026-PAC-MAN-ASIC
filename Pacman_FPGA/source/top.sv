@@ -33,13 +33,13 @@ module top (
 
   //RAM Signals
 
-    logic       map_rst,
-    logic       map_loaded,
+    logic       map_rst;
+    logic       map_loaded;
 
     //Port A: VGA read only 
-    logic [4:0] x_vga,
-    logic [4:0] y_vga,
-    logic [1:0] rdata_vga,
+    logic [4:0] x_vga;
+    logic [4:0] y_vga;
+    logic [1:0] rdata_vga;
 
 
     // Port B: Central Control read/write
