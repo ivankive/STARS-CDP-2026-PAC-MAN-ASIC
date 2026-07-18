@@ -1,4 +1,4 @@
-module maze_ram (
+module maze_bram (
     input  logic       clk,
     input  logic       reset,
 

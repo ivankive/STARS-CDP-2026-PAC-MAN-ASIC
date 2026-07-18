@@ -1,5 +1,3 @@
-`timescale 1ns/1ps
-
 module ghost_fsm (
     input  logic       clk,
     input  logic       reset,
