@@ -1,12 +1,12 @@
 module ghost_movement (
     input  logic           ghost_can_move,
 
-    input  logic [5:0] ghost_x,
-    input  logic [5:0] ghost_y,
+    input  logic [4:0] ghost_x,
+    input  logic [4:0] ghost_y,
     input  logic [1:0] ghost_dir,
 
-    input  logic [5:0] target_x,
-    input  logic [5:0] target_y,
+    input  logic [4:0] target_x,
+    input  logic [4:0] target_y,
 
     input  logic       can_up,
     input  logic       can_down,
@@ -15,8 +15,8 @@ module ghost_movement (
 
     input  logic       do_reverse,
 
-    output logic [5:0] next_x,
-    output logic [5:0] next_y,
+    output logic [4:0] next_x,
+    output logic [4:0] next_y,
     output logic [1:0] next_dir
 );
 

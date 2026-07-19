@@ -8,23 +8,23 @@ module ghost_controller (
     input  logic       power_pellet_active,
     input  logic       global_ghost_mode,
 
-    input  logic [5:0] pacman_x,
-    input  logic [5:0] pacman_y,
+    input  logic [4:0] pacman_x,
+    input  logic [4:0] pacman_y,
     input  logic [1:0] pacman_dir,
 
     input  logic [1:0] ghost_eaten,
 
     // Shared synchronous maze ROM interface
-    output logic [5:0] ghost_rom_x,
-    output logic [5:0] ghost_rom_y,
+    output logic [4:0] ghost_rom_x,
+    output logic [4:0] ghost_rom_y,
     input  logic       ghost_rom_can_move,
 
-    output logic [5:0] blinky_x,
-    output logic [5:0] blinky_y,
+    output logic [4:0] blinky_x,
+    output logic [4:0] blinky_y,
     output logic [1:0] blinky_dir,
 
-    output logic [5:0] pinky_x,
-    output logic [5:0] pinky_y,
+    output logic [4:0] pinky_x,
+    output logic [4:0] pinky_y,
     output logic [1:0] pinky_dir,
 
     output logic [1:0] dangerous_to_pacman,
@@ -41,18 +41,18 @@ module ghost_controller (
     localparam logic [1:0] DIR_LEFT  = 2'd2;
     localparam logic [1:0] DIR_RIGHT = 2'd3;
 
-    localparam logic [5:0] GRID_MAX_X = 6'd27;
-    localparam logic [5:0] GRID_MAX_Y = 6'd30;
+    localparam logic [4:0] GRID_MAX_X = 5'd27;
+    localparam logic [4:0] GRID_MAX_Y = 5'd30;
 
-    localparam logic [5:0] BLINKY_START_X = 6'd14;
-    localparam logic [5:0] BLINKY_START_Y = 6'd14;
+    localparam logic [4:0] BLINKY_START_X = 5'd14;
+    localparam logic [4:0] BLINKY_START_Y = 5'd14;
 
-    localparam logic [5:0] PINKY_START_X = 6'd14;
-    localparam logic [5:0] PINKY_START_Y = 6'd17;
+    localparam logic [4:0] PINKY_START_X = 5'd14;
+    localparam logic [4:0] PINKY_START_Y = 5'd17;
 
     // Ghost position and direction registers
-    logic [5:0] ghost_x   [0:1];
-    logic [5:0] ghost_y   [0:1];
+    logic [4:0] ghost_x   [0:1];
+    logic [4:0] ghost_y   [0:1];
     logic [1:0] ghost_dir [0:1];
 
     logic [1:0] ghost_state [0:1];
@@ -93,8 +93,8 @@ module ghost_controller (
     // Current ghost selected by the scheduler
     logic cur_ghost;
 
-    logic [5:0] target_x;
-    logic [5:0] target_y;
+    logic [4:0] target_x;
+    logic [4:0] target_y;
 
     // One shared target calculator
     ghost_target target_logic (
@@ -114,8 +114,8 @@ module ghost_controller (
     logic can_left;
     logic can_right;
 
-    logic [5:0] next_x;
-    logic [5:0] next_y;
+    logic [4:0] next_x;
+    logic [4:0] next_y;
     logic [1:0] next_dir;
 
     // One shared movement calculator
@@ -150,8 +150,8 @@ module ghost_controller (
 
     // Check whether a neighboring location is outside the maze
     function automatic logic direction_oob (
-        input logic [5:0] x,
-        input logic [5:0] y,
+        input logic [4:0] x,
+        input logic [4:0] y,
         input logic [1:0] direction
     );
         begin
@@ -175,8 +175,8 @@ module ghost_controller (
     endfunction
 
     // Calculate neighboring X coordinate
-    function automatic logic [5:0] step_x (
-        input logic [5:0] x,
+    function automatic logic [4:0] step_x (
+        input logic [4:0] x,
         input logic [1:0] direction
     );
         begin
@@ -194,8 +194,8 @@ module ghost_controller (
     endfunction
 
     // Calculate neighboring Y coordinate
-    function automatic logic [5:0] step_y (
-        input logic [5:0] y,
+    function automatic logic [4:0] step_y (
+        input logic [4:0] y,
         input logic [1:0] direction
     );
         begin
@@ -244,8 +244,8 @@ module ghost_controller (
             can_left  <= 1'b0;
             can_right <= 1'b0;
 
-            ghost_rom_x <= 6'd0;
-            ghost_rom_y <= 6'd0;
+            ghost_rom_x <= 5'd0;
+            ghost_rom_y <= 5'd0;
 
             issued_oob <= 1'b1;
         end else begin
@@ -269,18 +269,9 @@ module ghost_controller (
                         can_left  <= 1'b0;
                         can_right <= 1'b0;
 
-                        ghost_rom_x <=
-                            step_x(ghost_x[GHOST_BLINKY], DIR_UP);
-
-                        ghost_rom_y <=
-                            step_y(ghost_y[GHOST_BLINKY], DIR_UP);
-
-                        issued_oob <=
-                            direction_oob(
-                                ghost_x[GHOST_BLINKY],
-                                ghost_y[GHOST_BLINKY],
-                                DIR_UP
-                            );
+                        ghost_rom_x <= step_x(ghost_x[GHOST_BLINKY], DIR_UP);
+                        ghost_rom_y <= step_y(ghost_y[GHOST_BLINKY], DIR_UP);
+                        issued_oob <= direction_oob(ghost_x[GHOST_BLINKY], ghost_y[GHOST_BLINKY], DIR_UP );
 
                         scheduler_state <= S_WAIT_ROM;
                     end
@@ -294,21 +285,13 @@ module ghost_controller (
                 S_CAPTURE: begin
                     case (check_dir)
                         DIR_UP:
-                            can_up <= issued_oob ?
-                                      1'b0 : ghost_rom_can_move;
-
+                            can_up <= issued_oob ? 1'b0 : ghost_rom_can_move;
                         DIR_DOWN:
-                            can_down <= issued_oob ?
-                                        1'b0 : ghost_rom_can_move;
-
+                            can_down <= issued_oob ? 1'b0 : ghost_rom_can_move;
                         DIR_LEFT:
-                            can_left <= issued_oob ?
-                                        1'b0 : ghost_rom_can_move;
-
+                            can_left <= issued_oob ? 1'b0 : ghost_rom_can_move;
                         DIR_RIGHT:
-                            can_right <= issued_oob ?
-                                         1'b0 : ghost_rom_can_move;
-
+                            can_right <= issued_oob ? 1'b0 : ghost_rom_can_move;
                         default: begin
                         end
                     endcase

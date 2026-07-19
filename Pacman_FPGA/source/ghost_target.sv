@@ -2,15 +2,15 @@ module ghost_target (
     input  logic [1:0]     ghost_state,
     input  logic           ghost_id,
 
-    input  logic [5:0] ghost_x,
-    input  logic [5:0] ghost_y,
+    input  logic [4:0] ghost_x,
+    input  logic [4:0] ghost_y,
 
-    input  logic [5:0] pacman_x,
-    input  logic [5:0] pacman_y,
+    input  logic [4:0] pacman_x,
+    input  logic [4:0] pacman_y,
     input  logic [1:0]     pacman_dir,
 
-    output logic [5:0] target_x,
-    output logic [5:0] target_y
+    output logic [4:0] target_x,
+    output logic [4:0] target_y
 );
 
     localparam logic [1:0] G_CAGED      = 2'd0;
@@ -23,10 +23,10 @@ module ghost_target (
     localparam logic [1:0] DIR_LEFT  = 2'd2;
     localparam logic [1:0] DIR_RIGHT = 2'd3;
 
-    localparam logic [5:0] LOOKAHEAD = 6'(4);
+    localparam logic [4:0] LOOKAHEAD = 5'(4);
 
-    logic [5:0] pinky_target_x;
-    logic [5:0] pinky_target_y;
+    logic [4:0] pinky_target_x;
+    logic [4:0] pinky_target_y;
 
     /*
      * Pinky targets four tiles ahead of Pac-Man.
@@ -73,8 +73,8 @@ module ghost_target (
     end
 
     always_comb begin
-        target_x = 6'd14;
-        target_y = 6'd17;
+        target_x = 5'd14;
+        target_y = 5'd17;
 
         case (ghost_state)
             G_SCATTER: begin
@@ -102,13 +102,13 @@ module ghost_target (
             end
 
             G_CAGED: begin
-                target_x = 6'd14;
-                target_y = 6'd17;
+                target_x = 5'd14;
+                target_y = 5'd17;
             end
 
             default: begin
-                target_x = 6'd14;
-                target_y = 6'd17;
+                target_x = 5'd14;
+                target_y = 5'd17;
             end
         endcase
     end
