@@ -254,7 +254,7 @@ module ghost_controller (
                 if (frightened_start[i])
                     pending_reverse[i] <= 1'b1;
                 else if ((scheduler_state == S_WRITE) &&
-                         (cur_ghost == i))
+                         (cur_ghost == 1'(i)))
                     pending_reverse[i] <= 1'b0;
             end
 
