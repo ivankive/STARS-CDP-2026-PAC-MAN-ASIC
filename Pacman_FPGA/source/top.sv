@@ -145,10 +145,7 @@ module top (
     .map_rst      (1'b0),
     .reload_done  (map_loaded),
     .lives        (2'd3),
-    .game_state   (game_state),
-    .power_pellet_active (power_pellet_active),
-    .ghost_eaten  (ghost_eaten),
-    .dangerous_to_pacman 
+    .game_state   (game_state)
   );
 
 maze_bram maze_ram (

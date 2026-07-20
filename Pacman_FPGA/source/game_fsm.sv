@@ -2,56 +2,59 @@ module game_fsm (
     input  logic       clk,
     input  logic       reset,
 
-    input  logic [1:0] game_state,
-    input  logic       power_pellet_active,
-    input  logic       ghost_eaten,
-    input  logic       global_ghost_mode,
-
-    output logic [1:0] ghost_state,
-    output logic       ghost_can_move,
-    output logic       dangerous_to_pacman,
-    output logic       vulnerable_to_pacman,
-    output logic       frightened_start
+    // Maze reset/reload control
+    input  logic       map_rst,
+    input  logic       reload_done,
+    input  logic [1:0] lives,
+    output logic [1:0] game_state
 );
 
-    localparam logic [1:0] GAME_PLAYING = 2'd1;
+    localparam logic [1:0]
+        GAME_STARTING = 2'd0,
+        GAME_PLAYING  = 2'd1,
+        GAME_OVER     = 2'd2;
 
-    localparam logic [1:0] G_CAGED      = 2'd0;
-    localparam logic [1:0] G_SCATTER    = 2'd1;
-    localparam logic [1:0] G_CHASE      = 2'd2;
-    localparam logic [1:0] G_FRIGHTENED = 2'd3;
-
-    logic [1:0] state;
     logic [1:0] next_state;
 
-    always_comb begin
-        if ((game_state != GAME_PLAYING) || ghost_eaten)
-            next_state = G_CAGED;
-        else if (power_pellet_active)
-            next_state = G_FRIGHTENED;
-        else if (global_ghost_mode)
-            next_state = G_CHASE;
+    always_ff @(posedge clk) begin
+        if (reset)
+            game_state <= GAME_STARTING;
         else
-            next_state = G_SCATTER;
+            game_state <= next_state;
     end
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            state             <= G_CAGED;
-            frightened_start <= 1'b0;
-        end else begin
-            state <= next_state;
+    // Next-state logic
+    always_comb begin
+        next_state = game_state;
 
-            frightened_start <=
-                (state != G_FRIGHTENED) &&
-                (next_state == G_FRIGHTENED);
-        end
+        case (game_state)
+
+            // Wait for the maze memory to finish loading.
+            GAME_STARTING: begin
+                if (reload_done)
+                    next_state = GAME_PLAYING;
+            end
+
+            // Remain here while Pac-Man still has lives.
+            GAME_PLAYING: begin
+                if (lives == 2'd0)
+                    next_state = GAME_OVER;
+                else if (map_rst)
+                    next_state = GAME_STARTING;
+            end
+
+            // Remain in game over until the game is reset.
+            GAME_OVER: begin
+                if (map_rst)
+                    next_state = GAME_STARTING;
+            end
+
+            default: begin
+                next_state = GAME_STARTING;
+            end
+
+        endcase
     end
-
-    assign ghost_state          = state;
-    assign ghost_can_move       = (state != G_CAGED);
-    assign dangerous_to_pacman  = (state == G_SCATTER) ||
-                                  (state == G_CHASE);
-    assign vulnerable_to_pacman = (state == G_FRIGHTENED);
 
 endmodule
+
