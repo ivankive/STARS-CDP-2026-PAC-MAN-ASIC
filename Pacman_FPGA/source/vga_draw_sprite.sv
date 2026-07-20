@@ -16,7 +16,7 @@ module vga_draw_sprite(
   logic [4:0] tile_y;           // 0-27 Y tiles
   logic [4:0] tile_x;           // 0-35 X tiles
   logic [2:0] pixel_x, pixel_y; //0-7 pixels in tiles
-  logic draw_pacman, draw_circle;
+  logic draw_pacman, draw_circle, draw_blinky, draw_pinky;
   
   //determine tile location and pixel position of VGA
   assign tile_y = v_count[7:3]+24; //quotient

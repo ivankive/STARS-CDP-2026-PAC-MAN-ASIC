@@ -132,7 +132,7 @@ module top (
     .map_loaded (map_loaded),
     .pacman_x   (pacman_x),
     .pacman_y   (pacman_y),
-    .pacman_dir (pacman_dir)
+    .pacman_dir (pacman_dir),
     .blinky_x   (blinky_x),
     .blinky_y   (blinky_y),
     .pinky_x    (pinky_x),
@@ -145,7 +145,10 @@ module top (
     .map_rst      (1'b0),
     .reload_done  (map_loaded),
     .lives        (2'd3),
-    .game_state   (game_state)
+    .game_state   (game_state),
+    .power_pellet_active (power_pellet_active),
+    .ghost_eaten  (ghost_eaten),
+    .dangerous_to_pacman 
   );
 
 maze_bram maze_ram (

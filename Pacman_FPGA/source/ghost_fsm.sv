@@ -36,13 +36,14 @@ module ghost_fsm (
 
     // State register; frightened pulse
     always_ff @(posedge clk or posedge reset) begin
-        if (reset)
+        if (reset) begin
             state <= G_CAGED;
             frightened_start <= 1'b0;
-        else
+        end
+        else begin
             state <= next_state;
-            frightened_start <= (state != G_FRIGHTENED) &&
-                                (next_state == G_FRIGHTENED);
+            frightened_start <= (state != G_FRIGHTENED) && (next_state == G_FRIGHTENED);
+        end
     end
 
     // Next-state logic

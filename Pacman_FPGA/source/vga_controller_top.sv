@@ -14,7 +14,11 @@ module vga_controller_top(
     //pacman
     input logic [4:0] pacman_x,
     input logic [4:0] pacman_y,
-    input logic [1:0] pacman_dir
+    input logic [1:0] pacman_dir,
+    input  logic [4:0] blinky_x,
+    input  logic [4:0] blinky_y,
+    input  logic [4:0] pinky_x,
+    input  logic [4:0] pinky_y
 );
     logic [9:0] hcount_raw, vcount_raw;
     logic       hsync_raw, vsync_raw;
