@@ -5,6 +5,10 @@ module vga_draw_sprite(
     input logic  [4:0] pacman_x,   //pacman tile x position
     input logic  [4:0] pacman_y,   //pacman tile y position
     input logic  [1:0] pacman_dir, //pacman direction
+    input  logic [4:0] blinky_x,
+    input  logic [4:0] blinky_y,
+    input  logic [4:0] pinky_x,
+    input  logic [4:0] pinky_y,
     input logic  [2:0] input_rgb,  //pixel color from draw_tile
     output logic [2:0] output_rgb  //pixel color
   );
@@ -22,6 +26,8 @@ module vga_draw_sprite(
 
   //determine whether pixel is pacman
   assign draw_pacman = (tile_x == pacman_x) && (tile_y == pacman_y);
+  assign draw_blinky = (tile_x == blinky_x) && (tile_y == blinky_y);
+  assign draw_pinky = (tile_x == pinky_x) && (tile_y == pinky_y);
 
 //pixel generator for tile
   always_comb begin
@@ -76,6 +82,12 @@ module vga_draw_sprite(
           3'd7 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
         endcase
     end
+    else if (draw_blinky) begin
+            output_rgb = 3'b100;
+        end
+        else if (draw_pinky) begin
+            output_rgb = 3'b101;
+        end
     else
       output_rgb = input_rgb;
   end

@@ -25,6 +25,11 @@ module top (
   logic [4:0] pac_rom_x;
   logic [4:0] pac_rom_y;
   logic       pac_rom_can_move;
+  
+  logic       pellet_eaten;
+  logic       power_pellet_eaten;
+  logic       pacman_hit;
+  logic [1:0] ghost_eaten;
 
   //RAM VGA read port
   logic [4:0] x_vga, y_vga;
@@ -49,19 +54,31 @@ module top (
   logic [1:0] tile_b;
   logic       ghost_rom_can_move;
 
+  //Ghost stuff
+  logic global_ghost_mode;
+  logic tick_1hz;
+  logic power_pellet_active;
+  logic ghost_move_tick;
+
+  logic [4:0] blinky_x;
+  logic [4:0] blinky_y;
+  logic [1:0] blinky_dir;
+
+  logic [4:0] pinky_x;
+  logic [4:0] pinky_y;
+  logic [1:0] pinky_dir;
+
+  logic [1:0] dangerous_to_pacman;
+  logic [1:0] vulnerable_to_pacman;
+
   assign rom_x_a = (game_state == 2'b0) ? reload_rom_x : pac_rom_x;
   assign rom_y_a = (game_state == 2'b0) ? reload_rom_y : pac_rom_y;
   assign reload_rom_data = rom_tile_a;
   assign pac_rom_can_move = rom_can_move_a;
 
-  // ghost unused for now
-  assign ghost_rom_x = 5'd0;
-  assign ghost_rom_y = 5'd0;
+  //temp
+  assign power_pellet_active = 1'd0;
 
-  // central ram port unused for now
-  assign x_central = 5'd0;
-  assign y_central = 5'd0;
-  assign write_en  = 1'b0;
 
   pacman_movement pacman_controller(
     .clk          (hz100),
@@ -74,6 +91,33 @@ module top (
     .xpos         (pacman_x),
     .ypos         (pacman_y),
     .direction    (pacman_dir)
+  );
+
+  pacman_collision pacman_collision_inst (
+    .clk                   (hz100),
+    .reset                 (reset),
+    .game_running          ((game_state == 2'd1) && map_loaded),
+
+    .pacman_x              (pacman_x),
+    .pacman_y              (pacman_y),
+
+    .blinky_x              (blinky_x),
+    .blinky_y              (blinky_y),
+    .pinky_x               (pinky_x),
+    .pinky_y               (pinky_y),
+
+    .dangerous_to_pacman   (dangerous_to_pacman),
+    .vulnerable_to_pacman  (vulnerable_to_pacman),
+
+    .x_central             (x_central),
+    .y_central             (y_central),
+    .write_en              (write_en),
+    .rdata_central         (rdata_central),
+
+    .pellet_eaten          (pellet_eaten),
+    .power_pellet_eaten    (power_pellet_eaten),
+    .pacman_hit            (pacman_hit),
+    .ghost_eaten           (ghost_eaten)
   );
 
   vga_controller_top vga_controller(
@@ -89,6 +133,10 @@ module top (
     .pacman_x   (pacman_x),
     .pacman_y   (pacman_y),
     .pacman_dir (pacman_dir)
+    .blinky_x   (blinky_x),
+    .blinky_y   (blinky_y),
+    .pinky_x    (pinky_x),
+    .pinky_y    (pinky_y)
   );
 
   game_fsm game_fsm(
@@ -100,21 +148,21 @@ module top (
     .game_state   (game_state)
   );
 
-  maze_ram_temp maze_ram(
-    .clk            (hz100),
-    .reset          (reset),
-    .map_rst        (1'b0), //no in game reset yet
-    .map_loaded     (map_loaded),
-    .x_vga          (x_vga),
-    .y_vga          (y_vga),
-    .rdata_vga      (rdata_vga),
-    .x_central      (x_central),
-    .y_central      (y_central),
-    .write_en       (write_en),
-    .rdata_central  (rdata_central),
-    .rom_x          (reload_rom_x),
-    .rom_y          (reload_rom_y),
-    .rom_data       (reload_rom_data)
+maze_bram maze_ram (
+      .clk           (hz100),
+      .reset         (reset),
+      .map_rst       (1'b0),
+      .map_loaded    (map_loaded),
+      .x_vga         (x_vga),
+      .y_vga         (y_vga),
+      .rdata_vga     (rdata_vga),
+      .x_central     (x_central),
+      .y_central     (y_central),
+      .write_en      (write_en),
+      .rdata_central (rdata_central),
+      .rom_x         (reload_rom_x),
+      .rom_y         (reload_rom_y),
+      .rom_data      (reload_rom_data)
   );
 
   initial_maze_rom maze_rom(
@@ -127,5 +175,45 @@ module top (
     .tile_b     (tile_b),
     .can_move_b (ghost_rom_can_move)
   );
+
+  ghost_mode_controller ghost_mode (
+    .clk                 (hz100),
+    .reset               (reset),
+    .game_running        (game_state == 2'd1),
+    .tick_1hz            (tick_1hz),
+    .power_pellet_active (power_pellet_active),
+    .global_ghost_mode   (global_ghost_mode)
+);
+
+ghost_controller ghost_controller (
+    .clk                  (hz100),
+    .reset                (reset),
+    .move_tick            (ghost_move_tick),
+
+    .game_state           (game_state),
+    .power_pellet_active  (power_pellet_active),
+    .global_ghost_mode    (global_ghost_mode),
+
+    .pacman_x             (pacman_x),
+    .pacman_y             (pacman_y),
+    .pacman_dir           (pacman_dir),
+
+    .ghost_eaten          (ghost_eaten),
+
+    .ghost_rom_x          (ghost_rom_x),
+    .ghost_rom_y          (ghost_rom_y),
+    .ghost_rom_can_move   (ghost_rom_can_move),
+
+    .blinky_x             (blinky_x),
+    .blinky_y             (blinky_y),
+    .blinky_dir           (blinky_dir),
+
+    .pinky_x              (pinky_x),
+    .pinky_y              (pinky_y),
+    .pinky_dir            (pinky_dir),
+
+    .dangerous_to_pacman  (dangerous_to_pacman),
+    .vulnerable_to_pacman (vulnerable_to_pacman)
+);
 
 endmodule

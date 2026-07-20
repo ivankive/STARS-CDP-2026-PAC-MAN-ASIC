@@ -21,8 +21,8 @@ module ghost_movement (
 );
 
     localparam logic [1:0] DIR_UP    = 2'd0;
-    localparam logic [1:0] DIR_DOWN  = 2'd1;
-    localparam logic [1:0] DIR_LEFT  = 2'd2;
+    localparam logic [1:0] DIR_LEFT  = 2'd1;
+    localparam logic [1:0] DIR_DOWN  = 2'd2;
     localparam logic [1:0] DIR_RIGHT = 2'd3;
 
     logic [1:0] reverse_dir;
@@ -41,7 +41,7 @@ module ghost_movement (
         end
     endfunction
 
-    assign reverse_dir = ghost_dir ^ 2'b01;
+    assign reverse_dir = ghost_dir ^ 2'b10;
 
     always_comb begin
         next_dir = ghost_dir;

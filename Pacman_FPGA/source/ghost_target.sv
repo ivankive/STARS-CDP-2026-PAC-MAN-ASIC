@@ -19,8 +19,8 @@ module ghost_target (
     localparam logic [1:0] G_FRIGHTENED = 2'd3;
 
     localparam logic [1:0] DIR_UP    = 2'd0;
-    localparam logic [1:0] DIR_DOWN  = 2'd1;
-    localparam logic [1:0] DIR_LEFT  = 2'd2;
+    localparam logic [1:0] DIR_LEFT  = 2'd1;
+    localparam logic [1:0] DIR_DOWN  = 2'd2;
     localparam logic [1:0] DIR_RIGHT = 2'd3;
 
     localparam logic [4:0] LOOKAHEAD = 5'(4);

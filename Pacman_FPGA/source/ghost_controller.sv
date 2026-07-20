@@ -37,8 +37,8 @@ module ghost_controller (
     localparam logic [1:0] G_CAGED = 2'd0;
 
     localparam logic [1:0] DIR_UP    = 2'd0;
-    localparam logic [1:0] DIR_DOWN  = 2'd1;
-    localparam logic [1:0] DIR_LEFT  = 2'd2;
+    localparam logic [1:0] DIR_LEFT  = 2'd1;
+    localparam logic [1:0] DIR_DOWN  = 2'd2;
     localparam logic [1:0] DIR_RIGHT = 2'd3;
 
     localparam logic [4:0] GRID_MAX_X = 5'd27;
@@ -119,7 +119,7 @@ module ghost_controller (
     logic [1:0] next_dir;
 
     // One shared movement calculator
-    ghost_movement_brain movement_logic (
+    ghost_movement movement_logic (
         .ghost_can_move (ghost_can_move[cur_ghost]),
         .ghost_x        (ghost_x[cur_ghost]),
         .ghost_y        (ghost_y[cur_ghost]),

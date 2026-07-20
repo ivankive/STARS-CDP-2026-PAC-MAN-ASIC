@@ -76,9 +76,11 @@ module vga_controller_top(
         .video_on(video_on_d),
         .pacman_x(pacman_x),    //inputs from pacman_controller
         .pacman_y(pacman_y),
-        .pacman_dir(pacman_dir),
-      //.ghost_x(ghost_x),        //inputs from ghost_controller
-      //.ghost_y(ghost_y),
+        .pacman_dir(pacman_dir),      
+        .blinky_x   (blinky_x),   //inputs from ghost_controller
+        .blinky_y   (blinky_y),
+        .pinky_x    (pinky_x),
+        .pinky_y    (pinky_y),
         .input_rgb(rgb_tile),   //inputs from draw_tile
         .output_rgb(rgb_sprite) //outputs to draw_text
     );
