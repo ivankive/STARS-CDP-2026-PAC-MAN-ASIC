@@ -58,7 +58,6 @@ module top (
   logic global_ghost_mode;
   logic tick_1hz;
   logic power_pellet_active;
-  logic ghost_move_tick;
 
   logic [4:0] blinky_x;
   logic [4:0] blinky_y;
@@ -179,16 +178,13 @@ maze_bram maze_ram (
   ghost_mode_controller ghost_mode (
     .clk                 (hz100),
     .reset               (reset),
-    .game_running        (game_state == 2'd1),
-    .tick_1hz            (tick_1hz),
-    .power_pellet_active (power_pellet_active),
+    .game_active        (game_state == 2'd1),
     .global_ghost_mode   (global_ghost_mode)
 );
 
 ghost_controller ghost_controller (
     .clk                  (hz100),
     .reset                (reset),
-    .move_tick            (ghost_move_tick),
 
     .game_state           (game_state),
     .power_pellet_active  (power_pellet_active),

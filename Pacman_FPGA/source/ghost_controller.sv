@@ -2,8 +2,6 @@ module ghost_controller (
     input  logic clk,
     input  logic reset,
 
-    input  logic move_tick,
-
     input  logic [1:0] game_state,
     input  logic       power_pellet_active,
     input  logic       global_ghost_mode,
@@ -14,7 +12,7 @@ module ghost_controller (
 
     input  logic [1:0] ghost_eaten,
 
-    // Shared synchronous maze ROM interface
+    // Shared asynchronous maze ROM interface
     output logic [4:0] ghost_rom_x,
     output logic [4:0] ghost_rom_y,
     input  logic       ghost_rom_can_move,
@@ -50,7 +48,10 @@ module ghost_controller (
     localparam logic [4:0] PINKY_START_X = 5'd14;
     localparam logic [4:0] PINKY_START_Y = 5'd17;
 
-    // Ghost position and direction registers
+    localparam logic [21:0] GHOST_MOVE_COUNT = 22'd3_360_000;
+
+    logic [21:0] move_counter;
+
     logic [4:0] ghost_x   [0:1];
     logic [4:0] ghost_y   [0:1];
     logic [1:0] ghost_dir [0:1];
@@ -61,7 +62,6 @@ module ghost_controller (
     logic [1:0] frightened_start;
     logic [1:0] pending_reverse;
 
-    // One FSM for each ghost
     ghost_fsm blinky_fsm (
         .clk                  (clk),
         .reset                (reset),
@@ -90,13 +90,11 @@ module ghost_controller (
         .frightened_start     (frightened_start[GHOST_PINKY])
     );
 
-    // Current ghost selected by the scheduler
     logic cur_ghost;
 
     logic [4:0] target_x;
     logic [4:0] target_y;
 
-    // One shared target calculator
     ghost_target target_logic (
         .ghost_state (ghost_state[cur_ghost]),
         .ghost_id    (cur_ghost),
@@ -118,7 +116,6 @@ module ghost_controller (
     logic [4:0] next_y;
     logic [1:0] next_dir;
 
-    // One shared movement calculator
     ghost_movement movement_logic (
         .ghost_can_move (ghost_can_move[cur_ghost]),
         .ghost_x        (ghost_x[cur_ghost]),
@@ -138,7 +135,6 @@ module ghost_controller (
 
     typedef enum logic [1:0] {
         S_IDLE,
-        S_WAIT_ROM,
         S_CAPTURE,
         S_WRITE
     } scheduler_state_t;
@@ -148,7 +144,6 @@ module ghost_controller (
     logic [1:0] check_dir;
     logic       issued_oob;
 
-    // Check whether a neighboring location is outside the maze
     function automatic logic direction_oob (
         input logic [4:0] x,
         input logic [4:0] y,
@@ -174,7 +169,6 @@ module ghost_controller (
         end
     endfunction
 
-    // Calculate neighboring X coordinate
     function automatic logic [4:0] step_x (
         input logic [4:0] x,
         input logic [1:0] direction
@@ -193,7 +187,6 @@ module ghost_controller (
         end
     endfunction
 
-    // Calculate neighboring Y coordinate
     function automatic logic [4:0] step_y (
         input logic [4:0] y,
         input logic [1:0] direction
@@ -226,6 +219,8 @@ module ghost_controller (
         if (reset) begin
             scheduler_state <= S_IDLE;
 
+            move_counter <= 22'd0;
+
             cur_ghost <= GHOST_BLINKY;
             check_dir <= DIR_UP;
 
@@ -249,18 +244,19 @@ module ghost_controller (
 
             issued_oob <= 1'b1;
         end else begin
-            // Save frightened reversal requests
             for (i = 0; i < 2; i = i + 1) begin
                 if (frightened_start[i])
                     pending_reverse[i] <= 1'b1;
                 else if ((scheduler_state == S_WRITE) &&
-                         (cur_ghost == 1'(i)))
+                         (cur_ghost == i))
                     pending_reverse[i] <= 1'b0;
             end
 
             case (scheduler_state)
                 S_IDLE: begin
-                    if (move_tick) begin
+                    if (move_counter == GHOST_MOVE_COUNT - 1'b1) begin
+                        move_counter <= 22'd0;
+
                         cur_ghost <= GHOST_BLINKY;
                         check_dir <= DIR_UP;
 
@@ -269,29 +265,47 @@ module ghost_controller (
                         can_left  <= 1'b0;
                         can_right <= 1'b0;
 
-                        ghost_rom_x <= step_x(ghost_x[GHOST_BLINKY], DIR_UP);
-                        ghost_rom_y <= step_y(ghost_y[GHOST_BLINKY], DIR_UP);
-                        issued_oob <= direction_oob(ghost_x[GHOST_BLINKY], ghost_y[GHOST_BLINKY], DIR_UP );
+                        ghost_rom_x <=
+                            step_x(ghost_x[GHOST_BLINKY], DIR_UP);
 
-                        scheduler_state <= S_WAIT_ROM;
+                        ghost_rom_y <=
+                            step_y(ghost_y[GHOST_BLINKY], DIR_UP);
+
+                        issued_oob <=
+                            direction_oob(
+                                ghost_x[GHOST_BLINKY],
+                                ghost_y[GHOST_BLINKY],
+                                DIR_UP
+                            );
+
+                        scheduler_state <= S_CAPTURE;
+                    end else begin
+                        move_counter <= move_counter + 1'b1;
                     end
-                end
-
-                S_WAIT_ROM: begin
-                    // Wait one clock for synchronous ROM data
-                    scheduler_state <= S_CAPTURE;
                 end
 
                 S_CAPTURE: begin
                     case (check_dir)
                         DIR_UP:
-                            can_up <= issued_oob ? 1'b0 : ghost_rom_can_move;
+                            can_up <= issued_oob
+                                ? 1'b0
+                                : ghost_rom_can_move;
+
                         DIR_DOWN:
-                            can_down <= issued_oob ? 1'b0 : ghost_rom_can_move;
+                            can_down <= issued_oob
+                                ? 1'b0
+                                : ghost_rom_can_move;
+
                         DIR_LEFT:
-                            can_left <= issued_oob ? 1'b0 : ghost_rom_can_move;
+                            can_left <= issued_oob
+                                ? 1'b0
+                                : ghost_rom_can_move;
+
                         DIR_RIGHT:
-                            can_right <= issued_oob ? 1'b0 : ghost_rom_can_move;
+                            can_right <= issued_oob
+                                ? 1'b0
+                                : ghost_rom_can_move;
+
                         default: begin
                         end
                     endcase
@@ -319,8 +333,6 @@ module ghost_controller (
                                 ghost_y[cur_ghost],
                                 check_dir + 1'b1
                             );
-
-                        scheduler_state <= S_WAIT_ROM;
                     end
                 end
 
@@ -365,12 +377,13 @@ module ghost_controller (
                                 DIR_UP
                             );
 
-                        scheduler_state <= S_WAIT_ROM;
+                        scheduler_state <= S_CAPTURE;
                     end
                 end
 
                 default: begin
                     scheduler_state <= S_IDLE;
+                    move_counter    <= 22'd0;
                 end
             endcase
         end
