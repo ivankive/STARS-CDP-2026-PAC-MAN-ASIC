@@ -7,19 +7,21 @@ module pp_timer (
 
     logic[7:0] timer; // assuming a 60 hz clock input
 
-    always_ff @(posedge rst or posedge pp_collision or posedge clk) begin
+    always_ff @(posedge rst or posedge clk) begin
         if (rst) begin
             pp_active <= 1'b0;
             timer <= 8'b0;
-        end else if (pp_collision) begin
-            pp_active <= 1'b1;
-            timer <= 8'b0;
-        end else if (pp_active) begin
-            if (timer == 8'd179)  begin // 180/60 = 3 second active
-                pp_active <= 0;
+        end else begin
+            if (pp_collision) begin
+                pp_active <= 1'b1;
                 timer <= 8'b0;
-            end else begin
-                timer <= timer + 1'b1;
+            end else if (pp_active) begin
+                if (timer == 8'd179)  begin // 180/60 = 3 second active
+                    pp_active <= 0;
+                    timer <= 8'b0;
+                end else begin
+                    timer <= timer + 1'b1;
+                end
             end
         end
     end

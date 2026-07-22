@@ -11,7 +11,7 @@ module clock_div (
             count <= '0;
             clk_div <= 1'b0;
         end else begin
-            if (count == 18'd418749) begin // returns 60 Hz
+            if (count == 19'd418749) begin // returns 60 Hz
                 count <= '0;
                 clk_div <= 1'b1;
             end else begin
