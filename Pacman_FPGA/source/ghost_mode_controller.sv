@@ -9,8 +9,8 @@ module ghost_mode_controller (
     localparam logic MODE_SCATTER = 1'b0;
     localparam logic MODE_CHASE   = 1'b1;
 
-    localparam logic [28:0] SCATTER_COUNT = 29'd175_000_000;
-    localparam logic [28:0] CHASE_COUNT   = 29'd500_000_000;
+    localparam logic [28:0] SCATTER_COUNT = 29'd175_000_000; // 7 seconds
+    localparam logic [28:0] CHASE_COUNT   = 29'd500_000_000; // 20 seconds
 
     logic [28:0] mode_counter;
 

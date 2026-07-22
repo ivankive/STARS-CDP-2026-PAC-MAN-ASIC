@@ -4,19 +4,19 @@ module clock_div (
     output logic clk_div
 );
 
-    logic [23:0] count;
+    logic [21:0] count;
 
-    always_ff @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
+    always_ff @(posedge clk or negedge rst) begin
+        if (!rst) begin
             count <= '0;
-            ce <= 1'b0;
+            clk_div <= 1'b0;
         end else begin
-            if (count == 24'd3360000) begin
+            if (count == 22'd3350000) begin
                 count <= '0;
-                ce <= 1'b1;
+                clk_div <= 1'b1;
             end else begin
                 count <= count + 1'b1;
-                ce <= 1'b0;
+                clk_div <= 1'b0;
             end
         end
     end

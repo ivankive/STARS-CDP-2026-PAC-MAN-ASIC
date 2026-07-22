@@ -15,7 +15,7 @@ module pp_timer (
             pp_active <= 1'b1;
             timer <= 8'b0;
         end else if (pp_active) begin
-            if (timer == 27'd10000000)  begin// 180/60 = 3 second active
+            if (timer == 8'd179)  begin// 180/60 = 3 second active
                 pp_active <= 0;
                 timer <= 8'b0;
             end else begin

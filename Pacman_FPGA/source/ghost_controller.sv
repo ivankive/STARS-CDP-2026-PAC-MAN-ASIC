@@ -76,7 +76,7 @@ module ghost_controller (
         .vulnerable_to_pacman (vulnerable_to_pacman[GHOST_BLINKY]),
         .frightened_start     (frightened_start[GHOST_BLINKY])
     );
-
+    
     ghost_fsm pinky_fsm (
         .clk                  (clk),
         .reset                (reset),
@@ -90,7 +90,7 @@ module ghost_controller (
         .vulnerable_to_pacman (vulnerable_to_pacman[GHOST_PINKY]),
         .frightened_start     (frightened_start[GHOST_PINKY])
     );
-
+    
     logic cur_ghost;
 
     logic [4:0] target_x;
