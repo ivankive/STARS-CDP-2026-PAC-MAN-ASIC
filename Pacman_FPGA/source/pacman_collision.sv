@@ -66,7 +66,7 @@ module pacman_collision (
             power_pellet_eaten <= 1'b0;
             pacman_hit         <= 1'b0;
             ghost_eaten        <= 2'b00;
-            score              <= 10'd0
+            score              <= 10'd0;
         end else begin
             write_en           <= 1'b0;
             pellet_eaten       <= 1'b0;
@@ -78,18 +78,18 @@ module pacman_collision (
                 state <= S_READ;
             end else begin
                 if (collide_blinky) begin
-                    if (vulnerable_to_pacman[0])
+                    if (vulnerable_to_pacman[0]) begin
                         ghost_eaten[0] <= 1'b1;
                         score <= score + 10'd50;
-                    else if (dangerous_to_pacman[0])
+                    end else if (dangerous_to_pacman[0])
                         pacman_hit <= 1'b1;
                 end
 
                 if (collide_pinky) begin
-                    if (vulnerable_to_pacman[1])
+                    if (vulnerable_to_pacman[1]) begin
                         ghost_eaten[1] <= 1'b1;
                         score <= score + 10'd50;
-                    else if (dangerous_to_pacman[1])
+                    end else if (dangerous_to_pacman[1])
                         pacman_hit <= 1'b1;
                 end
 

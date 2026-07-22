@@ -182,7 +182,7 @@ maze_bram maze_ram (
     .clk                 (hz100),
     .reset               (reset),
     .game_active        (game_state == 2'd1),
-    .global_ghost_mode   (global_ghost_mode)
+    .ghost_mode   (global_ghost_mode)
 );
 
 ghost_controller ghost_controller (
