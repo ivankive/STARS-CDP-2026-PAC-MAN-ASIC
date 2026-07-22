@@ -49,9 +49,9 @@ module ghost_controller (
     localparam logic [4:0] PINKY_START_X = 5'd14;
     localparam logic [4:0] PINKY_START_Y = 5'd14;
 
-    localparam logic [21:0] GHOST_MOVE_COUNT = 22'd3_360_000;
+    localparam logic [2:0] GHOST_MOVE_COUNT = 3'd7;
 
-    logic [21:0] move_counter;
+    logic [2:0] move_counter;
 
     logic [4:0] ghost_x   [0:1];
     logic [4:0] ghost_y   [0:1];
@@ -220,7 +220,7 @@ module ghost_controller (
         if (reset) begin
             scheduler_state <= S_IDLE;
 
-            move_counter <= 22'd0;
+            move_counter <= 3'd0;
 
             cur_ghost <= GHOST_BLINKY;
             check_dir <= DIR_UP;
@@ -247,7 +247,7 @@ module ghost_controller (
         end else if (pacman_hit) begin
             scheduler_state <= S_IDLE;
 
-            move_counter <= 22'd0;
+            move_counter <= 3'd0;
 
             cur_ghost <= GHOST_BLINKY;
             check_dir <= DIR_UP;
@@ -282,8 +282,8 @@ module ghost_controller (
 
             case (scheduler_state)
                 S_IDLE: begin
-                    if (move_counter == GHOST_MOVE_COUNT - 1'b1) begin
-                        move_counter <= 22'd0;
+                    if (move_counter == GHOST_MOVE_COUNT) begin
+                        move_counter <= 3'd0;
 
                         cur_ghost <= GHOST_BLINKY;
                         check_dir <= DIR_UP;
@@ -411,7 +411,7 @@ module ghost_controller (
 
                 default: begin
                     scheduler_state <= S_IDLE;
-                    move_counter    <= 22'd0;
+                    move_counter    <= 3'd0;
                 end
             endcase
         end

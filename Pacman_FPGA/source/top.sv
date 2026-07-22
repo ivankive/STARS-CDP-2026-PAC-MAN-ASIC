@@ -190,7 +190,7 @@ maze_bram maze_ram (
 );
 
 ghost_controller ghost_controller (
-    .clk                  (hz100),
+    .clk                  (new_clock),
     .reset                (reset),
 
     .game_state           (game_state),
