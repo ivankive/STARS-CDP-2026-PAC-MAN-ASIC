@@ -102,6 +102,7 @@ module top (
   pacman_collision pacman_collision_inst (
     .clk                   (hz100),
     .reset                 (reset),
+    .game_tick             (new_clock),
     .game_running          ((game_state == 2'd1) && map_loaded),
 
     .pacman_x              (pacman_x),

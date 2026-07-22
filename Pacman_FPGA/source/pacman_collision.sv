@@ -3,6 +3,7 @@
 module pacman_collision (
     input  logic       clk,
     input  logic       reset,
+    input  logic       game_tick,
     input  logic       game_running,
 
     input  logic [4:0] pacman_x,
@@ -42,6 +43,7 @@ module pacman_collision (
     collision_state_t state;
     logic collide_blinky;
     logic collide_pinky;
+    logic [9:0] score_delta;
 
     always_comb begin
         collide_blinky =
@@ -60,7 +62,7 @@ module pacman_collision (
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
-            state              <= S_READ;            
+            state              <= S_READ;
             write_en           <= 1'b0;
             pellet_eaten       <= 1'b0;
             power_pellet_eaten <= 1'b0;
@@ -68,30 +70,38 @@ module pacman_collision (
             ghost_eaten        <= 2'b00;
             score              <= 10'd0;
         end else begin
-            write_en           <= 1'b0;
-            pellet_eaten       <= 1'b0;
-            power_pellet_eaten <= 1'b0;
-            pacman_hit         <= 1'b0;
-            ghost_eaten        <= 2'b00;
+            write_en     <= 1'b0;
+            pellet_eaten <= 1'b0;
+            score_delta  = 10'd0;
 
-            if (!game_running) begin
-                state <= S_READ;
-            end else begin
+            // Hold CDC events until the 60 Hz domain samples them, then clear.
+            // Clear on the cycle after new_clock rises (game_tick still high).
+            if (game_tick) begin
+                power_pellet_eaten <= 1'b0;
+                pacman_hit         <= 1'b0;
+                ghost_eaten        <= 2'b00;
+            end else if (game_running) begin
                 if (collide_blinky) begin
                     if (vulnerable_to_pacman[0]) begin
-                        ghost_eaten[0] <= 1'b1;
-                        score <= score + 10'd50;
+                        if (!ghost_eaten[0]) begin
+                            ghost_eaten[0] <= 1'b1;
+                            score_delta = score_delta + 10'd50;
+                        end
                     end else if (dangerous_to_pacman[0]) begin
-                        pacman_hit <= 1'b1;
+                        if (!pacman_hit)
+                            pacman_hit <= 1'b1;
                     end
                 end
 
                 if (collide_pinky) begin
                     if (vulnerable_to_pacman[1]) begin
-                        ghost_eaten[1] <= 1'b1;
-                        score <= score + 10'd50;
+                        if (!ghost_eaten[1]) begin
+                            ghost_eaten[1] <= 1'b1;
+                            score_delta = score_delta + 10'd50;
+                        end
                     end else if (dangerous_to_pacman[1]) begin
-                        pacman_hit <= 1'b1;
+                        if (!pacman_hit)
+                            pacman_hit <= 1'b1;
                     end
                 end
 
@@ -108,11 +118,13 @@ module pacman_collision (
                         if (rdata_central == TILE_PELLET) begin
                             write_en     <= 1'b1;
                             pellet_eaten <= 1'b1;
-                            score <= score + 10'd2;
+                            score_delta  = score_delta + 10'd2;
                         end else if (rdata_central == TILE_POWER_PELLET) begin
-                            write_en           <= 1'b1;
-                            power_pellet_eaten <= 1'b1;
-                            score <= score + 10'd15;
+                            write_en <= 1'b1;
+                            if (!power_pellet_eaten) begin
+                                power_pellet_eaten <= 1'b1;
+                                score_delta = score_delta + 10'd15;
+                            end
                         end
 
                         state <= S_READ;
@@ -122,7 +134,13 @@ module pacman_collision (
                         state <= S_READ;
                     end
                 endcase
+
+                if (score_delta != 10'd0)
+                    score <= score + score_delta;
             end
+
+            if (!game_running)
+                state <= S_READ;
         end
     end
 
