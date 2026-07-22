@@ -1,9 +1,10 @@
 module pacman_movement (
     input  logic       clk,
     input  logic       reset,
+    output logic       game_rst,
 
     input  logic       enable,
-    input  logic [3:0] pb,
+    input  logic [4:0] pb,
 
     input  logic       pacman_hit,
 
@@ -84,7 +85,6 @@ module pacman_movement (
             count      <= 24'd0;
             state      <= S_IDLE;
         end else begin
-            // Store latest requested direction.
             if (pb[0])
                 stored_dir <= UP;
             else if (pb[1])
@@ -93,6 +93,8 @@ module pacman_movement (
                 stored_dir <= DOWN;
             else if (pb[3])
                 stored_dir <= LEFT;
+            else if (pb[4])
+                game_rst <= 1'b1;
 
             if (!enable) begin
                 count <= 24'd0;

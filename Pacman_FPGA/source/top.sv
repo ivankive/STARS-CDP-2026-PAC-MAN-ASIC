@@ -31,6 +31,7 @@ module top (
   logic       pacman_hit;
   logic [1:0] ghost_eaten;
   logic [9:0] score;
+  logic       game_rst;
 
   //RAM VGA read port
   logic [4:0] x_vga, y_vga;
@@ -57,7 +58,6 @@ module top (
 
   //Ghost stuff
   logic global_ghost_mode;
-  logic tick_1hz;
   logic power_pellet_active;
 
   logic [4:0] blinky_x;
@@ -77,21 +77,23 @@ module top (
   assign pac_rom_can_move = rom_can_move_a;
 
   //temp
-  assign power_pellet_active = 1'd0;
+
+  pp_timer pp(.pp_collision(power_pellet_eaten), .clk(hz100), .rst(reset), .pp_active(power_pellet_active));
 
 
   pacman_movement pacman_controller(
     .clk          (hz100),
     .reset        (reset),
     .enable       ((game_state == 2'b01) && map_loaded),
-    .pb           ({pb[3], pb[2], pb[1], pb[6]}),
+    .pb           ({pb[0], pb[3], pb[2], pb[1], pb[6]}),
     .rom_x        (pac_rom_x),
     .rom_y        (pac_rom_y),
     .rom_can_move (pac_rom_can_move),
     .xpos         (pacman_x),
     .ypos         (pacman_y),
     .direction    (pacman_dir),
-    .pacman_hit   (pacman_hit)
+    .pacman_hit   (pacman_hit),
+    .game_rst     (game_rst)
   );
 
   pacman_collision pacman_collision_inst (
