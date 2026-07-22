@@ -4,14 +4,14 @@ module clock_div (
     output logic clk_div
 );
 
-    logic [21:0] count;
+    logic [18:0] count;
 
-    always_ff @(posedge clk or negedge rst) begin
-        if (!rst) begin
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst) begin
             count <= '0;
             clk_div <= 1'b0;
         end else begin
-            if (count == 22'd3350000) begin
+            if (count == 18'd418749) begin // returns 60 Hz
                 count <= '0;
                 clk_div <= 1'b1;
             end else begin

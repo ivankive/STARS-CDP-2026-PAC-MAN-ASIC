@@ -14,6 +14,9 @@ module top (
 );
   logic [9:0] hcount, vcount;
 
+  // Clock
+  logic new_clock;
+
   // Game state
   logic [1:0] game_state;
   logic       map_loaded;
@@ -76,13 +79,12 @@ module top (
   assign reload_rom_data = rom_tile_a;
   assign pac_rom_can_move = rom_can_move_a;
 
-  //temp
+  clock_div marcus(.clk(hz100), .rst(reset), .clk_div(new_clock));
 
-  pp_timer pp(.pp_collision(power_pellet_eaten), .clk(hz100), .rst(reset), .pp_active(power_pellet_active));
+  pp_timer pp(.pp_collision(power_pellet_eaten), .clk(new_clock), .rst(reset), .pp_active(power_pellet_active));
 
-
-  pacman_movement pacman_controller(
-    .clk          (hz100),
+  pacman_movement pacman_movement(
+    .clk          (new_clock),
     .reset        (reset),
     .enable       ((game_state == 2'b01) && map_loaded),
     .pb           ({pb[0], pb[3], pb[2], pb[1], pb[6]}),
@@ -181,7 +183,7 @@ maze_bram maze_ram (
   );
 
   ghost_mode_controller ghost_mode (
-    .clk                 (hz100),
+    .clk                 (new_clock),
     .reset               (reset),
     .game_active        (game_state == 2'd1),
     .ghost_mode   (global_ghost_mode)

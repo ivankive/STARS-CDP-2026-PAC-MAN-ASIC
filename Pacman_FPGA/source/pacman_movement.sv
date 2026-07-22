@@ -35,7 +35,7 @@ module pacman_movement (
     logic [1:0] stored_dir;
     logic [1:0] test_dir;
 
-    logic [21:0] count;
+    logic [2:0] count;
 
     assign direction = dir;
 
@@ -74,7 +74,7 @@ module pacman_movement (
             dir        <= RIGHT;
             stored_dir <= RIGHT;
             test_dir   <= RIGHT;
-            count      <= 22'd0;
+            count      <= 3'd0;
             state      <= S_IDLE;
         end else if (pacman_hit) begin
             xpos       <= 5'd14;
@@ -82,7 +82,7 @@ module pacman_movement (
             dir        <= RIGHT;
             stored_dir <= RIGHT;
             test_dir   <= RIGHT;
-            count      <= 22'd0;
+            count      <= 3'd0;
             state      <= S_IDLE;
         end else begin
             if (pb[0])
@@ -97,18 +97,18 @@ module pacman_movement (
                 game_rst <= 1'b1;
 
             if (!enable) begin
-                count <= 22'd0;
+                count <= 3'd0;
                 state <= S_IDLE;
             end else begin
                 case (state)
 
                     S_IDLE: begin
-                        if (count == 22'd3350000) begin
-                            count    <= 22'd0;
+                        if (count == 3'd7) begin
+                            count    <= 3'd0;
                             test_dir <= stored_dir;
                             state    <= S_CHECK_TURN;
                         end else begin
-                            count <= count + 22'd1;
+                            count <= count + 3'd1;
                         end
                     end
 
