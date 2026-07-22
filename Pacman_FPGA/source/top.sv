@@ -30,6 +30,7 @@ module top (
   logic       power_pellet_eaten;
   logic       pacman_hit;
   logic [1:0] ghost_eaten;
+  logic [9:0] score;
 
   //RAM VGA read port
   logic [4:0] x_vga, y_vga;
@@ -116,7 +117,8 @@ module top (
     .pellet_eaten          (pellet_eaten),
     .power_pellet_eaten    (power_pellet_eaten),
     .pacman_hit            (pacman_hit),
-    .ghost_eaten           (ghost_eaten)
+    .ghost_eaten           (ghost_eaten),
+    .score                 (score)
   );
 
   vga_controller_top vga_controller(
