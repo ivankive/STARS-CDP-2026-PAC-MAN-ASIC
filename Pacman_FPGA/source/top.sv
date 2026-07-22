@@ -90,7 +90,8 @@ module top (
     .rom_can_move (pac_rom_can_move),
     .xpos         (pacman_x),
     .ypos         (pacman_y),
-    .direction    (pacman_dir)
+    .direction    (pacman_dir),
+    .pacman_hit   (pacman_hit)
   );
 
   pacman_collision pacman_collision_inst (
@@ -195,6 +196,7 @@ ghost_controller ghost_controller (
     .pacman_x             (pacman_x),
     .pacman_y             (pacman_y),
     .pacman_dir           (pacman_dir),
+    .pacman_hit           (pacman_hit),
 
     .ghost_eaten          (ghost_eaten),
 

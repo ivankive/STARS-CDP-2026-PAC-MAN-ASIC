@@ -9,6 +9,7 @@ module ghost_controller (
     input  logic [4:0] pacman_x,
     input  logic [4:0] pacman_y,
     input  logic [1:0] pacman_dir,
+    input  logic       pacman_hit,
 
     input  logic [1:0] ghost_eaten,
 
@@ -42,11 +43,11 @@ module ghost_controller (
     localparam logic [4:0] GRID_MAX_X = 5'd27;
     localparam logic [4:0] GRID_MAX_Y = 5'd30;
 
-    localparam logic [4:0] BLINKY_START_X = 5'd14;
+    localparam logic [4:0] BLINKY_START_X = 5'd13;
     localparam logic [4:0] BLINKY_START_Y = 5'd14;
 
     localparam logic [4:0] PINKY_START_X = 5'd14;
-    localparam logic [4:0] PINKY_START_Y = 5'd17;
+    localparam logic [4:0] PINKY_START_Y = 5'd14;
 
     localparam logic [21:0] GHOST_MOVE_COUNT = 22'd3_360_000;
 
@@ -216,7 +217,7 @@ module ghost_controller (
     integer i;
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
+        if (reset || pacman_hit) begin
             scheduler_state <= S_IDLE;
 
             move_counter <= 22'd0;

@@ -5,6 +5,8 @@ module pacman_movement (
     input  logic       enable,
     input  logic [3:0] pb,
 
+    input  logic       pacman_hit,
+
     // One-port ROM wall-check interface
     output logic [4:0] rom_x,
     output logic [4:0] rom_y,
@@ -65,9 +67,9 @@ module pacman_movement (
     end
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            xpos       <= 5'd1;
-            ypos       <= 5'd4;
+        if (reset || pacman_hit) begin
+            xpos       <= 5'd14;
+            ypos       <= 5'd17;
             dir        <= RIGHT;
             stored_dir <= RIGHT;
             test_dir   <= RIGHT;
