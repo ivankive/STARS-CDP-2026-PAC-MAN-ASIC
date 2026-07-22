@@ -81,16 +81,18 @@ module pacman_collision (
                     if (vulnerable_to_pacman[0]) begin
                         ghost_eaten[0] <= 1'b1;
                         score <= score + 10'd50;
-                    end else if (dangerous_to_pacman[0])
+                    end else if (dangerous_to_pacman[0]) begin
                         pacman_hit <= 1'b1;
+                    end
                 end
 
                 if (collide_pinky) begin
                     if (vulnerable_to_pacman[1]) begin
                         ghost_eaten[1] <= 1'b1;
                         score <= score + 10'd50;
-                    end else if (dangerous_to_pacman[1])
+                    end else if (dangerous_to_pacman[1]) begin
                         pacman_hit <= 1'b1;
+                    end
                 end
 
                 case (state)

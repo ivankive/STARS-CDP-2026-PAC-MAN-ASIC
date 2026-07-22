@@ -67,7 +67,15 @@ module pacman_movement (
     end
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset || pacman_hit) begin
+        if (reset) begin
+            xpos       <= 5'd14;
+            ypos       <= 5'd17;
+            dir        <= RIGHT;
+            stored_dir <= RIGHT;
+            test_dir   <= RIGHT;
+            count      <= 24'd0;
+            state      <= S_IDLE;
+        end else if (pacman_hit) begin
             xpos       <= 5'd14;
             ypos       <= 5'd17;
             dir        <= RIGHT;

@@ -217,7 +217,34 @@ module ghost_controller (
     integer i;
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset || pacman_hit) begin
+        if (reset) begin
+            scheduler_state <= S_IDLE;
+
+            move_counter <= 22'd0;
+
+            cur_ghost <= GHOST_BLINKY;
+            check_dir <= DIR_UP;
+
+            ghost_x[GHOST_BLINKY]   <= BLINKY_START_X;
+            ghost_y[GHOST_BLINKY]   <= BLINKY_START_Y;
+            ghost_dir[GHOST_BLINKY] <= DIR_LEFT;
+
+            ghost_x[GHOST_PINKY]    <= PINKY_START_X;
+            ghost_y[GHOST_PINKY]    <= PINKY_START_Y;
+            ghost_dir[GHOST_PINKY]  <= DIR_LEFT;
+
+            pending_reverse <= 2'b00;
+
+            can_up    <= 1'b0;
+            can_down  <= 1'b0;
+            can_left  <= 1'b0;
+            can_right <= 1'b0;
+
+            ghost_rom_x <= 5'd0;
+            ghost_rom_y <= 5'd0;
+
+            issued_oob <= 1'b1;
+        end else if (pacman_hit) begin
             scheduler_state <= S_IDLE;
 
             move_counter <= 22'd0;
