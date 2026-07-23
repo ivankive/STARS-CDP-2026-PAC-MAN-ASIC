@@ -16,6 +16,7 @@ module pacman_collision (
 
     input  logic [1:0] dangerous_to_pacman,
     input  logic [1:0] vulnerable_to_pacman,
+    input  logic       power_pellet_active,
 
     output logic [4:0] x_central,
     output logic [4:0] y_central,
@@ -82,7 +83,7 @@ module pacman_collision (
                 ghost_eaten        <= 2'b00;
             end else if (game_running) begin
                 if (collide_blinky) begin
-                    if (vulnerable_to_pacman[0]) begin
+                    if (power_pellet_active || vulnerable_to_pacman[0]) begin
                         if (!ghost_eaten[0]) begin
                             ghost_eaten[0] <= 1'b1;
                             score_delta = score_delta + 10'd50;
@@ -94,7 +95,7 @@ module pacman_collision (
                 end
 
                 if (collide_pinky) begin
-                    if (vulnerable_to_pacman[1]) begin
+                    if (power_pellet_active || vulnerable_to_pacman[1]) begin
                         if (!ghost_eaten[1]) begin
                             ghost_eaten[1] <= 1'b1;
                             score_delta = score_delta + 10'd50;

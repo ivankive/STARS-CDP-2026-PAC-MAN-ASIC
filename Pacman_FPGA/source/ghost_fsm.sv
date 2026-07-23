@@ -56,7 +56,9 @@ module ghost_fsm (
             case (state)
 
                 G_CAGED: begin
-                    if (global_ghost_mode == GLOBAL_SCATTER)
+                    if (power_pellet_active)
+                        next_state = G_CAGED;
+                    else if (global_ghost_mode == GLOBAL_SCATTER)
                         next_state = G_SCATTER;
                     else
                         next_state = G_CHASE;
@@ -97,8 +99,8 @@ module ghost_fsm (
 
     always_comb begin
         ghost_can_move       = (state != G_CAGED);
-        dangerous_to_pacman  = (state == G_SCATTER) || (state == G_CHASE);
-        vulnerable_to_pacman = (state == G_FRIGHTENED);
+        dangerous_to_pacman  = ((state == G_SCATTER) || (state == G_CHASE)) && !power_pellet_active;
+        vulnerable_to_pacman = (state == G_FRIGHTENED) || (power_pellet_active && (state != G_CAGED));
     end
 
 endmodule

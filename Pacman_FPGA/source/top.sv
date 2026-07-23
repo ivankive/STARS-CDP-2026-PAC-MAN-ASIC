@@ -82,7 +82,7 @@ module top (
   clock_div marcus(.clk(hz100), .rst(reset), .clk_div(new_clock));
 
   pp_timer pp(.pp_collision(power_pellet_eaten), .clk(new_clock), .rst(reset), .pp_active(power_pellet_active));
-  assign red = power_pellet_eaten;
+  assign red = power_pellet_active;
 
   pacman_movement pacman_movement(
     .clk          (new_clock),
@@ -115,6 +115,7 @@ module top (
 
     .dangerous_to_pacman   (dangerous_to_pacman),
     .vulnerable_to_pacman  (vulnerable_to_pacman),
+    .power_pellet_active   (power_pellet_active),
 
     .x_central             (x_central),
     .y_central             (y_central),
