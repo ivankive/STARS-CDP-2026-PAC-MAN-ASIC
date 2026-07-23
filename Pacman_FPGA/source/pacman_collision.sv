@@ -28,7 +28,8 @@ module pacman_collision (
     output logic       pacman_hit,
     output logic [9:0] score,
     output logic [1:0] ghost_eaten,
-    output logic [1:0] lives
+    output logic [1:0] lives,
+    output logic [8:0] pellets
 );
 
     localparam logic [1:0] TILE_BLANK        = 2'b00;
@@ -72,6 +73,7 @@ module pacman_collision (
             ghost_eaten        <= 2'b00;
             score              <= 10'd0;
             lives              <= 2'd3;
+            pellets            <= 9'd288;
         end else begin
             write_en     <= 1'b0;
             pellet_eaten <= 1'b0;
@@ -126,11 +128,13 @@ module pacman_collision (
                             write_en     <= 1'b1;
                             pellet_eaten <= 1'b1;
                             score_delta  = score_delta + 10'd2;
+                            pellets      <= pellets - 9'd1;
                         end else if (rdata_central == TILE_POWER_PELLET) begin
                             write_en <= 1'b1;
                             if (!power_pellet_eaten) begin
                                 power_pellet_eaten <= 1'b1;
                                 score_delta = score_delta + 10'd15;
+                                pellets <= pellets - 9'd1;
                             end
                         end
 

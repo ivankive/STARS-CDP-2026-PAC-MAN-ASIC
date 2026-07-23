@@ -36,6 +36,7 @@ module top (
   logic [9:0] score;
   logic       game_rst;
   logic [1:0] lives;
+  logic [8:0] pellets;
 
   //RAM VGA read port
   logic [4:0] x_vga, y_vga;
@@ -129,7 +130,8 @@ module top (
     .ghost_eaten           (ghost_eaten),
     .score                 (score),
 
-    .lives                 (lives)
+    .lives                 (lives),
+    .pellets               (pellets)
   );
 
   vga_controller_top vga_controller(
@@ -157,7 +159,8 @@ module top (
     .map_rst      (1'b0),
     .reload_done  (map_loaded),
     .lives        (lives),
-    .game_state   (game_state)
+    .game_state   (game_state),
+    .pellets      (pellets)
   );
 
 maze_bram maze_ram (

@@ -6,6 +6,7 @@ module game_fsm (
     input  logic       map_rst,
     input  logic       reload_done,
     input  logic [1:0] lives,
+    input  logic [8:0] pellets,
     output logic [1:0] game_state
 );
 
@@ -37,7 +38,7 @@ module game_fsm (
 
             // Remain here while Pac-Man still has lives.
             GAME_PLAYING: begin
-                if (lives == 2'd0)
+                if (lives == 2'd0 || pellets == 9'd0)
                     next_state = GAME_OVER;
                 else if (map_rst)
                     next_state = GAME_STARTING;
