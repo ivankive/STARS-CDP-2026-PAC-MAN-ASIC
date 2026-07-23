@@ -91,9 +91,10 @@ module pacman_collision (
                             score_delta = score_delta + 10'd50;
                         end
                     end else if (dangerous_to_pacman[0]) begin
-                        if (!pacman_hit)
+                        if (!pacman_hit) begin
                             pacman_hit <= 1'b1;
-                            lives <= lives - 1;
+                            lives <= lives - 2'd1;
+                        end
                     end
                 end
 
@@ -104,9 +105,10 @@ module pacman_collision (
                             score_delta = score_delta + 10'd50;
                         end
                     end else if (dangerous_to_pacman[1]) begin
-                        if (!pacman_hit)
+                        if (!pacman_hit) begin
                             pacman_hit <= 1'b1;
-                            lives <= lives - 1;
+                            lives <= lives - 2'd1;
+                        end
                     end
                 end
 
