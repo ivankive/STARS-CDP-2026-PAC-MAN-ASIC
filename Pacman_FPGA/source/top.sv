@@ -35,6 +35,7 @@ module top (
   logic [1:0] ghost_eaten;
   logic [9:0] score;
   logic       game_rst;
+  logic [1:0] lives;
 
   //RAM VGA read port
   logic [4:0] x_vga, y_vga;
@@ -126,7 +127,9 @@ module top (
     .power_pellet_eaten    (power_pellet_eaten),
     .pacman_hit            (pacman_hit),
     .ghost_eaten           (ghost_eaten),
-    .score                 (score)
+    .score                 (score),
+
+    .lives                 (lives)
   );
 
   vga_controller_top vga_controller(
@@ -153,7 +156,7 @@ module top (
     .reset        (reset),
     .map_rst      (1'b0),
     .reload_done  (map_loaded),
-    .lives        (2'd3),
+    .lives        (lives),
     .game_state   (game_state)
   );
 
