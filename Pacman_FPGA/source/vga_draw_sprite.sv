@@ -1,15 +1,17 @@
 module vga_draw_sprite(
-    input logic  [9:0] h_count,    //Horizontal Display Counter (max value is 640px)
-    input logic  [9:0] v_count,    //Vertical Display Counter (maxvalue is 480px)
-    input logic        video_on,   //video on signal from vga_counter
-    input logic  [4:0] pacman_x,   //pacman tile x position
-    input logic  [4:0] pacman_y,   //pacman tile y position
-    input logic  [1:0] pacman_dir, //pacman direction
+    input  logic [9:0] h_count,    //Horizontal Display Counter (max value is 640px)
+    input  logic [9:0] v_count,    //Vertical Display Counter (maxvalue is 480px)
+    input  logic       video_on,   //video on signal from vga_counter
+    input  logic [4:0] pacman_x,   //pacman tile x position
+    input  logic [4:0] pacman_y,   //pacman tile y position
+    input  logic [1:0] pacman_dir, //pacman direction
     input  logic [4:0] blinky_x,
     input  logic [4:0] blinky_y,
+    input  logic [1:0] blinky_dir,
     input  logic [4:0] pinky_x,
     input  logic [4:0] pinky_y,
-    input logic  [2:0] input_rgb,  //pixel color from draw_tile
+    input  logic [1:0] pinky_dir,
+    input  logic [2:0] input_rgb,  //pixel color from draw_tile
     output logic [2:0] output_rgb  //pixel color
   );
   //variables

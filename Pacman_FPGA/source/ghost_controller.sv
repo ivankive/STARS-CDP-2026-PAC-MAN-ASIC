@@ -27,7 +27,8 @@ module ghost_controller (
     output logic [1:0] pinky_dir,
 
     output logic [1:0] dangerous_to_pacman,
-    output logic [1:0] vulnerable_to_pacman
+    output logic [1:0] vulnerable_to_pacman,
+    output logic [9:0] score
 );
 
     localparam logic GHOST_BLINKY = 1'b0;
@@ -49,7 +50,7 @@ module ghost_controller (
     localparam logic [4:0] PINKY_START_X = 5'd14;
     localparam logic [4:0] PINKY_START_Y = 5'd14;
 
-    localparam logic [2:0] GHOST_MOVE_COUNT = 3'd7;
+    localparam logic [2:0] GHOST_MOVE_COUNT = 3'd1;
 
     logic [2:0] move_counter;
 

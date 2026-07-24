@@ -149,8 +149,11 @@ module top (
     .pacman_dir (pacman_dir),
     .blinky_x   (blinky_x),
     .blinky_y   (blinky_y),
+    .blinky_dir (blinky_dir),
     .pinky_x    (pinky_x),
-    .pinky_y    (pinky_y)
+    .pinky_y    (pinky_y),
+    .pinky_dir   (pinky_dir),
+    .score      (score)
   );
 
   game_fsm game_fsm(
@@ -205,6 +208,7 @@ ghost_controller ghost_controller (
     .game_state           (game_state),
     .power_pellet_active  (power_pellet_active),
     .global_ghost_mode    (global_ghost_mode),
+    .score                (score),
 
     .pacman_x             (pacman_x),
     .pacman_y             (pacman_y),

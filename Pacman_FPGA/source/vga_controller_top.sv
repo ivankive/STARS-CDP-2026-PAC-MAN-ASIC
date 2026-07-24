@@ -15,10 +15,13 @@ module vga_controller_top(
     input logic [4:0] pacman_x,
     input logic [4:0] pacman_y,
     input logic [1:0] pacman_dir,
-    input  logic [4:0] blinky_x,
-    input  logic [4:0] blinky_y,
-    input  logic [4:0] pinky_x,
-    input  logic [4:0] pinky_y
+    input logic [4:0] blinky_x,
+    input logic [4:0] blinky_y,
+    input logic [1:0] blinky_dir,
+    input logic [4:0] pinky_x,
+    input logic [1:0] pinky_dir,
+    input logic [4:0] pinky_y,
+    input logic [9:0] score
 );
     logic [9:0] hcount_raw, vcount_raw;
     logic       hsync_raw, vsync_raw;
@@ -75,18 +78,20 @@ module vga_controller_top(
     );
 
     vga_draw_sprite draw_sprite(
-        .h_count(hcount_d),        //inputs from VGA_counter
-        .v_count(vcount_d),
-        .video_on(video_on_d),
-        .pacman_x(pacman_x),    //inputs from pacman_controller
-        .pacman_y(pacman_y),
+        .h_count   (hcount_d),        //inputs from VGA_counter
+        .v_count   (vcount_d),
+        .video_on  (video_on_d),
+        .pacman_x  (pacman_x),    //inputs from pacman_controller
+        .pacman_y  (pacman_y),
         .pacman_dir(pacman_dir),      
         .blinky_x   (blinky_x),   //inputs from ghost_controller
         .blinky_y   (blinky_y),
+        .blinky_dir (blinky_dir),
         .pinky_x    (pinky_x),
         .pinky_y    (pinky_y),
-        .input_rgb(rgb_tile),   //inputs from draw_tile
-        .output_rgb(rgb_sprite) //outputs to draw_text
+        .pinky_dir  (pinky_dir),
+        .input_rgb  (rgb_tile),   //inputs from draw_tile
+        .output_rgb (rgb_sprite) //outputs to draw_text
     );
 
     vga_draw_border draw_border(
@@ -98,11 +103,11 @@ module vga_controller_top(
     );
 
     vga_draw_text draw_text(
-        .h_count(hcount_d),        //inputs from VGA_counter
-        .v_count(vcount_d),
-        .video_on(video_on_d),
-      //.score(8'd0),           //inputs from central control system
-        .input_rgb(rgb_border), //inputs from draw_border
+        .h_count   (hcount_d),        //inputs from VGA_counter
+        .v_count   (vcount_d),
+        .video_on  (video_on_d),
+        .score     (score),           //inputs from central control system
+        .input_rgb (rgb_border), //inputs from draw_border
         .output_rgb(rgb_text)   //outputs to VGA
     );
     
