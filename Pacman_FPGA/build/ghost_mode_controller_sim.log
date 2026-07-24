@@ -1,0 +1,14 @@
+VCD info: dumpfile waves/ghost_mode_controller.vcd opened for output.
+PASS: reset leaves scatter
+PASS: inactive stays scatter
+PASS: still scatter just before switch
+PASS: scatter->chase after 419 cycles
+PASS: still chase just before switch
+PASS: chase->scatter after 1023 cycles
+PASS: scatter again mid-count
+PASS: pause forces scatter
+PASS: full scatter after resume
+PASS: async reset to scatter
+
+ghost_mode_controller_tb: 10 PASS, 0 FAIL
+testbench/ghost_mode_controller_tb.sv:89: $finish called at 19696000 (1ps)

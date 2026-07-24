@@ -1,0 +1,13 @@
+VCD info: dumpfile waves/pp_timer.vcd opened for output.
+PASS: reset clears pp_active
+PASS: pp_collision asserts pp_active
+PASS: still active at timer==179
+PASS: clears after 180 active cycles
+PASS: mid-window still active
+PASS: retrig still active near end
+PASS: retrig expires after full window
+PASS: active before async reset
+PASS: async reset clears pp_active
+
+pp_timer_tb: 9 PASS, 0 FAIL
+testbench/pp_timer_tb.sv:89: $finish called at 4175000 (1ps)

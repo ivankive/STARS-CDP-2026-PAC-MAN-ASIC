@@ -1,0 +1,17 @@
+VCD info: dumpfile waves/ghost_target.vcd opened for output.
+PASS: caged target (14,17)
+PASS: scatter Blinky (27,0)
+PASS: scatter Pinky (0,0)
+PASS: chase Blinky = Pac-Man
+PASS: Pinky right +4
+PASS: Pinky left -4
+PASS: Pinky up -4
+PASS: Pinky down +4
+PASS: Pinky left clamp to 0
+PASS: Pinky right clamp to 27
+PASS: Pinky up clamp to 0
+PASS: Pinky down clamp to 30
+PASS: frightened = ghost pos
+
+ghost_target_tb: 13 PASS, 0 FAIL
+testbench/ghost_target_tb.sv:137: $finish called at 13000 (1ps)
