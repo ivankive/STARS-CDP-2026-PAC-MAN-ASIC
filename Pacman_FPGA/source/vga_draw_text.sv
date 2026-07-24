@@ -19,7 +19,7 @@ module vga_draw_text(
   assign pixel_y = v_count[2:0]; //remainder
   assign pixel_x = h_count[2:0];
 
-assign output_rgb = input_rgb;
+  assign output_rgb = input_rgb;
 
 
 /*
