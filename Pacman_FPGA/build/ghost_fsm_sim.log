@@ -1,0 +1,28 @@
+VCD info: dumpfile waves/ghost_fsm.vcd opened for output.
+PASS: reset -> CAGED
+PASS: caged cannot move
+PASS: caged not dangerous
+PASS: non-playing stays CAGED
+PASS: caged -> SCATTER
+PASS: scatter can move
+PASS: scatter dangerous
+PASS: scatter not vulnerable
+PASS: scatter -> CHASE
+PASS: chase dangerous
+PASS: chase -> FRIGHTENED
+PASS: frightened_start pulse
+PASS: frightened can move
+PASS: frightened vulnerable
+PASS: frightened not dangerous
+PASS: frightened_start clears
+PASS: stay FRIGHTENED
+PASS: frightened -> CHASE
+PASS: again FRIGHTENED
+PASS: eaten -> CAGED
+PASS: caged while pellet active
+PASS: leave cage to SCATTER
+PASS: frightened -> SCATTER
+PASS: starting forces CAGED
+
+ghost_fsm_tb: 24 PASS, 0 FAIL
+testbench/ghost_fsm_tb.sv:166: $finish called at 206000 (1ps)

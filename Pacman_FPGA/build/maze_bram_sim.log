@@ -1,0 +1,18 @@
+VCD info: dumpfile waves/maze_bram.vcd opened for output.
+PASS: not loaded after reset
+PASS: map_loaded within timeout
+PASS: VGA reads pellet at (5,5)
+PASS: VGA reads wall at (0,3)
+PASS: VGA reads path at (4,4)
+PASS: VGA OOB returns wall
+PASS: central pellet before clear
+PASS: central pellet cleared to path
+PASS: central power tile
+PASS: central power cleared to path
+PASS: central OOB returns wall
+PASS: map_rst clears map_loaded
+PASS: map_loaded within timeout
+PASS: pellet restored after reload
+
+maze_bram_tb: 14 PASS, 0 FAIL
+testbench/maze_bram_tb.sv:179: $finish called at 17605000 (1ps)

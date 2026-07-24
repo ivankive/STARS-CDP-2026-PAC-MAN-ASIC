@@ -1,0 +1,14 @@
+VCD info: dumpfile waves/ghost_movement.vcd opened for output.
+PASS: cannot move holds pose
+PASS: move right toward target
+PASS: move left toward target
+PASS: move down toward target
+PASS: move up toward target
+PASS: do_reverse chooses left
+PASS: continue straight
+PASS: pick up when forward blocked
+PASS: dead-end reverse
+PASS: no legal move holds position
+
+ghost_movement_tb: 10 PASS, 0 FAIL
+testbench/ghost_movement_tb.sv:166: $finish called at 10000 (1ps)
