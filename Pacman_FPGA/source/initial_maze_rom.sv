@@ -73,7 +73,7 @@ module initial_maze_rom (
         tile_a = tile_from_xy(x_a, y_a);
         tile_b = tile_from_xy(x_b, y_b);
 
-        can_move_a = (tile_a != WALL_TILE);
-        can_move_b = (tile_b != WALL_TILE);
+        can_move_a = (tile_a != WALL_TILE && (!(x_a == 13 && y_a == 12) && !(x_a == 14 && y_a == 12)));
+        can_move_b = (tile_b != WALL_TILE && (!(x_b == 12 && (y_b >= 12 && y_b <= 16)) && !(x_b == 15 && (y_b >= 12 && y_b <= 16))));
     end
 endmodule

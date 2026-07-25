@@ -83,7 +83,7 @@ module ghost_target (
                  * Pinky:  upper-left corner.
                  */
                 target_x = ghost_id ? '0 : 27;
-                target_y = ghost_id ? '0 : 31;;
+                target_y = '0;
             end
 
             G_CHASE: begin
