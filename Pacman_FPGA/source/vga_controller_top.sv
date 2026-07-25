@@ -11,7 +11,7 @@ module vga_controller_top(
     input  logic [1:0] rdata_vga,
     input  logic       map_loaded,
 
-    //pacman
+    //sprites
     input logic [4:0] pacman_x,
     input logic [4:0] pacman_y,
     input logic [1:0] pacman_dir,
@@ -21,6 +21,7 @@ module vga_controller_top(
     input logic [4:0] pinky_x,
     input logic [1:0] pinky_dir,
     input logic [4:0] pinky_y,
+    input logic [1:0] lives,
     input logic [9:0] score
 );
     logic [9:0] hcount_raw, vcount_raw;
@@ -90,6 +91,7 @@ module vga_controller_top(
         .pinky_x    (pinky_x),
         .pinky_y    (pinky_y),
         .pinky_dir  (pinky_dir),
+        .lives      (lives),
         .input_rgb  (rgb_tile),   //inputs from draw_tile
         .output_rgb (rgb_sprite) //outputs to draw_text
     );

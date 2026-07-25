@@ -11,6 +11,7 @@ module vga_draw_sprite(
     input  logic [4:0] pinky_x,
     input  logic [4:0] pinky_y,
     input  logic [1:0] pinky_dir,
+    input  logic [1:0] lives,
     input  logic [2:0] input_rgb,  //pixel color from draw_tile
     output logic [2:0] output_rgb  //pixel color
   );
@@ -31,7 +32,7 @@ module vga_draw_sprite(
   assign draw_blinky = (tile_x == blinky_x) && (tile_y == blinky_y);
   assign draw_pinky = (tile_x == pinky_x) && (tile_y == pinky_y);
 
-//pixel generator for tile
+//Sprite pixel generator
   always_comb begin
     //draw black if not on map
     if (draw_pacman && video_on) begin
@@ -83,8 +84,6 @@ module vga_draw_sprite(
           3'd6 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
           3'd7 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
         endcase
-    
-  
     end else if (draw_blinky && video_on) begin
  
       if (blinky_dir == 2'd0) //up?
@@ -134,10 +133,7 @@ module vga_draw_sprite(
          3'd5 : output_rgb = 3'b100 ;
          3'd6 : output_rgb = 3'b100 ;
          3'd7 : output_rgb = (pixel_x != 3'd1 && pixel_x != 3'd3 && pixel_x != 3'd4 && pixel_x != 3'd6)? 3'b100 : 3'b000; 
-       endcase
-
-  
-    
+       endcase 
     end else if (draw_pinky && video_on) begin
 
       if (pinky_dir == 2'd0) //up?
@@ -188,11 +184,21 @@ module vga_draw_sprite(
            3'd6 : output_rgb = 3'b101 ;
            3'd7 : output_rgb = (pixel_x != 3'd1 && pixel_x != 3'd3 && pixel_x != 3'd4 && pixel_x != 3'd6)? 3'b101 : 3'b000; 
          endcase
-
-    end
- 
-    else
+    end else
       output_rgb = input_rgb;
+
+    //Lives display
+    if (lives == 2'd3) begin
+      if ((h_count <= 20) && (v_count < 328 && v_count > 311)) begin
+        output_rgb = 3'b110;
+      end
+    end else if (lives >= 2'd2) begin
+      if ((h_count < 15 && h_count > 7) && (v_count < 347 && v_count > 340)) begin
+        output_rgb = 3'b110;
+      end else if ((h_count < 22 && h_count > 14) && (v_count < 347 && v_count > 340)) begin
+        output_rgb = 3'b110;
+      end
+    end
   end
 
 

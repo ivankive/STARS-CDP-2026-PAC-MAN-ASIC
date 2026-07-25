@@ -153,6 +153,7 @@ module top (
     .pinky_x    (pinky_x),
     .pinky_y    (pinky_y),
     .pinky_dir   (pinky_dir),
+    .lives      (lives),
     .score      (score)
   );
 

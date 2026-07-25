@@ -11,7 +11,7 @@ module vga_draw_border(
 
   //determine whether pixel is in the map
   assign black_right   = ((h_count >= 224));
-  assign black_bottom = ((v_count >= (288+24)) && (v_count < 480));
+  assign black_bottom = ((v_count >= (288+24+8)) && (v_count < 480));
   assign black_top    = ((v_count < 64));
 
 
