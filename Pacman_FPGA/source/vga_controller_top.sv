@@ -21,6 +21,7 @@ module vga_controller_top(
     input logic [4:0] pinky_x,
     input logic [1:0] pinky_dir,
     input logic [4:0] pinky_y,
+    input logic       pp_active,
     input logic [1:0] lives,
     // input logic [9:0] score
 
@@ -94,6 +95,7 @@ module vga_controller_top(
         .pinky_x    (pinky_x),
         .pinky_y    (pinky_y),
         .pinky_dir  (pinky_dir),
+        .pp_active  (pp_active),
         .lives      (lives),
         .input_rgb  (rgb_tile),   //inputs from draw_tile
         .output_rgb (rgb_sprite) //outputs to draw_text

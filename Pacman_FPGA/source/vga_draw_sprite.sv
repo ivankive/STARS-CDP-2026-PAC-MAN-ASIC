@@ -12,6 +12,7 @@ module vga_draw_sprite(
     input  logic [4:0] pinky_y,
     input  logic [1:0] pinky_dir,
     input  logic [1:0] lives,
+    input  logic       pp_active, 
     input  logic [2:0] input_rgb,  //pixel color from draw_tile
     output logic [2:0] output_rgb  //pixel color
   );
@@ -85,8 +86,18 @@ module vga_draw_sprite(
           3'd7 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
         endcase
     end else if (draw_blinky && video_on) begin
- 
-      if (blinky_dir == 2'd0) //up?
+      if (pp_active) //powered up
+        casez (pixel_y) 
+          3'd0 : output_rgb = (pixel_x > 3'd1 && pixel_x < 3'd6)? 3'b011 : 3'b000;
+          3'd1 : output_rgb = (pixel_x > 3'd0 && pixel_x < 3'd7)? 3'b011 : 3'b000;
+          3'd2 : output_rgb = (pixel_x < 3'd1 || pixel_x > 3'd6 || (pixel_x > 3'd2 && pixel_x < 3'd5))? 3'b011 : (pixel_x == 3'd1 || pixel_x == 3'd6)? 3'b111 : 3'b000; //eyes
+          3'd3 : output_rgb = (pixel_x < 3'd1 || pixel_x > 3'd6 || (pixel_x > 3'd2 && pixel_x < 3'd5))? 3'b011 : 3'b111; //eyes
+          3'd4 : output_rgb = 3'b011 ;
+          3'd5 : output_rgb = 3'b011 ;
+          3'd6 : output_rgb = 3'b011 ;
+          3'd7 : output_rgb = (pixel_x != 3'd1 && pixel_x != 3'd3 && pixel_x != 3'd4 && pixel_x != 3'd6)? 3'b011 : 3'b000; 
+        endcase
+      else if (blinky_dir == 2'd0) //up?
         casez (pixel_y) 
           3'd0 : output_rgb = (pixel_x > 3'd1 && pixel_x < 3'd6)? 3'b100 : 3'b000;
           3'd1 : output_rgb = (pixel_x > 3'd0 && pixel_x < 3'd7)? 3'b100 : 3'b000;
@@ -135,8 +146,18 @@ module vga_draw_sprite(
          3'd7 : output_rgb = (pixel_x != 3'd1 && pixel_x != 3'd3 && pixel_x != 3'd4 && pixel_x != 3'd6)? 3'b100 : 3'b000; 
        endcase 
     end else if (draw_pinky && video_on) begin
-
-      if (pinky_dir == 2'd0) //up?
+      if (pp_active) //powered up
+        casez (pixel_y) 
+          3'd0 : output_rgb = (pixel_x > 3'd1 && pixel_x < 3'd6)? 3'b011 : 3'b000;
+          3'd1 : output_rgb = (pixel_x > 3'd0 && pixel_x < 3'd7)? 3'b011 : 3'b000;
+          3'd2 : output_rgb = (pixel_x < 3'd1 || pixel_x > 3'd6 || (pixel_x > 3'd2 && pixel_x < 3'd5))? 3'b011 : (pixel_x == 3'd1 || pixel_x == 3'd6)? 3'b111 : 3'b000; //eyes
+          3'd3 : output_rgb = (pixel_x < 3'd1 || pixel_x > 3'd6 || (pixel_x > 3'd2 && pixel_x < 3'd5))? 3'b011 : 3'b111; //eyes
+          3'd4 : output_rgb = 3'b011 ;
+          3'd5 : output_rgb = 3'b011 ;
+          3'd6 : output_rgb = 3'b011 ;
+          3'd7 : output_rgb = (pixel_x != 3'd1 && pixel_x != 3'd3 && pixel_x != 3'd4 && pixel_x != 3'd6)? 3'b011 : 3'b000; 
+        endcase
+      else if (pinky_dir == 2'd0) //up?
        casez (pixel_y)
          3'd0 : output_rgb = (pixel_x > 3'd1 && pixel_x < 3'd6)? 3'b101 : 3'b000;
          3'd1 : output_rgb = (pixel_x > 3'd0 && pixel_x < 3'd7)? 3'b101 : 3'b000;

@@ -155,7 +155,8 @@ module top (
     .blinky_dir (blinky_dir),
     .pinky_x    (pinky_x),
     .pinky_y    (pinky_y),
-    .pinky_dir   (pinky_dir),
+    .pinky_dir  (pinky_dir),
+    .pp_active  (power_pellet_active),
     .lives      (lives),
     .game_state (game_state)
     // .score      (score)
