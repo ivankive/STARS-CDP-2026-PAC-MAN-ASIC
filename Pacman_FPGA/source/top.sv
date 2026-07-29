@@ -12,6 +12,8 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
+  assign right[7] = hz100;
+
   logic [9:0] hcount, vcount;
 
   // Clock
@@ -90,7 +92,7 @@ module top (
     .clk          (new_clock),
     .reset        (reset),
     .enable       ((game_state == 2'b01) && map_loaded),
-    .pb           ({pb[0], pb[3], pb[2], pb[1], pb[6]}),
+    .pb           ({pb[3], pb[2], pb[1], pb[6]}),
     .rom_x        (pac_rom_x),
     .rom_y        (pac_rom_y),
     .rom_can_move (pac_rom_can_move),
@@ -153,7 +155,8 @@ module top (
     .pinky_x    (pinky_x),
     .pinky_y    (pinky_y),
     .pinky_dir   (pinky_dir),
-    .lives      (lives)
+    .lives      (lives),
+    .game_state (game_state)
     // .score      (score)
   );
 
@@ -163,8 +166,9 @@ module top (
     .map_rst      (1'b0),
     .reload_done  (map_loaded),
     .lives        (lives),
-    .game_state   (game_state),
-    .pellets      (pellets)
+    .pellets      (pellets),
+    .inputs       ({pb[3], pb[2], pb[1], pb[6]}),
+    .game_state   (game_state)
   );
 
 maze_bram maze_ram (

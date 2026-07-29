@@ -188,15 +188,44 @@ module vga_draw_sprite(
       output_rgb = input_rgb;
 
     //Lives display
-    if (lives == 2'd3) begin
-      if ((h_count <= 20) && (v_count < 328 && v_count > 311)) begin
-        output_rgb = 3'b110;
+    if (lives >= 2'd1) begin
+      if((h_count <= 7) && (v_count < 328 && v_count > 311)) begin
+        casez (pixel_y)
+          3'd0 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+          3'd1 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+          3'd2 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+          3'd3 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+          3'd4 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+          3'd5 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+          3'd6 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+          3'd7 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+        endcase
       end
-    end else if (lives >= 2'd2) begin
-      if ((h_count < 15 && h_count > 7) && (v_count < 347 && v_count > 340)) begin
-        output_rgb = 3'b110;
-      end else if ((h_count < 22 && h_count > 14) && (v_count < 347 && v_count > 340)) begin
-        output_rgb = 3'b110;
+    end if (lives >= 2'd2) begin
+      if ((h_count < 24 && h_count > 15) && (v_count < 328 && v_count > 311)) begin
+        casez (pixel_y)
+          3'd0 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+          3'd1 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+          3'd2 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+          3'd3 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+          3'd4 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+          3'd5 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+          3'd6 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+          3'd7 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+        endcase
+      end
+      end if (lives >= 2'd3) begin
+      if ((h_count <= 39 && h_count > 31) && (v_count < 328 && v_count > 311)) begin
+        casez (pixel_y)
+          3'd0 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+          3'd1 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+          3'd2 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+          3'd3 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+          3'd4 : output_rgb = (pixel_x < 3'd4)?   3'b110: 3'b000;
+          3'd5 : output_rgb = (pixel_x < 3'd5)?   3'b110: 3'b000;
+          3'd6 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
+          3'd7 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
+        endcase
       end
     end
   end

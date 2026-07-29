@@ -4,7 +4,7 @@ module pacman_movement (
     output logic       game_rst,
 
     input  logic       enable,
-    input  logic [4:0] pb,
+    input  logic [3:0] pb,
 
     input  logic       pacman_hit,
 
@@ -93,8 +93,6 @@ module pacman_movement (
                 stored_dir <= DOWN;
             else if (pb[3])
                 stored_dir <= LEFT;
-            else if (pb[4])
-                game_rst <= 1'b1;
 
             if (!enable) begin
                 count <= 3'd0;

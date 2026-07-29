@@ -21,8 +21,11 @@ module vga_controller_top(
     input logic [4:0] pinky_x,
     input logic [1:0] pinky_dir,
     input logic [4:0] pinky_y,
-    input logic [1:0] lives
+    input logic [1:0] lives,
     // input logic [9:0] score
+
+    //text
+    input logic [1:0] game_state 
 );
     logic [9:0] hcount_raw, vcount_raw;
     logic       hsync_raw, vsync_raw;
@@ -109,6 +112,7 @@ module vga_controller_top(
         .v_count   (vcount_d),
         .video_on  (video_on_d),
         // .score     (score),           //inputs from central control system
+        .game_state(game_state),
         .input_rgb (rgb_border), //inputs from draw_border
         .output_rgb(rgb_text)   //outputs to VGA
     );

@@ -60,9 +60,9 @@ module ice40hx8k (hwclk,pb,ss7,ss6,ss5,ss4,ss3,ss2,ss1,ss0,left,right,red,green,
         .SHIFTREG_DIV_MODE(1'b0), // 0 => div-by-4; 1 => div-by-7
         .FDA_FEEDBACK(4'b0000),
         .FDA_RELATIVE(4'b0000),
-        .DIVR(4'b0000),        // 0
-        .DIVF(7'b1000010),     // 66
-        .DIVQ(3'b101),         // 5
+        .DIVR(4'b0000),         // 0
+        .DIVF(7'b1000010),      // 66
+        .DIVQ(3'b101),          // 5
         .FILTER_RANGE(3'b001),  // 1
     ) pll (
         .REFERENCECLK (hwclk),
