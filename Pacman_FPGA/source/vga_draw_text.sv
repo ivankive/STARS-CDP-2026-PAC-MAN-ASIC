@@ -1,8 +1,8 @@
 module vga_draw_text(
     input logic  [9:0] h_count,    //Horizontal Display Counter (max value is 640px)
     input logic  [9:0] v_count,    //Vertical Display Counter (maxvalue is 480px)
-    input logic        video_on,  
-    input logic  [9:0] score,                              //video on signal from vga_counter
+    input logic        video_on,
+    // input logic  [9:0] score,                              //video on signal from vga_counter
     input logic  [2:0] input_rgb,  //pixel color from draw_tile
     output logic [2:0] output_rgb  //pixel color
   );
@@ -12,7 +12,7 @@ module vga_draw_text(
   logic [4:0] tile_x;           // 0-35 X tiles
   logic [2:0] pixel_x, pixel_y; //0-7 pixels in tiles
   logic draw_s, draw_c, draw_o, draw_r, draw_e;
-  logic score_pos;
+  // logic score_pos;
   
   //determine tile location and pixel position of VGA
   assign tile_y = v_count[7:3]; //quotient

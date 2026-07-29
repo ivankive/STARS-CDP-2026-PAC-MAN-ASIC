@@ -8,7 +8,7 @@
 
 This project implements the classic Pac-Man arcade game entirely in hardware using SystemVerilog. The design targets an **iCE40 HX8K FPGA** for development and prototyping, with a final goal of **ASIC tapeout** on the **sky130** open-source PDK.
 
-The game runs on a tile-based maze rendered over VGA. Pac-Man and ghost movement, collision detection, pellet collection, scoring, and ghost AI are handled by dedicated hardware modules rather than a software CPU.
+The game runs on a tile-based maze rendered over VGA. Pac-Man and ghost movement, collision detection, pellet collection, and ghost AI are handled by dedicated hardware modules rather than a software CPU.
 
 The working FPGA design lives under [`Pacman_FPGA/`](Pacman_FPGA/).
 
@@ -21,13 +21,13 @@ The working FPGA design lives under [`Pacman_FPGA/`](Pacman_FPGA/).
 - [x] Sprite rendering (Pac-Man, Blinky, Pinky)
 - [x] Maze ROM + BRAM (runtime pellet state, map reload)
 - [x] Pac-Man movement with pushbutton input and wall collision
-- [x] Pellet / power-pellet collection and scoring
+- [x] Pellet / power-pellet collection
 - [x] Ghost AI (Blinky & Pinky — chase, scatter, frightened)
 - [x] Power-pellet timer and frightened mode
 - [x] Game FSM (starting → playing → game over)
 - [x] Full top-level integration on FPGA
 - [ ] Lives tracking / respawn fully wired through top
-- [ ] Score on 7-segment display
+- [ ] Scoring (commented out in RTL)
 - [ ] ASIC synthesis & tapeout
 
 ---
@@ -64,7 +64,7 @@ Display, game-state, memory, and movement subsystems are integrated in `top.sv`.
     │         ├── vga_draw_border
     │         └── vga_draw_text
     │
-    ├──► maze_bram ◄──► pacman_collision (pellets, score, hits)
+    ├──► maze_bram ◄──► pacman_collision (pellets, hits)
     │         ▲
     │         └── initial_maze_rom (reload + wall checks)
     │
@@ -111,7 +111,7 @@ top
 | `clock_div.sv` | Divides 100 MHz → ~60 Hz game tick |
 | `game_fsm.sv` | Starting / playing / game-over states |
 | `pacman_movement.sv` | Pac-Man grid position, direction, button input |
-| `pacman_collision.sv` | Pellets, power pellets, ghost contact, score |
+| `pacman_collision.sv` | Pellets, power pellets, ghost contact |
 | `pp_timer.sv` | Power-pellet / frightened duration |
 | `maze_bram.sv` | Dual-port BRAM for runtime maze + VGA reads |
 | `initial_maze_rom.sv` | Static maze ROM (walls / pellets) |
@@ -162,7 +162,7 @@ top
 | `pb` | Input | Pushbuttons [20:0] |
 | `left[3:4]` | Output | VGA hsync / vsync |
 | `right[3:1]` | Output | VGA RGB |
-| `ss0–ss7` | Output | 7-segment displays (unused for score yet) |
+| `ss0–ss7` | Output | 7-segment displays (unused) |
 | UART | I/O | Serial debug interface |
 
 Pin assignments are in [`Pacman_FPGA/support/pinmap.pcf`](Pacman_FPGA/support/pinmap.pcf).
@@ -215,12 +215,12 @@ Source files go in `Pacman_FPGA/source/`; testbenches in `Pacman_FPGA/testbench/
 | VGA display | Done | Counter + tile/sprite/border/text layers |
 | Maze memory | Done | ROM + BRAM with VGA and gameplay ports |
 | Pac-Man movement | Done | 60 Hz tick; integrated in `top` |
-| Pellets / scoring | Done | Collision module clears pellets and tracks score |
+| Pellets | Done | Collision module clears pellets |
 | Ghost AI | Done | Blinky & Pinky with mode controller |
 | Power pellet mode | Done | Timer + frightened / eatable ghosts |
 | Full integration | Done | Wired in `Pacman_FPGA/source/top.sv` |
 | Lives / game over UX | Partial | FSM present; lives still hardcoded in top |
-| 7-segment score | Not started | Score exists in logic, not driven to `ss*` |
+| Scoring | Disabled | Score logic commented out in RTL |
 | ASIC tapeout | Not started | PDK setup available via Makefile |
 
 ---
