@@ -51,7 +51,12 @@ module game_fsm (
             // Remain in game over until the game is reset.
             GAME_OVER: begin
                 if (map_rst || |inputs)
-                    next_state = GAME_PLAYING;
+                    next_state = GAME_STARTING;
+            end
+
+            GAME_WIN: begin
+                if (map_rst || |inputs)
+                    next_state = GAME_STARTING;
             end
 
             default: begin

@@ -92,7 +92,7 @@ module top (
     .clk          (new_clock),
     .reset        (reset),
     .enable       ((game_state == 2'b01) && map_loaded),
-    .pb           ({pb[3], pb[2], pb[1], pb[6]}),
+    .pb           ({pb[7], pb[6], pb[5], pb[10]}),
     .rom_x        (pac_rom_x),
     .rom_y        (pac_rom_y),
     .rom_can_move (pac_rom_can_move),
@@ -108,6 +108,7 @@ module top (
     .reset                 (reset),
     .game_tick             (new_clock),
     .game_running          ((game_state == 2'd1) && map_loaded),
+    .game_starting         (game_state == 2'd0),
 
     .pacman_x              (pacman_x),
     .pacman_y              (pacman_y),
@@ -167,7 +168,7 @@ module top (
     .reload_done  (map_loaded),
     .lives        (lives),
     .pellets      (pellets),
-    .inputs       ({pb[3], pb[2], pb[1], pb[6]}),
+    .inputs       ({pb[7], pb[6], pb[5], pb[10]}),
     .game_state   (game_state)
   );
 

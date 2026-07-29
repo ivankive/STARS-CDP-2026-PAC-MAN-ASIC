@@ -80,7 +80,7 @@ module vga_controller_top(
         .tile_data   (rdata_vga),
         .output_rgb  (rgb_tile)
     );
-
+    
     vga_draw_sprite draw_sprite(
         .h_count   (hcount_d),        //inputs from VGA_counter
         .v_count   (vcount_d),
@@ -99,27 +99,29 @@ module vga_controller_top(
         .output_rgb (rgb_sprite) //outputs to draw_text
     );
 
-    vga_draw_border draw_border(
-        .h_count(hcount_d),        //inputs from VGA_counter
-        .v_count(vcount_d),
-        .video_on(video_on_d),
-        .input_rgb(rgb_sprite), //inputs from draw_sprite
-        .output_rgb(rgb_border)   //outputs to draw_text
-    );
-
     vga_draw_text draw_text(
         .h_count   (hcount_d),        //inputs from VGA_counter
         .v_count   (vcount_d),
         .video_on  (video_on_d),
         // .score     (score),           //inputs from central control system
         .game_state(game_state),
-        .input_rgb (rgb_border), //inputs from draw_border
+        .input_rgb (rgb_sprite), //inputs from draw_border
         .output_rgb(rgb_text)   //outputs to VGA
     );
+
+    vga_draw_border draw_border(
+        .h_count(hcount_d),        //inputs from VGA_counter
+        .v_count(vcount_d),
+        .video_on(video_on_d),
+        .input_rgb(rgb_text), //inputs from draw_sprite
+        .output_rgb(rgb_border)   //outputs to draw_text
+    );
+
+
     
-    assign rgb[0] = rgb_text[2]; //output to VGA
-    assign rgb[1] = rgb_text[1];
-    assign rgb[2] = rgb_text[0];
+    assign rgb[0] = rgb_border[2]; //output to VGA
+    assign rgb[1] = rgb_border[1];
+    assign rgb[2] = rgb_border[0];
 
 
 endmodule

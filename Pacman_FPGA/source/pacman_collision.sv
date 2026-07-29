@@ -5,6 +5,7 @@ module pacman_collision (
     input  logic       reset,
     input  logic       game_tick,
     input  logic       game_running,
+    input  logic       game_starting,
 
     input  logic [4:0] pacman_x,
     input  logic [4:0] pacman_y,
@@ -74,6 +75,16 @@ module pacman_collision (
             // score              <= 10'd0;
             lives              <= 2'd3;
             pellets            <= 9'd288;
+        end else if (game_starting) begin
+            state              <= S_READ;
+            write_en           <= 1'b0;
+            pellet_eaten       <= 1'b0;
+            power_pellet_eaten <= 1'b0;
+            pacman_hit         <= 1'b0;
+            ghost_eaten        <= 2'b00;
+            // score              <= 10'd0;
+            lives              <= 2'd3;
+            pellets            <= 9'd288; 
         end else begin
             write_en     <= 1'b0;
             pellet_eaten <= 1'b0;
