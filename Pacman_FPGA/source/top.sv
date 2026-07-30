@@ -78,6 +78,9 @@ module top (
   logic [1:0] dangerous_to_pacman;
   logic [1:0] vulnerable_to_pacman;
 
+  logic [3:0] inputs;
+
+  assign inputs = {pb[7], pb[6], pb[5], pb[10]};
   assign rom_x_a = (game_state == 2'b0) ? reload_rom_x : pac_rom_x;
   assign rom_y_a = (game_state == 2'b0) ? reload_rom_y : pac_rom_y;
   assign reload_rom_data = rom_tile_a;
@@ -92,7 +95,7 @@ module top (
     .clk          (new_clock),
     .reset        (reset),
     .enable       ((game_state == 2'b01) && map_loaded),
-    .pb           ({pb[7], pb[6], pb[5], pb[10]}),
+    .pb           (inputs),
     .rom_x        (pac_rom_x),
     .rom_y        (pac_rom_y),
     .rom_can_move (pac_rom_can_move),
@@ -165,18 +168,18 @@ module top (
   game_fsm game_fsm(
     .clk          (hz100),
     .reset        (reset),
-    .map_rst      (1'b0),
+    .map_rst      ((game_state == 2'd2 || game_state == 2'd3) && |inputs),
     .reload_done  (map_loaded),
     .lives        (lives),
     .pellets      (pellets),
-    .inputs       ({pb[7], pb[6], pb[5], pb[10]}),
+    .inputs       (inputs),
     .game_state   (game_state)
   );
 
 maze_bram maze_ram (
       .clk           (hz100),
       .reset         (reset),
-      .map_rst       (1'b0),
+      .map_rst       ((game_state == 2'd2 || game_state == 2'd3) && |inputs),
       .map_loaded    (map_loaded),
       .x_vga         (x_vga),
       .y_vga         (y_vga),
