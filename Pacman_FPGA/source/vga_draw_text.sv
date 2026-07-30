@@ -11,17 +11,11 @@ module vga_draw_text(
     logic [4:0] tile_y;           // 0-27 Y tiles
     logic [4:0] tile_x;           // 0-35 X tiles
     logic [2:0] pixel_x, pixel_y; // 0-7 pixels in tile
-    logic draw_pacman_text;
+    logic draw_pacman_text, draw_lose_text, draw_win_text, draw_press_button_text; // whether to draw the text or not
     logic draw_s, draw_c, draw_o, draw_r, draw_e;
  
   // digit tile enables (to the right of "SCORE")
     logic draw_hundreds, draw_tens, draw_ones;
-
-
-
-
-
-
     // Determine tile location and pixel position
     assign tile_y = v_count[7:3];
     assign tile_x = h_count[7:3];
@@ -31,6 +25,18 @@ module vga_draw_text(
     assign draw_pacman_text =
         (tile_y >= 5'd18) && (tile_y <= 5'd21) &&
         (tile_x >= 5'd1)  && (tile_x < 5'd27);
+
+    assign draw_lose_text =
+        (tile_y >= 5'd18) && (tile_y <= 5'd21) &&
+        (tile_x >= 5'd3)  && (tile_x < 5'd25);
+
+    assign draw_win_text =
+        (tile_y >= 5'd18) && (tile_y <= 5'd21) &&
+        (tile_x >= 5'd4)  && (tile_x < 5'd25);
+
+    assign draw_press_button_text =
+        (tile_y == 5'd24) &&
+        (tile_x >= 5'd7)  && (tile_x < 5'd21);
 
     assign draw_s = (h_count <= 7) && (h_count > 0) && (v_count < 8);
     assign draw_c = (h_count <= 15) && (h_count > 7) && (v_count < 8);
@@ -80,6 +86,18 @@ module vga_draw_text(
     always_comb begin
         // Default: pass through background
         output_rgb = input_rgb;
+        //draw press any button to play text
+        if (game_state != 2'b01 && video_on && draw_press_button_text) begin
+            casez(pixel_y)
+                3'd2 : output_rgb = (h_count = 3,4,8,9,14,15,19,20,24,25,26,27,30,31,33,34,36,38,39,40,42,43,44)? 3'b111 : 3'b000;
+                3'd3 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
+                3'd4 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
+                3'd5 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
+                3'd6 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
+                default: output_rgb = input_rgb;
+            endcase
+        end else
+
 
         if (game_state == 2'b00 && draw_pacman_text && video_on) begin
             case (tile_y)
@@ -146,70 +164,203 @@ module vga_draw_text(
 
                 default: ;
             endcase
-        
-    
+        end else if (game_state == 2'b10 && draw_lose_text && video_on) begin
+            case (tile_y)
 
+                // U SUCK!
+                5'd18:
+                      output_rgb =
+                          (tile_x != 4  &&
+                          tile_x != 6  &&
+                          tile_x != 7 &&
+                          tile_x != 9 &&
+                          tile_x != 10 &&
+                          tile_x != 11 &&
+                          tile_x != 15 &&
+                          tile_x != 19 &&
+                          tile_x != 23)
+                          ? 3'b111 : input_rgb;
+
+                5'd19:
+                      output_rgb =
+                          (tile_x != 4  &&
+                          tile_x != 6  &&
+                          tile_x != 7  &&
+                          tile_x != 9 &&
+                          tile_x != 10 &&
+                          tile_x != 11 &&
+                          tile_x != 13 &&
+                          tile_x != 15 && 
+                          tile_x != 17 && //.5
+                          tile_x != 18 && //.5
+                          tile_x != 19 &&
+                          tile_x != 21 && //.5
+                          tile_x != 22 && //.5
+                          tile_x != 23)   
+                          ? 3'b111 : ((tile_x == 17 || tile_x == 18 || tile_x == 21 || tile_x == 22) && pixel_y >= 3'd5) ? 3'b111 : input_rgb;
+
+                5'd20:
+                      output_rgb =
+                          (tile_x != 4  &&
+                          tile_x != 6  &&
+                          tile_x != 7  &&
+                          tile_x != 9 &&
+                          tile_x != 10 &&
+                          tile_x != 11 &&
+                          tile_x != 13 &&
+                          tile_x != 15 && 
+                          tile_x != 16 && //.5
+                          tile_x != 17 && //.5
+                          tile_x != 19 &&
+                          tile_x != 21 && //.5
+                          tile_x != 22 && //.5
+                          tile_x != 23 &&
+                          tile_x != 24) //.5   
+                          ? 3'b111 : ((tile_x == 16 || tile_x == 17 || tile_x == 21 || tile_x == 22 || tile_x == 24) && pixel_y <= 3'd3) ? 3'b111 : input_rgb;
+
+                5'd21:
+                    output_rgb =
+                        (tile_x != 6  &&
+                         tile_x != 7  &&
+                         tile_x != 11  &&
+                         tile_x != 15  &&
+                         tile_x != 19  &&
+                         tile_x != 23
+                        )
+                        ? 3'b111 : input_rgb;
+
+                default: ;
+            endcase
+
+        end else if (game_state == 2'b11 && draw_win_text && video_on) begin
+            case (tile_y)
+
+                // U WIN!
+                5'd18:
+                      output_rgb =
+                          (tile_x != 5  &&
+                          tile_x != 7  &&
+                          tile_x != 8 &&
+                          tile_x != 10 &&
+                          tile_x != 11 &&
+                          tile_x != 12 &&
+                          tile_x != 14 &&
+                          tile_x != 18 &&
+                          tile_x != 20 &&
+                          tile_x != 21 &&
+                          tile_x != 23)
+                          ? 3'b111 : input_rgb;
+
+                5'd19:
+                      output_rgb =
+                          (tile_x != 5  &&
+                          tile_x != 7  &&
+                          tile_x != 8 &&
+                          tile_x != 10 &&
+                          tile_x != 12 &&
+                          tile_x != 14 &&
+                          tile_x != 15 &&
+                          tile_x != 17 &&
+                          tile_x != 18 &&
+                          tile_x != 21 &&
+                          tile_x != 23)
+                          ? 3'b111 : input_rgb;
+
+                5'd20:
+                      output_rgb =
+                          (tile_x != 5  &&
+                          tile_x != 7  &&
+                          tile_x != 8 &&
+                          tile_x != 10 &&
+                          tile_x != 12 &&
+                          tile_x != 14 &&
+                          tile_x != 15 &&
+                          tile_x != 17 &&
+                          tile_x != 18 &&
+                          tile_x != 20 &&
+                          tile_x != 23 &&
+                          tile_x != 24)
+                          ? 3'b111 : (tile_x == 24 && pixel_y <= 3'd3) ? 3'b111 : input_rgb;
+
+                5'd21:
+                      output_rgb =
+                          (
+                          tile_x != 7  &&
+                          tile_x != 8 &&
+                          tile_x != 9 &&
+                          tile_x != 11 &&
+                          tile_x != 13 &&
+                          tile_x != 14 &&
+                          tile_x != 18 &&
+                          tile_x != 20 &&
+                          tile_x != 21 &&
+                          tile_x != 23)
+                          ? 3'b111 : input_rgb;
+
+                default: ;
+            endcase
+        
         end else if (draw_s && video_on)begin
         casez (pixel_y)
-          3'd0 : output_rgb  =  3'b111;
-          3'd1 : output_rgb =   3'b111;
-          3'd2 : output_rgb = (pixel_x < 3)?  3'b111 : 3'b000;
-          3'd3 : output_rgb =   3'b111;
-          3'd4 : output_rgb =   3'b111;
-          3'd5 : output_rgb =  (pixel_x > 5)?  3'b111 : 3'b000;
-          3'd6 : output_rgb =  3'b111;
-          3'd7 : output_rgb =  3'b111;     
+            3'd0 : output_rgb  =  3'b111;
+            3'd1 : output_rgb =   3'b111;
+            3'd2 : output_rgb = (pixel_x < 3)?  3'b111 : 3'b000;
+            3'd3 : output_rgb =   3'b111;
+            3'd4 : output_rgb =   3'b111;
+            3'd5 : output_rgb =  (pixel_x > 5)?  3'b111 : 3'b000;
+            3'd6 : output_rgb =  3'b111;
+            3'd7 : output_rgb =  3'b111;     
         endcase
-     
-      end else if (draw_c && video_on)begin
-        casez (pixel_y)
-          3'd0 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
-          3'd1 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
-          3'd2 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
-          3'd3 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
-          3'd4 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
-          3'd5 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
-          3'd6 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
-          3'd7 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;    
-        endcase
-     
-      end else if (draw_o && video_on)begin
-        casez (pixel_y)
-          3'd0 : output_rgb  =  3'b111;
-          3'd1 : output_rgb  =  3'b111;
-          3'd2 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
-          3'd3 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
-          3'd4 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
-          3'd5 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
-          3'd6 : output_rgb  =  3'b111;
-          3'd7 : output_rgb  =  3'b111; 
-        endcase
- 
- 
-      end else if (draw_r && video_on)begin
-        casez (pixel_y)
-          3'd0 : output_rgb = (pixel_x > 0)?                                                   3'b111 : 3'b000;
-          3'd1 : output_rgb = (pixel_x != 0 && pixel_x != 3 && pixel_x !=4 && pixel_x != 5)?   3'b111 : 3'b000;
-          3'd2 : output_rgb = (pixel_x != 0 && pixel_x != 3 && pixel_x !=4 && pixel_x != 5)?   3'b111 : 3'b000;
-          3'd3 : output_rgb = (pixel_x > 0)?                                                   3'b111 : 3'b000;
-          3'd4 : output_rgb = (pixel_x > 0 || pixel_x < 6)?                                    3'b111 : 3'b000;
-          3'd5 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| (pixel_x > 3 && pixel_x < 7))?   3'b111 : 3'b000;
-          3'd6 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| pixel_x > 4)?                    3'b111 : 3'b000;
-          3'd7 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| pixel_x > 5)?                    3'b111 : 3'b000;    
-        endcase
- 
- 
-      end else if (draw_e && video_on)begin
-        casez (pixel_y)
-          3'd0 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
-          3'd1 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
-          3'd2 : output_rgb = (pixel_x == 3 || pixel_x == 2)?        3'b111 : 3'b000;
-          3'd3 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
-          3'd4 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
-          3'd5 : output_rgb = (pixel_x == 3 || pixel_x == 2)?        3'b111 : 3'b000;
-          3'd6 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
-          3'd7 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;    
-        endcase
+      
+        end else if (draw_c && video_on)begin
+          casez (pixel_y)
+            3'd0 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
+            3'd1 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
+            3'd2 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+            3'd3 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+            3'd4 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+            3'd5 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+            3'd6 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
+            3'd7 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;    
+          endcase
+      
+        end else if (draw_o && video_on)begin
+          casez (pixel_y)
+            3'd0 : output_rgb  =  3'b111;
+            3'd1 : output_rgb  =  3'b111;
+            3'd2 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+            3'd3 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+            3'd4 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+            3'd5 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+            3'd6 : output_rgb  =  3'b111;
+            3'd7 : output_rgb  =  3'b111; 
+          endcase
+  
+  
+        end else if (draw_r && video_on)begin
+          casez (pixel_y)
+            3'd0 : output_rgb = (pixel_x > 0)?                                                   3'b111 : 3'b000;
+            3'd1 : output_rgb = (pixel_x != 0 && pixel_x != 3 && pixel_x !=4 && pixel_x != 5)?   3'b111 : 3'b000;
+            3'd2 : output_rgb = (pixel_x != 0 && pixel_x != 3 && pixel_x !=4 && pixel_x != 5)?   3'b111 : 3'b000;
+            3'd3 : output_rgb = (pixel_x > 0)?                                                   3'b111 : 3'b000;
+            3'd4 : output_rgb = (pixel_x > 0 || pixel_x < 6)?                                    3'b111 : 3'b000;
+            3'd5 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| (pixel_x > 3 && pixel_x < 7))?   3'b111 : 3'b000;
+            3'd6 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| pixel_x > 4)?                    3'b111 : 3'b000;
+            3'd7 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| pixel_x > 5)?                    3'b111 : 3'b000;    
+          endcase
+  
+  
+        end else if (draw_e && video_on)begin
+          casez (pixel_y)
+            3'd0 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+            3'd1 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+            3'd2 : output_rgb = (pixel_x == 3 || pixel_x == 2)?        3'b111 : 3'b000;
+            3'd3 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+            3'd4 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+            3'd5 : output_rgb = (pixel_x == 3 || pixel_x == 2)?        3'b111 : 3'b000;
+            3'd6 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+            3'd7 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;    
+          endcase
  
 
 
