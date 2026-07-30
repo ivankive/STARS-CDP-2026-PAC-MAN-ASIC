@@ -77,27 +77,43 @@ module vga_draw_text(
     logic [3:0] cur_digit;   // which digit this tile shows
     logic [7:0] cur_row;     // that digit's glyph row
     logic       cur_pix;     // the single pixel we want
+    
+    
+    localparam [113:0] ROW2 = 114'h39cf39c32511c97df3247cc1c8322;
+    localparam [113:0] ROW3 = 114'h25284204b511291044b41121284a2;
+    localparam [113:0] ROW4 = 114'h39ce3987ace1c91044ac1121c879c;
+    localparam [113:0] ROW5 = 114'h21480844a441291044a4112108488;
+    localparam [113:0] ROW6 = 114'h212f7384a441c610432410c10f488;
 
-
-
-
+    logic pixel_on; // whether to draw the text pixel or not
 
     // Pixel generator for text
+    logic [9:0] text_x;
+
+    always_comb begin
+        pixel_on = 1'b0;
+        text_x = h_count - 10'd56;   // tile 7 = 7*8 = 56
+
+        if (draw_press_button_text && text_x < 114) begin
+            case (pixel_y)
+                3'd2: pixel_on = ROW2[113-text_x];
+                3'd3: pixel_on = ROW3[113-text_x];
+                3'd4: pixel_on = ROW4[113-text_x];
+                3'd5: pixel_on = ROW5[113-text_x];
+                3'd6: pixel_on = ROW6[113-text_x];
+                default: pixel_on = 1'b0;
+            endcase
+        end
+    end
+
+
+
+
+
     always_comb begin
         // Default: pass through background
         output_rgb = input_rgb;
         //draw press any button to play text
-        if (game_state != 2'b01 && video_on && draw_press_button_text) begin
-            casez(pixel_y)
-                3'd2 : output_rgb = (h_count = 3,4,8,9,14,15,19,20,24,25,26,27,30,31,33,34,36,38,39,40,42,43,44)? 3'b111 : 3'b000;
-                3'd3 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
-                3'd4 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
-                3'd5 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
-                3'd6 : output_rgb = (pixel_x > 0 && pixel_x < 3)? 3'b111 : 3'b000;
-                default: output_rgb = input_rgb;
-            endcase
-        end else
-
 
         if (game_state == 2'b00 && draw_pacman_text && video_on) begin
             case (tile_y)
@@ -300,17 +316,21 @@ module vga_draw_text(
                 default: ;
             endcase
         
+        end else if (game_state != 2'b01 && draw_press_button_text && video_on) begin
+
+          output_rgb = pixel_on ? 3'b111 : input_rgb;
+
         end else if (draw_s && video_on)begin
-        casez (pixel_y)
-            3'd0 : output_rgb  =  3'b111;
-            3'd1 : output_rgb =   3'b111;
-            3'd2 : output_rgb = (pixel_x < 3)?  3'b111 : 3'b000;
-            3'd3 : output_rgb =   3'b111;
-            3'd4 : output_rgb =   3'b111;
-            3'd5 : output_rgb =  (pixel_x > 5)?  3'b111 : 3'b000;
-            3'd6 : output_rgb =  3'b111;
-            3'd7 : output_rgb =  3'b111;     
-        endcase
+          casez (pixel_y)
+              3'd0 : output_rgb  =  3'b111;
+              3'd1 : output_rgb =   3'b111;
+              3'd2 : output_rgb = (pixel_x < 3)?  3'b111 : 3'b000;
+              3'd3 : output_rgb =   3'b111;
+              3'd4 : output_rgb =   3'b111;
+              3'd5 : output_rgb =  (pixel_x > 5)?  3'b111 : 3'b000;
+              3'd6 : output_rgb =  3'b111;
+              3'd7 : output_rgb =  3'b111;     
+          endcase
       
         end else if (draw_c && video_on)begin
           casez (pixel_y)
