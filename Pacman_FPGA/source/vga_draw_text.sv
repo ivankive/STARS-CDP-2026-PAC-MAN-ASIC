@@ -1,7 +1,8 @@
 module vga_draw_text(
     input  logic [9:0] h_count,    // Horizontal Display Counter
     input  logic [9:0] v_count,    // Vertical Display Counter
-    input  logic       video_on,
+    input  logic       video_on, 
+    input  logic [9:0] score,      //binary score from central control system
     input  logic [1:0] game_state,
     input  logic [2:0] input_rgb,  // pixel color from draw_tile
     output logic [2:0] output_rgb  // pixel color
@@ -11,6 +12,15 @@ module vga_draw_text(
     logic [4:0] tile_x;           // 0-35 X tiles
     logic [2:0] pixel_x, pixel_y; // 0-7 pixels in tile
     logic draw_pacman_text;
+    logic draw_s, draw_c, draw_o, draw_r, draw_e;
+ 
+  // digit tile enables (to the right of "SCORE")
+    logic draw_hundreds, draw_tens, draw_ones;
+
+
+
+
+
 
     // Determine tile location and pixel position
     assign tile_y = v_count[7:3];
@@ -21,6 +31,50 @@ module vga_draw_text(
     assign draw_pacman_text =
         (tile_y >= 5'd18) && (tile_y <= 5'd21) &&
         (tile_x >= 5'd1)  && (tile_x < 5'd27);
+
+    assign draw_s = (h_count <= 7) && (h_count > 0) && (v_count < 8);
+    assign draw_c = (h_count <= 15) && (h_count > 7) && (v_count < 8);
+    assign draw_o = (h_count <= 23) && (h_count > 15) && (v_count < 8);
+    assign draw_r = (h_count <= 31) && (h_count > 23) && (v_count < 8);
+    assign draw_e = (h_count <= 39) && (h_count > 31) && (v_count < 8); 
+
+
+    // tile 5 is a blank gap.
+    // tile 6 = hundreds, tile 7 = tens, tile 8 = ones.
+    assign draw_hundreds = (h_count >= 48) && (h_count < 56) && (v_count < 8);
+    assign draw_tens     = (h_count >= 56) && (h_count < 64) && (v_count < 8);
+    assign draw_ones     = (h_count >= 64) && (h_count < 72) && (v_count < 8);
+ 
+
+
+    // binary score -> decimal digits (updates every frame, so the
+    // display changes automatically the moment `score` changes)
+    assign hundreds = 4'((score / 10'd100) % 10'd10);
+    assign tens     = 4'((score / 10'd10)  % 10'd10);
+    assign ones     = 4'( score            % 10'd10);
+
+    always_comb begin
+        if  (draw_tens) 
+        cur_digit = tens;
+        else if (draw_ones) 
+        cur_digit = ones;
+        else                
+        cur_digit = hundreds;
+    end
+
+    assign cur_row = digit_row(cur_digit, pixel_y);
+    assign cur_pix = cur_row[3'd7 - pixel_x];
+
+    // decimal digits of the binary score
+    logic [3:0] hundreds, tens, ones;
+
+    logic [3:0] cur_digit;   // which digit this tile shows
+    logic [7:0] cur_row;     // that digit's glyph row
+    logic       cur_pix;     // the single pixel we want
+
+
+
+
 
     // Pixel generator for text
     always_comb begin
@@ -92,7 +146,200 @@ module vga_draw_text(
 
                 default: ;
             endcase
-        end
+        
+    
+
+        end else if (draw_s && video_on)begin
+        casez (pixel_y)
+          3'd0 : output_rgb  =  3'b111;
+          3'd1 : output_rgb =   3'b111;
+          3'd2 : output_rgb = (pixel_x < 3)?  3'b111 : 3'b000;
+          3'd3 : output_rgb =   3'b111;
+          3'd4 : output_rgb =   3'b111;
+          3'd5 : output_rgb =  (pixel_x > 5)?  3'b111 : 3'b000;
+          3'd6 : output_rgb =  3'b111;
+          3'd7 : output_rgb =  3'b111;     
+        endcase
+     
+      end else if (draw_c && video_on)begin
+        casez (pixel_y)
+          3'd0 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
+          3'd1 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
+          3'd2 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+          3'd3 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+          3'd4 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+          3'd5 : output_rgb = (pixel_x ==1  || pixel_x == 2)?        3'b111 : 3'b000;
+          3'd6 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;
+          3'd7 : output_rgb = (pixel_x != 0 && pixel_x <  7)?        3'b111 : 3'b000;    
+        endcase
+     
+      end else if (draw_o && video_on)begin
+        casez (pixel_y)
+          3'd0 : output_rgb  =  3'b111;
+          3'd1 : output_rgb  =  3'b111;
+          3'd2 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+          3'd3 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+          3'd4 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+          3'd5 : output_rgb = (pixel_x < 2 || pixel_x > 6)?          3'b111 : 3'b000;
+          3'd6 : output_rgb  =  3'b111;
+          3'd7 : output_rgb  =  3'b111; 
+        endcase
+ 
+ 
+      end else if (draw_r && video_on)begin
+        casez (pixel_y)
+          3'd0 : output_rgb = (pixel_x > 0)?                                                   3'b111 : 3'b000;
+          3'd1 : output_rgb = (pixel_x != 0 && pixel_x != 3 && pixel_x !=4 && pixel_x != 5)?   3'b111 : 3'b000;
+          3'd2 : output_rgb = (pixel_x != 0 && pixel_x != 3 && pixel_x !=4 && pixel_x != 5)?   3'b111 : 3'b000;
+          3'd3 : output_rgb = (pixel_x > 0)?                                                   3'b111 : 3'b000;
+          3'd4 : output_rgb = (pixel_x > 0 || pixel_x < 6)?                                    3'b111 : 3'b000;
+          3'd5 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| (pixel_x > 3 && pixel_x < 7))?   3'b111 : 3'b000;
+          3'd6 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| pixel_x > 4)?                    3'b111 : 3'b000;
+          3'd7 : output_rgb = ((pixel_x > 0 && pixel_x < 3)|| pixel_x > 5)?                    3'b111 : 3'b000;    
+        endcase
+ 
+ 
+      end else if (draw_e && video_on)begin
+        casez (pixel_y)
+          3'd0 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+          3'd1 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+          3'd2 : output_rgb = (pixel_x == 3 || pixel_x == 2)?        3'b111 : 3'b000;
+          3'd3 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+          3'd4 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+          3'd5 : output_rgb = (pixel_x == 3 || pixel_x == 2)?        3'b111 : 3'b000;
+          3'd6 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;
+          3'd7 : output_rgb = (pixel_x> 1 && pixel_x < 7)?           3'b111 : 3'b000;    
+        endcase
+ 
+
+
+
+
+    // draw numbers
+    // basically a function gives you the values of the pixels in a row based on the height of the pixel y and then
+    // access the value of the pixel you access it through array indexing and the leftmost is 7
+
+       end else if ((draw_hundreds || draw_tens || draw_ones) && video_on) begin
+
+            output_rgb = cur_pix ? 3'b111 : 3'b000;
+
+       end else
+
+        output_rgb = input_rgb;
+
+
     end
+
+
+
+    function automatic logic [7:0] digit_row(input logic [3:0] digit, input logic [2:0] row);
+    
+    
+    case (digit)
+      4'd0: case (row)
+        3'd0: digit_row = 8'b00111100;
+        3'd1: digit_row = 8'b01100110;
+        3'd2: digit_row = 8'b01100110;
+        3'd3: digit_row = 8'b01100110;
+        3'd4: digit_row = 8'b01100110;
+        3'd5: digit_row = 8'b01100110;
+        3'd6: digit_row = 8'b00111100;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd1: case (row)
+        3'd0: digit_row = 8'b00011000;
+        3'd1: digit_row = 8'b00111000;
+        3'd2: digit_row = 8'b00011000;
+        3'd3: digit_row = 8'b00011000;
+        3'd4: digit_row = 8'b00011000;
+        3'd5: digit_row = 8'b00011000;
+        3'd6: digit_row = 8'b01111110;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd2: case (row)
+        3'd0: digit_row = 8'b00111100;
+        3'd1: digit_row = 8'b01100110;
+        3'd2: digit_row = 8'b00000110;
+        3'd3: digit_row = 8'b00001100;
+        3'd4: digit_row = 8'b00110000;
+        3'd5: digit_row = 8'b01100000;
+        3'd6: digit_row = 8'b01111110;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd3: case (row)
+        3'd0: digit_row = 8'b00111100;
+        3'd1: digit_row = 8'b01100110;
+        3'd2: digit_row = 8'b00000110;
+        3'd3: digit_row = 8'b00011100;
+        3'd4: digit_row = 8'b00000110;
+        3'd5: digit_row = 8'b01100110;
+        3'd6: digit_row = 8'b00111100;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd4: case (row)
+        3'd0: digit_row = 8'b00001100;
+        3'd1: digit_row = 8'b00011100;
+        3'd2: digit_row = 8'b00111100;
+        3'd3: digit_row = 8'b01101100;
+        3'd4: digit_row = 8'b01111110;
+        3'd5: digit_row = 8'b00001100;
+        3'd6: digit_row = 8'b00001100;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd5: case (row)
+        3'd0: digit_row = 8'b01111110;
+        3'd1: digit_row = 8'b01100000;
+        3'd2: digit_row = 8'b01111100;
+        3'd3: digit_row = 8'b00000110;
+        3'd4: digit_row = 8'b00000110;
+        3'd5: digit_row = 8'b01100110;
+        3'd6: digit_row = 8'b00111100;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd6: case (row)
+        3'd0: digit_row = 8'b00111100;
+        3'd1: digit_row = 8'b01100000;
+        3'd2: digit_row = 8'b01100000;
+        3'd3: digit_row = 8'b01111100;
+        3'd4: digit_row = 8'b01100110;
+        3'd5: digit_row = 8'b01100110;
+        3'd6: digit_row = 8'b00111100;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd7: case (row)
+        3'd0: digit_row = 8'b01111110;
+        3'd1: digit_row = 8'b00000110;
+        3'd2: digit_row = 8'b00001100;
+        3'd3: digit_row = 8'b00011000;
+        3'd4: digit_row = 8'b00110000;
+        3'd5: digit_row = 8'b00110000;
+        3'd6: digit_row = 8'b00110000;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd8: case (row)
+        3'd0: digit_row = 8'b00111100;
+        3'd1: digit_row = 8'b01100110;
+        3'd2: digit_row = 8'b01100110;
+        3'd3: digit_row = 8'b00111100;
+        3'd4: digit_row = 8'b01100110;
+        3'd5: digit_row = 8'b01100110;
+        3'd6: digit_row = 8'b00111100;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      4'd9: case (row)
+        3'd0: digit_row = 8'b00111100;
+        3'd1: digit_row = 8'b01100110;
+        3'd2: digit_row = 8'b01100110;
+        3'd3: digit_row = 8'b00111110;
+        3'd4: digit_row = 8'b00000110;
+        3'd5: digit_row = 8'b00000110;
+        3'd6: digit_row = 8'b00111100;
+        3'd7: digit_row = 8'b00000000;
+      endcase
+      default: digit_row = 8'b00000000;
+
+      endcase
+
+    endfunction
 
 endmodule

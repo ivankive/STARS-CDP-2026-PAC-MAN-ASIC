@@ -23,7 +23,7 @@ module vga_controller_top(
     input logic [4:0] pinky_y,
     input logic       pp_active,
     input logic [1:0] lives,
-    // input logic [9:0] score
+    input logic [9:0] score,
 
     //text
     input logic [1:0] game_state 
@@ -98,19 +98,20 @@ module vga_controller_top(
         .pp_active  (pp_active),
         .lives      (lives),
         .input_rgb  (rgb_tile),   //inputs from draw_tile
-        .output_rgb (rgb_sprite) //outputs to draw_text
+        .output_rgb (rgb_sprite) //outputs to border
     );
 
     vga_draw_text draw_text(
         .h_count   (hcount_d),        //inputs from VGA_counter
         .v_count   (vcount_d),
         .video_on  (video_on_d),
-        // .score     (score),           //inputs from central control system
+        .score     (score),           //inputs from central control system
         .game_state(game_state),
-        .input_rgb (rgb_sprite), //inputs from draw_border
-        .output_rgb(rgb_text)   //outputs to VGA
+        .input_rgb (rgb_sprite), //inputs from draw_sprite
+        .output_rgb(rgb_text)   //outputs to draw_border
     );
-
+    
+    
     vga_draw_border draw_border(
         .h_count(hcount_d),        //inputs from VGA_counter
         .v_count(vcount_d),
@@ -118,6 +119,7 @@ module vga_controller_top(
         .input_rgb(rgb_text), //inputs from draw_sprite
         .output_rgb(rgb_border)   //outputs to draw_text
     );
+
 
 
     

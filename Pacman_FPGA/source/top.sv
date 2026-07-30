@@ -35,7 +35,7 @@ module top (
   logic       power_pellet_eaten;
   logic       pacman_hit;
   logic [1:0] ghost_eaten;
-  // logic [9:0] score;
+  logic [9:0] score;
   logic       game_rst;
   logic [1:0] lives;
   logic [8:0] pellets;
@@ -131,7 +131,7 @@ module top (
     .power_pellet_eaten    (power_pellet_eaten),
     .pacman_hit            (pacman_hit),
     .ghost_eaten           (ghost_eaten),
-    // .score                 (score),
+    .score                 (score),
 
     .lives                 (lives),
     .pellets               (pellets)
@@ -158,8 +158,8 @@ module top (
     .pinky_dir  (pinky_dir),
     .pp_active  (power_pellet_active),
     .lives      (lives),
-    .game_state (game_state)
-    // .score      (score)
+    .game_state (game_state),
+    .score      (score)
   );
 
   game_fsm game_fsm(
@@ -215,7 +215,7 @@ ghost_controller ghost_controller (
     .game_state           (game_state),
     .power_pellet_active  (power_pellet_active),
     .global_ghost_mode    (global_ghost_mode),
-    // .score                (score),
+    .score                (score),
 
     .pacman_x             (pacman_x),
     .pacman_y             (pacman_y),

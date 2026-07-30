@@ -6,14 +6,14 @@ module vga_draw_border(
     output logic [2:0] output_rgb  //pixel color
   );
   //variables
-    logic black_right, black_bottom, black_top;
+    logic black_right, black_bottom, black_top, black_top_between_numbers;
 
 
   //determine whether pixel is in the map
-  assign black_right   = ((h_count >= 224));
-  assign black_bottom = ((v_count >= (288+24+8)) && (v_count < 480));
-  assign black_top    = ((v_count < 64));
-
+  assign black_right               = ((h_count >= 224));
+  assign black_bottom              = ((v_count >= (288+24+8)) && (v_count < 480));
+  assign black_top_between_numbers = ((v_count < 8)  && (h_count == 0 || (h_count > 39 && h_count < 48) || (h_count >= 72)));
+  assign black_top                 = ((v_count < 64) && (v_count > 7 )  ||  black_top_between_numbers);
 
   //pixel generator for tile
   always_comb begin
