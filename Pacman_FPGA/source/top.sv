@@ -218,7 +218,6 @@ ghost_controller ghost_controller (
     .game_state           (game_state),
     .power_pellet_active  (power_pellet_active),
     .global_ghost_mode    (global_ghost_mode),
-    .score                (score),
 
     .pacman_x             (pacman_x),
     .pacman_y             (pacman_y),
