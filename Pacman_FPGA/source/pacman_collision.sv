@@ -27,7 +27,6 @@ module pacman_collision (
     output logic       pellet_eaten,
     output logic       power_pellet_eaten,
     output logic       pacman_hit,
-    output logic [9:0] score,
     output logic [1:0] ghost_eaten,
     output logic [1:0] lives,
     output logic [8:0] pellets
@@ -47,7 +46,6 @@ module pacman_collision (
     collision_state_t state;
     logic collide_blinky;
     logic collide_pinky;
-    logic [9:0] score_delta;
 
     always_comb begin
         collide_blinky =
@@ -72,7 +70,6 @@ module pacman_collision (
             power_pellet_eaten <= 1'b0;
             pacman_hit         <= 1'b0;
             ghost_eaten        <= 2'b00;
-            score              <= 10'd0;
             lives              <= 2'd3;
             pellets            <= 9'd288;
         end else if (game_starting) begin
@@ -82,13 +79,11 @@ module pacman_collision (
             power_pellet_eaten <= 1'b0;
             pacman_hit         <= 1'b0;
             ghost_eaten        <= 2'b00;
-            // score              <= 10'd0;
             lives              <= 2'd3;
             pellets            <= 9'd288; 
         end else begin
             write_en     <= 1'b0;
             pellet_eaten <= 1'b0;
-            score_delta  = 10'd0;
 
             // Hold CDC events until the 60 Hz domain samples them, then clear.
             // Clear on the cycle after new_clock rises (game_tick still high).
@@ -101,7 +96,6 @@ module pacman_collision (
                     if (power_pellet_active || vulnerable_to_pacman[0]) begin
                         if (!ghost_eaten[0]) begin
                             ghost_eaten[0] <= 1'b1;
-                            score_delta = score_delta + 10'd20;
                         end
                     end else if (dangerous_to_pacman[0]) begin
                         if (!pacman_hit) begin
@@ -115,7 +109,6 @@ module pacman_collision (
                     if (power_pellet_active || vulnerable_to_pacman[1]) begin
                         if (!ghost_eaten[1]) begin
                             ghost_eaten[1] <= 1'b1;
-                            score_delta = score_delta + 10'd20;
                         end
                     end else if (dangerous_to_pacman[1]) begin
                         if (!pacman_hit) begin
@@ -138,13 +131,11 @@ module pacman_collision (
                         if (rdata_central == TILE_PELLET) begin
                             write_en     <= 1'b1;
                             pellet_eaten <= 1'b1;
-                            score_delta  = score_delta + 10'd2;
                             pellets      <= pellets - 9'd1;
                         end else if (rdata_central == TILE_POWER_PELLET) begin
                             write_en <= 1'b1;
                             if (!power_pellet_eaten) begin
                                 power_pellet_eaten <= 1'b1;
-                                 score_delta = score_delta + 10'd15;
                                 pellets <= pellets - 9'd1;
                             end
                         end
@@ -156,9 +147,6 @@ module pacman_collision (
                         state <= S_READ;
                     end
                 endcase
-
-                 if (score_delta != 10'd0)
-                     score <= score + score_delta;
             end
 
             if (!game_running)
