@@ -46,7 +46,7 @@ module game_fsm (
             GAME_PLAYING: begin
                 if (lives == 2'd0)
                     next_state = GAME_OVER;
-                else if (pellets == 8'd0)
+                else if (pellets == 8'd1)
                     next_state = GAME_WIN;
             end
 

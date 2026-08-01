@@ -106,7 +106,7 @@ module vga_controller_top(
         .input_rgb  (rgb_tile),   //inputs from draw_tile
         .output_rgb (rgb_sprite)  //outputs to border
     );
-
+/*
     vga_draw_border draw_border(
         .h_count(hcount_d),        //inputs from VGA_counter
         .v_count(vcount_d),
@@ -115,8 +115,10 @@ module vga_controller_top(
         .output_rgb(rgb_border)
     );
 
-    assign rgb[0] = rgb_border[2]; //output to VGA
-    assign rgb[1] = rgb_border[1];
-    assign rgb[2] = rgb_border[0];
+    */
+
+    assign rgb[0] = rgb_sprite[2]; //output to VGA
+    assign rgb[1] = rgb_sprite[1];
+    assign rgb[2] = rgb_sprite[0];
 
 endmodule

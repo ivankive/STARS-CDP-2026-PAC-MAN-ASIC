@@ -121,6 +121,8 @@ module pacman_collision (
 
                     if (col_is_power) begin
                         power_pellet_eaten <= 1'b1;
+                        pellet_eaten <= 1'b1;
+                        
                     end else begin
                         pellet_eaten <= 1'b1;
                     end

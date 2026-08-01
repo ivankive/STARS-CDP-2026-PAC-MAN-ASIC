@@ -29,7 +29,7 @@ module vga_draw_tile(
   assign pixel_y_d = v_count_d[2:0]; //remainder
   assign pixel_x_d = h_count_d[2:0];
 
-  assign in_map_raw = video_on_raw && (tile_x_raw < 5'd28) && (tile_y_raw < 5'd31);
+  assign in_map_raw = video_on_raw && (tile_x_raw < 5'd24) && (tile_y_raw < 5'd24);
   assign vga_active = in_map_raw;
 
   always_comb begin
@@ -42,7 +42,7 @@ module vga_draw_tile(
     end
   end
 
-  assign in_map_d = video_on_d && ((h_count_d[7:3]) < 5'd28) && ((v_count_d[7:3] + 5'd24) < 5'd31);
+  assign in_map_d = video_on_d && ((h_count_d[7:3]) < 5'd24) && ((v_count_d[7:3] + 5'd24) < 5'd24);
   
   //pixel generator for tile
   always_comb begin

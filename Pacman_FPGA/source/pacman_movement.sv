@@ -69,7 +69,7 @@ module pacman_movement (
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
-            xpos       <= 5'd12;
+            xpos       <= 5'd11;
             ypos       <= 5'd19;
             dir        <= RIGHT;
             stored_dir <= RIGHT;
@@ -77,7 +77,7 @@ module pacman_movement (
             count      <= 3'd0;
             state      <= S_IDLE;
         end else if (pacman_hit) begin
-            xpos       <= 5'd12;
+            xpos       <= 5'd11;
             ypos       <= 5'd19;
             dir        <= RIGHT;
             stored_dir <= RIGHT;
@@ -127,10 +127,10 @@ module pacman_movement (
 
                     S_CHECK_FORWARD: begin
                         // Tunnel teleports need no maze lookup.
-                        if (xpos == 5'd0 && ypos == 5'd14 && dir == LEFT) begin
-                            xpos  <= 5'd24;
+                        if (xpos == 5'd0 && ypos == 5'd13 && dir == LEFT) begin
+                            xpos  <= 5'd23;
                             state <= S_IDLE;
-                        end else if (xpos == 5'd24 && ypos == 5'd14 && dir == RIGHT) begin
+                        end else if (xpos == 5'd23 && ypos == 5'd13 && dir == RIGHT) begin
                             xpos  <= 5'd0;
                             state <= S_IDLE;
                         end else if (rom_valid) begin

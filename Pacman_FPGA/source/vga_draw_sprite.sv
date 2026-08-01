@@ -102,7 +102,7 @@ module vga_draw_sprite(
 
     //Lives display
     if (lives >= 2'd1) begin
-      if((h_count <= 7) && (v_count < 320 && v_count > 311)) begin
+      if((h_count <= 7) && (v_count < 320-56 && v_count > 311-56)) begin
         casez (pixel_y)
           3'd0 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
           3'd1 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
@@ -115,7 +115,7 @@ module vga_draw_sprite(
         endcase
       end
     end if (lives >= 2'd2) begin
-      if ((h_count < 24 && h_count > 15) && (v_count < 320 && v_count > 311)) begin
+      if ((h_count < 24 && h_count > 15) && (v_count < 320-56 && v_count > 311-56)) begin
         casez (pixel_y)
           3'd0 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
           3'd1 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
@@ -128,7 +128,7 @@ module vga_draw_sprite(
         endcase
       end
       end if (lives >= 2'd3) begin
-      if ((h_count <= 39 && h_count > 31) && (v_count < 320 && v_count > 311)) begin
+      if ((h_count <= 39 && h_count > 31) && (v_count < 320-56 && v_count > 311-56)) begin
         casez (pixel_y)
           3'd0 : output_rgb = (pixel_x != 3'b0)?  3'b110: 3'b000;
           3'd1 : output_rgb = (pixel_x != 3'd7)?  3'b110: 3'b000;
