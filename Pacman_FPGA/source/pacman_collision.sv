@@ -1,18 +1,5 @@
 `default_nettype none
 
-// pacman_collision - tapeout version
-//
-// Changes vs FPGA version:
-//  * No more read-modify-write of a writable maze. The module presents
-//    Pac-Man's tile to maze_query_arbiter, receives {collectible,
-//    is_power, pellet_index, valid}, checks the eaten bit in pellet_state,
-//    and pulses pellet_set_en to mark the pellet collected. The old
-//    S_READ/S_WAIT/S_CHECK BRAM FSM is gone: validity is tracked by the
-//    arbiter per-address, and pellet_state forwards same-cycle writes, so
-//    a single guarded decision per cycle is race-free and cannot
-//    double-count.
-//  * Score tracking removed for tapeout.
-
 module pacman_collision (
     input  wire logic       clk,
     input  wire logic       reset,
@@ -50,7 +37,7 @@ module pacman_collision (
     output logic            pacman_hit,
     output logic [1:0]      ghost_eaten,
     output logic [1:0]      lives,
-    output logic [8:0]      pellets
+    output logic [7:0]      pellets
 );
 
     logic collide_blinky;
@@ -81,7 +68,7 @@ module pacman_collision (
             pacman_hit         <= 1'b0;
             ghost_eaten        <= 2'b00;
             lives              <= 2'd3;
-            pellets            <= 9'd288;
+            pellets            <= 8'd186;
         end else if (game_starting) begin
             pellet_set_en      <= 1'b0;
             pellet_eaten       <= 1'b0;
@@ -89,7 +76,7 @@ module pacman_collision (
             pacman_hit         <= 1'b0;
             ghost_eaten        <= 2'b00;
             lives              <= 2'd3;
-            pellets            <= 9'd288;
+            pellets            <= 8'd186;
         end else begin
             pellet_set_en <= 1'b0;
             pellet_eaten  <= 1'b0;
@@ -130,7 +117,7 @@ module pacman_collision (
                 if (col_valid && col_collectible && !pellet_already_eaten) begin
                     pellet_set_en    <= 1'b1;
                     pellet_set_index <= col_pellet_index;
-                    pellets          <= pellets - 9'd1;
+                    pellets          <= pellets - 8'd1;
 
                     if (col_is_power) begin
                         power_pellet_eaten <= 1'b1;
