@@ -3,6 +3,7 @@ module ghost_controller (
     input  logic reset,
 
     input  logic [1:0] game_state,
+    input  logic       spawn_reset,
     input  logic       power_pellet_active,
     input  logic       global_ghost_mode,
 
@@ -215,8 +216,6 @@ module ghost_controller (
 
     integer i;
 
-    localparam logic [1:0] GAME_STARTING = 2'd0;
-
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
             scheduler_state <= S_IDLE;
@@ -245,7 +244,7 @@ module ghost_controller (
             ghost_rom_y <= 5'd0;
 
             issued_oob <= 1'b1;
-        end else if ((game_state == GAME_STARTING) || pacman_hit) begin
+        end else if (spawn_reset || pacman_hit) begin
             scheduler_state <= S_IDLE;
 
             move_counter <= 3'd0;

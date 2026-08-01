@@ -104,6 +104,20 @@ module top (
 
   clock_div marcus(.clk(hz100), .rst(reset), .clk_div(new_clock));
 
+  // Sticky spawn reset for the 60 Hz movement domain.
+  // game_fsm / pellet clear run on hz100; pacman/ghosts only tick on the
+  // single-cycle new_clock pulse. Hold spawn_reset through STARTING and
+  // until the next game tick after leaving so positions always snap back.
+  logic spawn_reset;
+  always_ff @(posedge hz100 or posedge reset) begin
+    if (reset)
+      spawn_reset <= 1'b1;
+    else if (game_state == 2'd0)
+      spawn_reset <= 1'b1;
+    else if (new_clock)
+      spawn_reset <= 1'b0;
+  end
+
   pp_timer pp(.pp_collision(power_pellet_eaten), .clk(new_clock), .rst(reset), .pp_active(power_pellet_active));
   assign red = power_pellet_active;
 
@@ -175,7 +189,7 @@ module top (
     .clk           (new_clock),
     .reset         (reset),
     .enable        (game_state == 2'b01),
-    .game_starting (game_state == 2'd0),
+    .game_starting (spawn_reset),
     .pb            (inputs),
     .pacman_hit    (pacman_hit),
     .rom_x         (pac_rom_x),
@@ -270,6 +284,7 @@ module top (
     .reset                (reset),
 
     .game_state           (game_state),
+    .spawn_reset          (spawn_reset),
     .power_pellet_active  (power_pellet_active),
     .global_ghost_mode    (global_ghost_mode),
 
