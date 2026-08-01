@@ -130,7 +130,6 @@ module pacman_movement_tb;
         force dut.dir  = LEFT;
         force dut.stored_dir = LEFT;
         force dut.test_dir = LEFT;
-        force dut.state = 2'd0; // S_IDLE
         force dut.count = 3'd0;
         tick(1);
         release dut.xpos;
@@ -138,7 +137,6 @@ module pacman_movement_tb;
         release dut.dir;
         release dut.stored_dir;
         release dut.test_dir;
-        release dut.state;
         release dut.count;
 
         // Block CHECK_TURN into underflow tile so CHECK_FORWARD wrap runs.
@@ -154,7 +152,6 @@ module pacman_movement_tb;
         force dut.dir  = RIGHT;
         force dut.stored_dir = RIGHT;
         force dut.test_dir = RIGHT;
-        force dut.state = 2'd0; // S_IDLE
         force dut.count = 3'd0;
         tick(1);
         release dut.xpos;
@@ -162,7 +159,6 @@ module pacman_movement_tb;
         release dut.dir;
         release dut.stored_dir;
         release dut.test_dir;
-        release dut.state;
         release dut.count;
 
         // Block CHECK_TURN into x=28 so CHECK_FORWARD right-wrap runs.
