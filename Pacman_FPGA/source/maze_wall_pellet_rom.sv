@@ -105,14 +105,16 @@ module maze_wall_pellet_rom (
     // Contains only collectibles strictly left of x.
     logic [23:0] prefix_mask;
 
-    logic [3:0] prefix_count;
+    // Max 22 collectibles per row, so 5 bits is enough; use 8 to match
+    // pellet_index width and avoid wrap when adding into row_base.
+    logic [7:0] prefix_count;
 
     always_comb begin
         row = row_data(y);
 
         collect_mask = 24'd0;
         prefix_mask  = 24'd0;
-        prefix_count = 4'd0;
+        prefix_count = 8'd0;
 
         // The MSB of each tile is 1 for both 10 and 11.
         for (int i = 0; i < 24; i++) begin
@@ -129,15 +131,13 @@ module maze_wall_pellet_rom (
 
         // Count collectibles to the left.
         for (int i = 0; i < 24; i++) begin
-            prefix_count = prefix_count + prefix_mask[i];
+            prefix_count = prefix_count + {7'b0, prefix_mask[i]};
         end
 
         if (in_bounds(x, y)) begin
             tile = row[(6'd47 - x*2) -: 2];
 
-            pellet_index =
-                row_base(y) +
-                {{4{1'b0}}, prefix_count};
+            pellet_index = row_base(y) + prefix_count;
         end else begin
             tile         = WALL_TILE;
             pellet_index = 8'd0;
