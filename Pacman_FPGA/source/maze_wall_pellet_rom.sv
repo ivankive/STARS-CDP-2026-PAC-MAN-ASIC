@@ -139,13 +139,10 @@ module maze_wall_pellet_rom (
 
         collectible = tile[1];
 
-        // Movement rules (unchanged from initial_maze_rom):
-        // Pac-Man may not enter the ghost-house door tiles.
         can_move_pac = (tile != WALL_TILE) &&
                        !((x == 5'd13) && (y == 5'd12)) &&
                        !((x == 5'd14) && (y == 5'd12));
 
-        // Ghosts may not cross the house side walls.
         can_move_ghost = (tile != WALL_TILE) &&
                          !((x == 5'd12) && (y >= 5'd12) && (y <= 5'd16)) &&
                          !((x == 5'd15) && (y >= 5'd12) && (y <= 5'd16));
