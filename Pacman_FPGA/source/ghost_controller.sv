@@ -215,6 +215,8 @@ module ghost_controller (
 
     integer i;
 
+    localparam logic [1:0] GAME_STARTING = 2'd0;
+
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
             scheduler_state <= S_IDLE;
@@ -243,7 +245,7 @@ module ghost_controller (
             ghost_rom_y <= 5'd0;
 
             issued_oob <= 1'b1;
-        end else if (pacman_hit) begin
+        end else if ((game_state == GAME_STARTING) || pacman_hit) begin
             scheduler_state <= S_IDLE;
 
             move_counter <= 3'd0;

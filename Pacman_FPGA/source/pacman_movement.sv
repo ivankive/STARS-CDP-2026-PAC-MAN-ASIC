@@ -3,6 +3,7 @@ module pacman_movement (
     input  logic       reset,
 
     input  logic       enable,
+    input  logic       game_starting,
     input  logic [3:0] pb,
 
     input  logic       pacman_hit,
@@ -76,7 +77,7 @@ module pacman_movement (
             test_dir   <= RIGHT;
             count      <= 3'd0;
             state      <= S_IDLE;
-        end else if (pacman_hit) begin
+        end else if (game_starting || pacman_hit) begin
             xpos       <= 5'd11;
             ypos       <= 5'd19;
             dir        <= RIGHT;

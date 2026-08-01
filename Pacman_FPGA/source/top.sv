@@ -172,18 +172,19 @@ module top (
   // ---------------- Game logic ----------------
 
   pacman_movement pacman_movement(
-    .clk          (new_clock),
-    .reset        (reset),
-    .enable       (game_state == 2'b01),
-    .pb           (inputs),
-    .pacman_hit   (pacman_hit),
-    .rom_x        (pac_rom_x),
-    .rom_y        (pac_rom_y),
-    .rom_valid    (pac_rom_valid),
-    .rom_can_move (pac_rom_can_move),
-    .xpos         (pacman_x),
-    .ypos         (pacman_y),
-    .direction    (pacman_dir)
+    .clk           (new_clock),
+    .reset         (reset),
+    .enable        (game_state == 2'b01),
+    .game_starting (game_state == 2'd0),
+    .pb            (inputs),
+    .pacman_hit    (pacman_hit),
+    .rom_x         (pac_rom_x),
+    .rom_y         (pac_rom_y),
+    .rom_valid     (pac_rom_valid),
+    .rom_can_move  (pac_rom_can_move),
+    .xpos          (pacman_x),
+    .ypos          (pacman_y),
+    .direction     (pacman_dir)
   );
 
   pacman_collision pacman_collision_inst (

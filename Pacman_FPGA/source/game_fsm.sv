@@ -4,7 +4,10 @@
 // reload_done / map_loaded) is gone. There is no ROM-to-BRAM copy any
 // more - a new game only requires clearing the pellet_state array, which
 // top.sv does combinationally while this FSM sits in GAME_STARTING.
-// GAME_STARTING therefore starts the game on any button press.
+// GAME_STARTING therefore starts the game on a button press edge.
+//
+// Button edges (not levels) are required so WIN/OVER -> STARTING does not
+// immediately fall through to PLAYING while the same press is still held.
 
 module game_fsm (
     input  logic       clk,
@@ -23,12 +26,21 @@ module game_fsm (
         GAME_WIN      = 2'd3;
 
     logic [1:0] next_state;
+    logic       inputs_any;
+    logic       inputs_any_d;
+    logic       press;
+
+    assign inputs_any = |inputs;
+    assign press      = inputs_any & ~inputs_any_d;
 
     always_ff @(posedge clk) begin
-        if (reset)
-            game_state <= GAME_STARTING;
-        else
-            game_state <= next_state;
+        if (reset) begin
+            game_state    <= GAME_STARTING;
+            inputs_any_d  <= 1'b0;
+        end else begin
+            game_state   <= next_state;
+            inputs_any_d <= inputs_any;
+        end
     end
 
     // Next-state logic
@@ -37,26 +49,26 @@ module game_fsm (
 
         case (game_state)
 
-            // Pellet state is being held clear; wait for a button press.
+            // Pellet state is being held clear; wait for a new button press.
             GAME_STARTING: begin
-                if (|inputs)
+                if (press)
                     next_state = GAME_PLAYING;
             end
 
             GAME_PLAYING: begin
                 if (lives == 2'd0)
                     next_state = GAME_OVER;
-                else if (pellets == 8'd1)
+                else if (pellets == 8'd0)
                     next_state = GAME_WIN;
             end
 
             GAME_OVER: begin
-                if (|inputs)
+                if (press)
                     next_state = GAME_STARTING;
             end
 
             GAME_WIN: begin
-                if (|inputs)
+                if (press)
                     next_state = GAME_STARTING;
             end
 
