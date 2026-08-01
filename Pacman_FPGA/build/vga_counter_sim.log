@@ -1,0 +1,19 @@
+VCD info: dumpfile waves/vga_counter.vcd opened for output.
+PASS: reset h/v zero
+PASS: reset video_on
+PASS: reset hsync high
+PASS: reset vsync high
+PASS: mid visible video_on
+PASS: hcount advanced
+PASS: last visible pixel video_on
+PASS: h=640 video off
+PASS: hsync assert start
+PASS: hsync deassert
+PASS: line wrap to v=1
+PASS: enter v=480 blank
+PASS: vsync assert
+PASS: vsync deassert
+PASS: frame wrap to 0,0
+
+vga_counter_tb: 15 PASS, 0 FAIL
+testbench/vga_counter_tb.sv:108: $finish called at 4200016000 (1ps)

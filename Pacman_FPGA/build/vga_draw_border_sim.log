@@ -1,0 +1,13 @@
+VCD info: dumpfile waves/vga_draw_border.vcd opened for output.
+PASS: pass-through in playfield
+PASS: blank when video_off
+PASS: black right margin
+PASS: black bottom margin
+PASS: black top band
+PASS: black between score glyphs h=0
+PASS: black between score glyphs gap
+PASS: black right of score row
+PASS: score letter strip pass-through
+
+vga_draw_border_tb: 9 PASS, 0 FAIL
+testbench/vga_draw_border_tb.sv:87: $finish called at 9000 (1ps)

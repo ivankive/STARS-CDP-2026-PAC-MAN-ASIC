@@ -1,0 +1,110 @@
+$date
+	Sat Aug  1 00:16:17 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module vga_draw_border_tb $end
+$var wire 3 ! output_rgb [2:0] $end
+$var reg 10 " h_count [9:0] $end
+$var reg 3 # input_rgb [2:0] $end
+$var reg 10 $ v_count [9:0] $end
+$var reg 1 % video_on $end
+$var integer 32 & fail_count [31:0] $end
+$var integer 32 ' pass_count [31:0] $end
+$scope module dut $end
+$var wire 1 ( black_bottom $end
+$var wire 1 ) black_top $end
+$var wire 1 * black_top_between_numbers $end
+$var wire 10 + h_count [9:0] $end
+$var wire 3 , input_rgb [2:0] $end
+$var wire 10 - v_count [9:0] $end
+$var wire 1 % video_on $end
+$var wire 1 . black_right $end
+$var reg 3 / output_rgb [2:0] $end
+$upscope $end
+$scope task check $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b101 /
+0.
+b1100100 -
+b101 ,
+b1100100 +
+0*
+0)
+0(
+b0 '
+b0 &
+1%
+b1100100 $
+b101 #
+b1100100 "
+b101 !
+$end
+#1000
+b0 !
+b0 /
+0%
+b1 '
+#2000
+1.
+b11100000 "
+b11100000 +
+1%
+b10 '
+#3000
+1(
+b0 !
+b0 /
+b101000000 $
+b101000000 -
+0.
+b1100100 "
+b1100100 +
+b11 '
+#4000
+1)
+0(
+b100000 $
+b100000 -
+b100 '
+#5000
+b0 !
+b0 /
+1)
+1*
+b0 "
+b0 +
+b11 $
+b11 -
+b101 '
+#6000
+b101101 "
+b101101 +
+b110 '
+#7000
+b1010000 "
+b1010000 +
+b111 '
+#8000
+b111 !
+b111 /
+0)
+0*
+b111 #
+b111 ,
+b100 "
+b100 +
+b1000 '
+#9000
+b1001 '

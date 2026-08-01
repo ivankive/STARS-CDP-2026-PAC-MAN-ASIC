@@ -8,6 +8,7 @@ module game_fsm_tb;
     logic       reload_done;
     logic [1:0] lives;
     logic [8:0] pellets;
+    logic [3:0] inputs;
     logic [1:0] game_state;
 
     int pass_count;
@@ -16,6 +17,7 @@ module game_fsm_tb;
     localparam logic [1:0] GAME_STARTING = 2'd0;
     localparam logic [1:0] GAME_PLAYING  = 2'd1;
     localparam logic [1:0] GAME_OVER     = 2'd2;
+    localparam logic [1:0] GAME_WIN      = 2'd3;
 
     game_fsm dut (
         .clk(clk),
@@ -24,6 +26,7 @@ module game_fsm_tb;
         .reload_done(reload_done),
         .lives(lives),
         .pellets(pellets),
+        .inputs(inputs),
         .game_state(game_state)
     );
 
@@ -40,7 +43,6 @@ module game_fsm_tb;
         end
     endtask
 
-    // Drive on negedge, sample after posedge
     task automatic cycle;
         @(negedge clk);
     endtask
@@ -58,6 +60,7 @@ module game_fsm_tb;
         reload_done = 1'b0;
         lives       = 2'd3;
         pellets     = 9'd288;
+        inputs      = 4'b0000;
 
         $dumpfile("waves/game_fsm.vcd");
         $dumpvars(0, game_fsm_tb);
@@ -69,16 +72,18 @@ module game_fsm_tb;
         sample();
         check("reset -> STARTING", game_state === GAME_STARTING);
 
-        sample();
-        sample();
-        check("wait without reload", game_state === GAME_STARTING);
-
         cycle();
         reload_done = 1'b1;
         sample();
-        check("reload_done -> PLAYING", game_state === GAME_PLAYING);
+        check("reload without input stays STARTING", game_state === GAME_STARTING);
+
+        cycle();
+        inputs = 4'b0001;
+        sample();
+        check("reload+input -> PLAYING", game_state === GAME_PLAYING);
         cycle();
         reload_done = 1'b0;
+        inputs      = 4'b0000;
 
         cycle();
         lives = 2'd0;
@@ -86,40 +91,44 @@ module game_fsm_tb;
         check("lives==0 -> OVER", game_state === GAME_OVER);
 
         cycle();
-        map_rst = 1'b1;
+        inputs = 4'b1000;
         sample();
         cycle();
-        map_rst = 1'b0;
-        check("map_rst from OVER -> STARTING", game_state === GAME_STARTING);
+        inputs = 4'b0000;
+        check("input from OVER -> STARTING", game_state === GAME_STARTING);
 
         cycle();
         lives       = 2'd3;
         pellets     = 9'd10;
         reload_done = 1'b1;
+        inputs      = 4'b0010;
         sample();
         cycle();
         reload_done = 1'b0;
+        inputs      = 4'b0000;
         check("reload again -> PLAYING", game_state === GAME_PLAYING);
 
         cycle();
         pellets = 9'd0;
         sample();
-        check("pellets==0 -> OVER", game_state === GAME_OVER);
+        check("pellets==0 -> WIN", game_state === GAME_WIN);
 
         cycle();
         map_rst = 1'b1;
         sample();
         cycle();
         map_rst = 1'b0;
-        check("map_rst from OVER path -> STARTING", game_state === GAME_STARTING);
+        check("map_rst from WIN -> STARTING", game_state === GAME_STARTING);
 
         cycle();
         pellets     = 9'd5;
         lives       = 2'd2;
         reload_done = 1'b1;
+        inputs      = 4'b0100;
         sample();
         cycle();
         reload_done = 1'b0;
+        inputs      = 4'b0000;
         check("playing again", game_state === GAME_PLAYING);
 
         cycle();
@@ -131,9 +140,11 @@ module game_fsm_tb;
 
         cycle();
         reload_done = 1'b1;
+        inputs      = 4'b0001;
         sample();
         cycle();
         reload_done = 1'b0;
+        inputs      = 4'b0000;
         cycle();
         reset = 1'b1;
         sample();

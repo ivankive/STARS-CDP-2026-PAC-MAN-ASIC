@@ -1,0 +1,19 @@
+VCD info: dumpfile waves/ghost_controller.vcd opened for output.
+PASS: reset blinky spawn
+PASS: reset pinky spawn
+PASS: caged not dangerous
+PASS: starting keeps blinky caged
+PASS: starting keeps pinky caged
+PASS: playing makes ghosts dangerous
+PASS: not vulnerable yet
+PASS: blinky left cage
+PASS: pinky left cage
+PASS: rom addr in range
+PASS: frightened vulnerable
+PASS: frightened not dangerous
+PASS: eaten blinky respawns
+PASS: hit resets blinky
+PASS: hit resets pinky
+
+ghost_controller_tb: 15 PASS, 0 FAIL
+testbench/ghost_controller_tb.sv:183: $finish called at 1136000 (1ps)

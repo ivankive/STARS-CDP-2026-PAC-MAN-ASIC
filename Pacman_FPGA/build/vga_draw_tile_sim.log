@@ -1,0 +1,15 @@
+VCD info: dumpfile waves/vga_draw_tile.vcd opened for output.
+PASS: unloaded map black
+PASS: request tile coords
+PASS: wall tile blue
+PASS: empty tile black
+PASS: pellet center white
+PASS: pellet corner black
+PASS: power pellet body white
+PASS: power pellet cut corner black
+PASS: video_off forces black
+PASS: oob request defaults x/y
+PASS: oob draw black
+
+vga_draw_tile_tb: 11 PASS, 0 FAIL
+testbench/vga_draw_tile_tb.sv:120: $finish called at 9000 (1ps)

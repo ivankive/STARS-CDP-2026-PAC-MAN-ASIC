@@ -1,0 +1,13 @@
+VCD info: dumpfile waves/vga_draw_text.vcd opened for output.
+PASS: playing mid-screen pass-through
+PASS: SCORE S glyph white
+PASS: digit 7 leading black
+PASS: digit 7 body white
+PASS: hundreds digit drawn
+PASS: starting title white block
+PASS: game over text white
+PASS: win text white
+PASS: video_off pass-through
+
+vga_draw_text_tb: 9 PASS, 0 FAIL
+testbench/vga_draw_text_tb.sv:108: $finish called at 9000 (1ps)

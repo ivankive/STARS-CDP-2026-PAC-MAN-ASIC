@@ -1,0 +1,18 @@
+VCD info: dumpfile waves/initial_maze_rom.vcd opened for output.
+PASS: corner (0,0) wall
+PASS: corner (27,30) wall
+PASS: pellet at (1,1)
+PASS: power pellet (1,4)
+PASS: power pellet (26,4)
+PASS: house empty path tile
+PASS: pac door (13,12) blocked
+PASS: pac door (14,12) blocked
+PASS: ghost side wall (12,14) blocked on B
+PASS: open path still free on A
+PASS: ghost side wall (15,16) blocked on B
+PASS: port A pellet while B wall
+PASS: oob x wall
+PASS: oob y wall
+
+initial_maze_rom_tb: 14 PASS, 0 FAIL
+testbench/initial_maze_rom_tb.sv:109: $finish called at 11000 (1ps)

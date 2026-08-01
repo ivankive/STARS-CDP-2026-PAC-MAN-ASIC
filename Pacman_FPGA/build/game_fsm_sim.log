@@ -1,0 +1,15 @@
+VCD info: dumpfile waves/game_fsm.vcd opened for output.
+PASS: reset -> STARTING
+PASS: reload without input stays STARTING
+PASS: reload+input -> PLAYING
+PASS: lives==0 -> OVER
+PASS: input from OVER -> STARTING
+PASS: reload again -> PLAYING
+PASS: pellets==0 -> WIN
+PASS: map_rst from WIN -> STARTING
+PASS: playing again
+PASS: map_rst from PLAYING -> STARTING
+PASS: sync reset -> STARTING
+
+game_fsm_tb: 11 PASS, 0 FAIL
+testbench/game_fsm_tb.sv:157: $finish called at 216000 (1ps)

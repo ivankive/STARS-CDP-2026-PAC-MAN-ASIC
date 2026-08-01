@@ -221,19 +221,28 @@ make clean              # Remove build artifacts
 
 Source files go in `Pacman_FPGA/source/`; testbenches in `Pacman_FPGA/testbench/`.
 
-Available gameplay unit tests (run with `make sim_<name>_src`):
+Available unit tests (run with `make sim_<name>_src`):
 
 | Testbench | Coverage |
 |-----------|----------|
-| `game_fsm` | STARTING → PLAYING → OVER / WIN; reload / lives / pellets |
+| `game_fsm` | STARTING → PLAYING → OVER / WIN; input + reload / lives / pellets |
 | `pacman_movement` | Spawn, facing, turns, wall block, tunnel wrap, hit / `game_rst` |
 | `pacman_collision` | Pellet / power clear, lives, ghost eat / hit (score checks partially commented) |
 | `maze_bram` | Load, VGA / central reads, pellet clear, map reload |
+| `initial_maze_rom` | Walls / pellets / power pellets, dual-port, door blocks, OOB |
 | `pp_timer` | Activate, 180-tick window, retrigger, async reset |
+| `clock_div` | 60 Hz single-cycle pulse, period, async reset |
 | `ghost_mode_controller` | Scatter / chase schedule and pause |
 | `ghost_fsm` | Caged / scatter / chase / frightened / eaten |
 | `ghost_target` | Blinky & Pinky targets (chase offset, clamps, frightened) |
 | `ghost_movement` | Pathing toward target, reverse, blocked / dead-end |
+| `ghost_controller` | Spawn, leave cage, ROM probes, frightened / eaten / hit reset |
+| `vga_counter` | 640×480 timing, hsync / vsync, video_on, frame wrap |
+| `vga_draw_tile` | Wall / pellet / power-pellet pixels, map unload, OOB |
+| `vga_draw_sprite` | Pac-Man / Blinky / Pinky colors, frightened cyan, lives icons |
+| `vga_draw_text` | SCORE glyphs / digits, title / lose / win overlays |
+| `vga_draw_border` | Playfield pass-through and blackout margins |
+| `vga_controller_top` | Pipeline sync, tile addressing, layered compose |
 
 ---
 
@@ -251,7 +260,7 @@ Available gameplay unit tests (run with `make sim_<name>_src`):
 | Ghost AI | Done | Blinky & Pinky; frightened ghosts draw cyan |
 | Power pellet mode | Done | Timer + frightened / eatable ghosts |
 | Full integration | Done | Wired in `Pacman_FPGA/source/top.sv` |
-| Unit testbenches | Done | 9 module TBs under `Pacman_FPGA/testbench/` |
+| Unit testbenches | Done | 18 module TBs under `Pacman_FPGA/testbench/` |
 | ASIC tapeout | Not started | PDK setup available via Makefile |
 
 ---

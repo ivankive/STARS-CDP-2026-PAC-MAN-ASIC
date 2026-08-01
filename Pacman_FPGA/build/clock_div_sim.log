@@ -1,0 +1,12 @@
+PASS: async reset clears clk_div
+PASS: idle before first pulse
+PASS: still low just before pulse
+PASS: pulse on divider wrap
+PASS: pulse is single-cycle
+PASS: second pulse
+PASS: second pulse clears
+PASS: async reset mid-count
+PASS: exactly one pulse in next full period
+
+clock_div_tb: 9 PASS, 0 FAIL
+testbench/clock_div_tb.sv:97: $finish called at 12572526000 (1ps)

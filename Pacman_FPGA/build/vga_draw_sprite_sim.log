@@ -1,0 +1,12 @@
+VCD info: dumpfile waves/vga_draw_sprite.vcd opened for output.
+PASS: background pass-through
+PASS: pacman yellow
+PASS: blinky red body
+PASS: blinky frightened cyan
+PASS: pinky body
+PASS: life icon 1 yellow
+PASS: no lives hides icon
+PASS: video_off uses background
+
+vga_draw_sprite_tb: 8 PASS, 0 FAIL
+testbench/vga_draw_sprite_tb.sv:131: $finish called at 8000 (1ps)

@@ -1,0 +1,12 @@
+VCD info: dumpfile waves/vga_controller_top.vcd opened for output.
+PASS: reset syncs idle high
+PASS: pipeline rgb driven
+PASS: found wall tile request
+PASS: tile layer draws wall blue
+PASS: top rgb driven
+PASS: hsync eventually toggles
+PASS: x_vga stays in maze width
+PASS: sim stable after unload
+
+vga_controller_top_tb: 8 PASS, 0 FAIL
+testbench/vga_controller_top_tb.sv:150: $finish called at 25876000 (1ps)
