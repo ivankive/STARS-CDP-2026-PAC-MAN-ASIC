@@ -6,7 +6,7 @@ module pacman_movement_tb;
     logic       reset;
     logic       game_rst;
     logic       enable;
-    logic [4:0] pb;
+    logic [3:0] pb;
     logic       pacman_hit;
     logic [4:0] rom_x;
     logic [4:0] rom_y;
@@ -76,8 +76,9 @@ module pacman_movement_tb;
         pass_count  = 0;
         fail_count  = 0;
         reset       = 1'b1;
+        game_rst    = 1'b0;
         enable      = 1'b0;
-        pb          = 5'b0;
+        pb          = 4'b0;
         pacman_hit  = 1'b0;
         force_wall  = 1'b0;
         wall_x      = 5'd0;
@@ -97,10 +98,10 @@ module pacman_movement_tb;
         wait_move_cycle();
         check("moved right to (15,17)", (xpos === 5'd15) && (ypos === 5'd17));
 
-        // Request up and move
-        pb = 5'b00001; // UP on pb[0]
+        // Request up and move: pb[0]=UP, pb[1]=RIGHT, pb[2]=DOWN, pb[3]=LEFT
+        pb = 4'b0001; // UP on pb[0]
         tick(1);
-        pb = 5'b0;
+        pb = 4'b0;
         wait_move_cycle();
         check("turned/moved up", (xpos === 5'd15) && (ypos === 5'd16) && (direction === UP));
 
@@ -108,9 +109,9 @@ module pacman_movement_tb;
         force_wall = 1'b1;
         wall_x     = 5'd14; // left of current (15,16)
         wall_y     = 5'd16;
-        pb         = 5'b01000; // LEFT
+        pb         = 4'b1000; // LEFT
         tick(1);
-        pb = 5'b0;
+        pb = 4'b0;
         wait_move_cycle();
         check("blocked left continues up",
               (xpos === 5'd15) && (ypos === 5'd15) && (direction === UP));
@@ -123,13 +124,6 @@ module pacman_movement_tb;
         enable = 1'b0;
         tick(1);
 
-        // Force position via hit-reset is spawn; instead walk/teleport using hit then
-        // carefully drive: use force by disabling and poking is not possible.
-        // Drive to tunnel using open maze from spawn is slow; pulse pacman_hit then
-        // manually only tests hit restore, then separately force wrap by setting
-        // inputs after we get near tunnel... For wrap, re-init and use long walk
-        // is excessive. Use hierarchical force if supported, else walk.
-        // Icarus supports force/release on nets.
         enable = 1'b1;
         force dut.xpos = 5'd0;
         force dut.ypos = 5'd14;
@@ -185,11 +179,27 @@ module pacman_movement_tb;
         pacman_hit = 1'b0;
         check("hit restores spawn", (xpos === 5'd14) && (ypos === 5'd17) && (direction === RIGHT));
 
-        // pb[4] asserts game_rst (DUT never clears it)
-        pb = 5'b10000;
+        // Disable stops further movement from spawn
+        enable = 1'b0;
+        pb     = 4'b0010; // RIGHT request while disabled
+        tick(5);
+        pb = 4'b0;
+        check("disabled holds spawn", (xpos === 5'd14) && (ypos === 5'd17));
+
+        // Soft restart (game_rst) restores spawn from an arbitrary pose
+        enable = 1'b1;
+        force dut.xpos = 5'd20;
+        force dut.ypos = 5'd10;
+        force dut.dir  = UP;
         tick(1);
-        pb = 5'b0;
-        check("pb4 sets game_rst", game_rst === 1'b1);
+        release dut.xpos;
+        release dut.ypos;
+        release dut.dir;
+        game_rst = 1'b1;
+        tick(1);
+        game_rst = 1'b0;
+        check("game_rst restores spawn",
+              (xpos === 5'd14) && (ypos === 5'd17) && (direction === RIGHT));
 
         $display("\npacman_movement_tb: %0d PASS, %0d FAIL", pass_count, fail_count);
         $finish;

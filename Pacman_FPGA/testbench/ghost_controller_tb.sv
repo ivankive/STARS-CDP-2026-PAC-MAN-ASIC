@@ -21,7 +21,6 @@ module ghost_controller_tb;
     logic [1:0] pinky_dir;
     logic [1:0] dangerous_to_pacman;
     logic [1:0] vulnerable_to_pacman;
-    logic [9:0] score;
 
     int pass_count;
     int fail_count;
@@ -63,8 +62,7 @@ module ghost_controller_tb;
         .pinky_y(pinky_y),
         .pinky_dir(pinky_dir),
         .dangerous_to_pacman(dangerous_to_pacman),
-        .vulnerable_to_pacman(vulnerable_to_pacman),
-        .score(score)
+        .vulnerable_to_pacman(vulnerable_to_pacman)
     );
 
     initial clk = 1'b0;

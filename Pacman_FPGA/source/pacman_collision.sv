@@ -82,7 +82,7 @@ module pacman_collision (
             power_pellet_eaten <= 1'b0;
             pacman_hit         <= 1'b0;
             ghost_eaten        <= 2'b00;
-            // score              <= 10'd0;
+            score              <= 10'd0;
             lives              <= 2'd3;
             pellets            <= 9'd288; 
         end else begin

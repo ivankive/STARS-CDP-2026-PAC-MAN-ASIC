@@ -1,7 +1,7 @@
 module pacman_movement (
     input  logic       clk,
     input  logic       reset,
-    output logic       game_rst,
+    input  logic       game_rst,  // soft restart (WIN/OVER -> STARTING)
 
     input  logic       enable,
     input  logic [3:0] pb,
@@ -76,7 +76,7 @@ module pacman_movement (
             test_dir   <= RIGHT;
             count      <= 3'd0;
             state      <= S_IDLE;
-        end else if (pacman_hit) begin
+        end else if (game_rst || pacman_hit) begin
             xpos       <= 5'd14;
             ypos       <= 5'd17;
             dir        <= RIGHT;

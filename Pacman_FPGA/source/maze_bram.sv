@@ -165,8 +165,9 @@ module maze_bram (
     end
 
     always_ff @(posedge clk or posedge reset) begin
-        if (reset) vga_valid_q <= 1'b0;
-        else       vga_valid_q <= map_loaded && vga_in_bounds;
+        if (reset)        vga_valid_q <= 1'b0;
+        else if (map_rst) vga_valid_q <= 1'b0;
+        else              vga_valid_q <= map_loaded && vga_in_bounds;
     end
 
     always_comb begin

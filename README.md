@@ -227,7 +227,7 @@ Available unit tests (run with `make sim_<name>_src`):
 |-----------|----------|
 | `game_fsm` | STARTING → PLAYING → OVER / WIN; input + reload / lives / pellets |
 | `pacman_movement` | Spawn, facing, turns, wall block, tunnel wrap, hit / `game_rst` |
-| `pacman_collision` | Pellet / power clear, lives, ghost eat / hit (score checks partially commented) |
+| `pacman_collision` | Pellet / power / ghost scoring (+2 / +15 / +20), lives, hit, `game_starting` |
 | `maze_bram` | Load, VGA / central reads, pellet clear, map reload |
 | `initial_maze_rom` | Walls / pellets / power pellets, dual-port, door blocks, OOB |
 | `pp_timer` | Activate, 180-tick window, retrigger, async reset |

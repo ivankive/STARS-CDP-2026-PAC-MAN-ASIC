@@ -36,7 +36,6 @@ module top (
   logic       pacman_hit;
   logic [1:0] ghost_eaten;
   logic [9:0] score;
-  logic       game_rst;
   logic [1:0] lives;
   logic [8:0] pellets;
 
@@ -88,7 +87,13 @@ module top (
 
   clock_div marcus(.clk(hz100), .rst(reset), .clk_div(new_clock));
 
-  pp_timer pp(.pp_collision(power_pellet_eaten), .clk(new_clock), .rst(reset), .pp_active(power_pellet_active));
+  // Clear frightened window on hard reset and soft restart (STARTING).
+  pp_timer pp(
+    .pp_collision(power_pellet_eaten),
+    .clk(new_clock),
+    .rst(reset || (game_state == 2'd0)),
+    .pp_active(power_pellet_active)
+  );
   assign red = power_pellet_active;
 
   pacman_movement pacman_movement(
@@ -103,7 +108,7 @@ module top (
     .ypos         (pacman_y),
     .direction    (pacman_dir),
     .pacman_hit   (pacman_hit),
-    .game_rst     (game_rst)
+    .game_rst     (game_state == 2'd0)
   );
 
   pacman_collision pacman_collision_inst (

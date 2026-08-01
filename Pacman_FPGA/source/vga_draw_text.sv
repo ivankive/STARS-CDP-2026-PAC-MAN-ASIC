@@ -16,6 +16,129 @@ module vga_draw_text(
  
   // digit tile enables (to the right of "SCORE")
     logic draw_hundreds, draw_tens, draw_ones;
+
+    // decimal digits of the binary score
+    logic [3:0] hundreds, tens, ones;
+    logic [3:0] cur_digit;   // which digit this tile shows
+    logic [7:0] cur_row;     // that digit's glyph row
+    logic       cur_pix;     // the single pixel we want
+
+    localparam [113:0] ROW2 = 114'h39cf39c32511c97df3247cc1c8322;
+    localparam [113:0] ROW3 = 114'h25284204b511291044b41121284a2;
+    localparam [113:0] ROW4 = 114'h39ce3987ace1c91044ac1121c879c;
+    localparam [113:0] ROW5 = 114'h21480844a441291044a4112108488;
+    localparam [113:0] ROW6 = 114'h212f7384a441c610432410c10f488;
+
+    logic pixel_on; // whether to draw the text pixel or not
+    logic [9:0] text_x;
+
+    // Glyph row lookup for score digits (must be declared before use)
+    function automatic logic [7:0] digit_row(input logic [3:0] digit, input logic [2:0] row);
+        case (digit)
+          4'd0: case (row)
+            3'd0: digit_row = 8'b00111100;
+            3'd1: digit_row = 8'b01100110;
+            3'd2: digit_row = 8'b01100110;
+            3'd3: digit_row = 8'b01100110;
+            3'd4: digit_row = 8'b01100110;
+            3'd5: digit_row = 8'b01100110;
+            3'd6: digit_row = 8'b00111100;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd1: case (row)
+            3'd0: digit_row = 8'b00011000;
+            3'd1: digit_row = 8'b00111000;
+            3'd2: digit_row = 8'b00011000;
+            3'd3: digit_row = 8'b00011000;
+            3'd4: digit_row = 8'b00011000;
+            3'd5: digit_row = 8'b00011000;
+            3'd6: digit_row = 8'b01111110;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd2: case (row)
+            3'd0: digit_row = 8'b00111100;
+            3'd1: digit_row = 8'b01100110;
+            3'd2: digit_row = 8'b00000110;
+            3'd3: digit_row = 8'b00001100;
+            3'd4: digit_row = 8'b00110000;
+            3'd5: digit_row = 8'b01100000;
+            3'd6: digit_row = 8'b01111110;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd3: case (row)
+            3'd0: digit_row = 8'b00111100;
+            3'd1: digit_row = 8'b01100110;
+            3'd2: digit_row = 8'b00000110;
+            3'd3: digit_row = 8'b00011100;
+            3'd4: digit_row = 8'b00000110;
+            3'd5: digit_row = 8'b01100110;
+            3'd6: digit_row = 8'b00111100;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd4: case (row)
+            3'd0: digit_row = 8'b00001100;
+            3'd1: digit_row = 8'b00011100;
+            3'd2: digit_row = 8'b00111100;
+            3'd3: digit_row = 8'b01101100;
+            3'd4: digit_row = 8'b01111110;
+            3'd5: digit_row = 8'b00001100;
+            3'd6: digit_row = 8'b00001100;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd5: case (row)
+            3'd0: digit_row = 8'b01111110;
+            3'd1: digit_row = 8'b01100000;
+            3'd2: digit_row = 8'b01111100;
+            3'd3: digit_row = 8'b00000110;
+            3'd4: digit_row = 8'b00000110;
+            3'd5: digit_row = 8'b01100110;
+            3'd6: digit_row = 8'b00111100;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd6: case (row)
+            3'd0: digit_row = 8'b00111100;
+            3'd1: digit_row = 8'b01100000;
+            3'd2: digit_row = 8'b01100000;
+            3'd3: digit_row = 8'b01111100;
+            3'd4: digit_row = 8'b01100110;
+            3'd5: digit_row = 8'b01100110;
+            3'd6: digit_row = 8'b00111100;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd7: case (row)
+            3'd0: digit_row = 8'b01111110;
+            3'd1: digit_row = 8'b00000110;
+            3'd2: digit_row = 8'b00001100;
+            3'd3: digit_row = 8'b00011000;
+            3'd4: digit_row = 8'b00110000;
+            3'd5: digit_row = 8'b00110000;
+            3'd6: digit_row = 8'b00110000;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd8: case (row)
+            3'd0: digit_row = 8'b00111100;
+            3'd1: digit_row = 8'b01100110;
+            3'd2: digit_row = 8'b01100110;
+            3'd3: digit_row = 8'b00111100;
+            3'd4: digit_row = 8'b01100110;
+            3'd5: digit_row = 8'b01100110;
+            3'd6: digit_row = 8'b00111100;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          4'd9: case (row)
+            3'd0: digit_row = 8'b00111100;
+            3'd1: digit_row = 8'b01100110;
+            3'd2: digit_row = 8'b01100110;
+            3'd3: digit_row = 8'b00111110;
+            3'd4: digit_row = 8'b00000110;
+            3'd5: digit_row = 8'b00000110;
+            3'd6: digit_row = 8'b00111100;
+            3'd7: digit_row = 8'b00000000;
+          endcase
+          default: digit_row = 8'b00000000;
+        endcase
+    endfunction
+
     // Determine tile location and pixel position
     assign tile_y = v_count[7:3];
     assign tile_x = h_count[7:3];
@@ -42,53 +165,30 @@ module vga_draw_text(
     assign draw_c = (h_count <= 15) && (h_count > 7) && (v_count < 8);
     assign draw_o = (h_count <= 23) && (h_count > 15) && (v_count < 8);
     assign draw_r = (h_count <= 31) && (h_count > 23) && (v_count < 8);
-    assign draw_e = (h_count <= 39) && (h_count > 31) && (v_count < 8); 
-
+    assign draw_e = (h_count <= 39) && (h_count > 31) && (v_count < 8);
 
     // tile 5 is a blank gap.
     // tile 6 = hundreds, tile 7 = tens, tile 8 = ones.
     assign draw_hundreds = (h_count >= 48) && (h_count < 56) && (v_count < 8);
     assign draw_tens     = (h_count >= 56) && (h_count < 64) && (v_count < 8);
     assign draw_ones     = (h_count >= 64) && (h_count < 72) && (v_count < 8);
- 
 
-
-    // binary score -> decimal digits (updates every frame, so the
-    // display changes automatically the moment `score` changes)
+    // binary score -> decimal digits
     assign hundreds = 4'((score / 10'd100) % 10'd10);
     assign tens     = 4'((score / 10'd10)  % 10'd10);
     assign ones     = 4'( score            % 10'd10);
 
     always_comb begin
-        if  (draw_tens) 
-        cur_digit = tens;
-        else if (draw_ones) 
-        cur_digit = ones;
-        else                
-        cur_digit = hundreds;
+        if (draw_tens)
+            cur_digit = tens;
+        else if (draw_ones)
+            cur_digit = ones;
+        else
+            cur_digit = hundreds;
     end
 
     assign cur_row = digit_row(cur_digit, pixel_y);
     assign cur_pix = cur_row[3'd7 - pixel_x];
-
-    // decimal digits of the binary score
-    logic [3:0] hundreds, tens, ones;
-
-    logic [3:0] cur_digit;   // which digit this tile shows
-    logic [7:0] cur_row;     // that digit's glyph row
-    logic       cur_pix;     // the single pixel we want
-    
-    
-    localparam [113:0] ROW2 = 114'h39cf39c32511c97df3247cc1c8322;
-    localparam [113:0] ROW3 = 114'h25284204b511291044b41121284a2;
-    localparam [113:0] ROW4 = 114'h39ce3987ace1c91044ac1121c879c;
-    localparam [113:0] ROW5 = 114'h21480844a441291044a4112108488;
-    localparam [113:0] ROW6 = 114'h212f7384a441c610432410c10f488;
-
-    logic pixel_on; // whether to draw the text pixel or not
-
-    // Pixel generator for text
-    logic [9:0] text_x;
 
     always_comb begin
         pixel_on = 1'b0;
@@ -400,117 +500,5 @@ module vga_draw_text(
 
 
     end
-
-
-
-    function automatic logic [7:0] digit_row(input logic [3:0] digit, input logic [2:0] row);
-    
-    
-    case (digit)
-      4'd0: case (row)
-        3'd0: digit_row = 8'b00111100;
-        3'd1: digit_row = 8'b01100110;
-        3'd2: digit_row = 8'b01100110;
-        3'd3: digit_row = 8'b01100110;
-        3'd4: digit_row = 8'b01100110;
-        3'd5: digit_row = 8'b01100110;
-        3'd6: digit_row = 8'b00111100;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd1: case (row)
-        3'd0: digit_row = 8'b00011000;
-        3'd1: digit_row = 8'b00111000;
-        3'd2: digit_row = 8'b00011000;
-        3'd3: digit_row = 8'b00011000;
-        3'd4: digit_row = 8'b00011000;
-        3'd5: digit_row = 8'b00011000;
-        3'd6: digit_row = 8'b01111110;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd2: case (row)
-        3'd0: digit_row = 8'b00111100;
-        3'd1: digit_row = 8'b01100110;
-        3'd2: digit_row = 8'b00000110;
-        3'd3: digit_row = 8'b00001100;
-        3'd4: digit_row = 8'b00110000;
-        3'd5: digit_row = 8'b01100000;
-        3'd6: digit_row = 8'b01111110;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd3: case (row)
-        3'd0: digit_row = 8'b00111100;
-        3'd1: digit_row = 8'b01100110;
-        3'd2: digit_row = 8'b00000110;
-        3'd3: digit_row = 8'b00011100;
-        3'd4: digit_row = 8'b00000110;
-        3'd5: digit_row = 8'b01100110;
-        3'd6: digit_row = 8'b00111100;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd4: case (row)
-        3'd0: digit_row = 8'b00001100;
-        3'd1: digit_row = 8'b00011100;
-        3'd2: digit_row = 8'b00111100;
-        3'd3: digit_row = 8'b01101100;
-        3'd4: digit_row = 8'b01111110;
-        3'd5: digit_row = 8'b00001100;
-        3'd6: digit_row = 8'b00001100;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd5: case (row)
-        3'd0: digit_row = 8'b01111110;
-        3'd1: digit_row = 8'b01100000;
-        3'd2: digit_row = 8'b01111100;
-        3'd3: digit_row = 8'b00000110;
-        3'd4: digit_row = 8'b00000110;
-        3'd5: digit_row = 8'b01100110;
-        3'd6: digit_row = 8'b00111100;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd6: case (row)
-        3'd0: digit_row = 8'b00111100;
-        3'd1: digit_row = 8'b01100000;
-        3'd2: digit_row = 8'b01100000;
-        3'd3: digit_row = 8'b01111100;
-        3'd4: digit_row = 8'b01100110;
-        3'd5: digit_row = 8'b01100110;
-        3'd6: digit_row = 8'b00111100;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd7: case (row)
-        3'd0: digit_row = 8'b01111110;
-        3'd1: digit_row = 8'b00000110;
-        3'd2: digit_row = 8'b00001100;
-        3'd3: digit_row = 8'b00011000;
-        3'd4: digit_row = 8'b00110000;
-        3'd5: digit_row = 8'b00110000;
-        3'd6: digit_row = 8'b00110000;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd8: case (row)
-        3'd0: digit_row = 8'b00111100;
-        3'd1: digit_row = 8'b01100110;
-        3'd2: digit_row = 8'b01100110;
-        3'd3: digit_row = 8'b00111100;
-        3'd4: digit_row = 8'b01100110;
-        3'd5: digit_row = 8'b01100110;
-        3'd6: digit_row = 8'b00111100;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      4'd9: case (row)
-        3'd0: digit_row = 8'b00111100;
-        3'd1: digit_row = 8'b01100110;
-        3'd2: digit_row = 8'b01100110;
-        3'd3: digit_row = 8'b00111110;
-        3'd4: digit_row = 8'b00000110;
-        3'd5: digit_row = 8'b00000110;
-        3'd6: digit_row = 8'b00111100;
-        3'd7: digit_row = 8'b00000000;
-      endcase
-      default: digit_row = 8'b00000000;
-
-      endcase
-
-    endfunction
 
 endmodule
