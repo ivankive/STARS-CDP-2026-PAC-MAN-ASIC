@@ -52,6 +52,16 @@ module game_fsm_tb;
         #1;
     endtask
 
+    // Drive a one-cycle button rising edge (low -> high), sample after the edge clock.
+    task automatic press_button(input logic [3:0] btn);
+        cycle();
+        inputs = 4'b0000;
+        sample();
+        cycle();
+        inputs = btn;
+        sample();
+    endtask
+
     initial begin
         pass_count  = 0;
         fail_count  = 0;
@@ -77,10 +87,8 @@ module game_fsm_tb;
         sample();
         check("reload without input stays STARTING", game_state === GAME_STARTING);
 
-        cycle();
-        inputs = 4'b0001;
-        sample();
-        check("reload+input -> PLAYING", game_state === GAME_PLAYING);
+        press_button(4'b0001);
+        check("reload+posedge input -> PLAYING", game_state === GAME_PLAYING);
         cycle();
         reload_done = 1'b0;
         inputs      = 4'b0000;
@@ -90,46 +98,49 @@ module game_fsm_tb;
         sample();
         check("lives==0 -> OVER", game_state === GAME_OVER);
 
+        // Held button must not leave OVER until a rising edge
         cycle();
         inputs = 4'b1000;
         sample();
-        cycle();
-        inputs = 4'b0000;
-        check("input from OVER -> STARTING", game_state === GAME_STARTING);
+        // First cycle after 0->1 is a rise -> STARTING
+        check("posedge input from OVER -> STARTING", game_state === GAME_STARTING);
 
+        // Stay in STARTING while button remains held even after reload
         cycle();
         lives       = 2'd3;
         pellets     = 9'd10;
         reload_done = 1'b1;
-        inputs      = 4'b0010;
         sample();
+        check("held button does not start PLAYING", game_state === GAME_STARTING);
+
+        // Need a new rising edge (release then press)
+        press_button(4'b0010);
+        check("new posedge -> PLAYING", game_state === GAME_PLAYING);
         cycle();
         reload_done = 1'b0;
         inputs      = 4'b0000;
-        check("reload again -> PLAYING", game_state === GAME_PLAYING);
 
         cycle();
         pellets = 9'd0;
         sample();
         check("pellets==0 -> WIN", game_state === GAME_WIN);
 
-        cycle();
-        map_rst = 1'b1;
-        sample();
-        cycle();
-        map_rst = 1'b0;
-        check("map_rst from WIN -> STARTING", game_state === GAME_STARTING);
+        press_button(4'b0100);
+        check("posedge from WIN -> STARTING", game_state === GAME_STARTING);
 
         cycle();
         pellets     = 9'd5;
         lives       = 2'd2;
         reload_done = 1'b1;
-        inputs      = 4'b0100;
+        // button still held from previous press — must not auto-play
         sample();
+        check("held after WIN restart stays STARTING", game_state === GAME_STARTING);
+
+        press_button(4'b0100);
+        check("second posedge after WIN -> PLAYING", game_state === GAME_PLAYING);
         cycle();
         reload_done = 1'b0;
         inputs      = 4'b0000;
-        check("playing again", game_state === GAME_PLAYING);
 
         cycle();
         map_rst = 1'b1;
@@ -140,8 +151,8 @@ module game_fsm_tb;
 
         cycle();
         reload_done = 1'b1;
-        inputs      = 4'b0001;
-        sample();
+        press_button(4'b0001);
+        check("posedge after map_rst -> PLAYING", game_state === GAME_PLAYING);
         cycle();
         reload_done = 1'b0;
         inputs      = 4'b0000;

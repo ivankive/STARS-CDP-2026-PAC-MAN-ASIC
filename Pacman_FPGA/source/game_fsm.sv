@@ -19,6 +19,21 @@ module game_fsm (
 
     logic [1:0] next_state;
 
+    // Rising edge of any button (level holds must not advance the FSM).
+    logic inputs_any;
+    logic inputs_any_d;
+    logic inputs_rise;
+
+    assign inputs_any  = |inputs;
+    assign inputs_rise = inputs_any && !inputs_any_d;
+
+    always_ff @(posedge clk) begin
+        if (reset)
+            inputs_any_d <= 1'b0;
+        else
+            inputs_any_d <= inputs_any;
+    end
+
     always_ff @(posedge clk) begin
         if (reset)
             game_state <= GAME_STARTING;
@@ -32,9 +47,9 @@ module game_fsm (
 
         case (game_state)
 
-            // Wait for the maze memory to finish loading.
+            // Wait for maze load, then require a fresh button press.
             GAME_STARTING: begin
-                if (reload_done && |inputs)
+                if (reload_done && inputs_rise)
                     next_state = GAME_PLAYING;
             end
 
@@ -48,14 +63,14 @@ module game_fsm (
                     next_state = GAME_STARTING;
             end
 
-            // Remain in game over until the game is reset.
+            // Remain in game over until a fresh button press / map_rst.
             GAME_OVER: begin
-                if (map_rst || |inputs)
+                if (map_rst || inputs_rise)
                     next_state = GAME_STARTING;
             end
 
             GAME_WIN: begin
-                if (map_rst || |inputs)
+                if (map_rst || inputs_rise)
                     next_state = GAME_STARTING;
             end
 
@@ -67,4 +82,3 @@ module game_fsm (
     end
 
 endmodule
-

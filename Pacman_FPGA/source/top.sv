@@ -78,8 +78,24 @@ module top (
   logic [1:0] vulnerable_to_pacman;
 
   logic [3:0] inputs;
+  logic       inputs_any;
+  logic       inputs_any_d;
+  logic       inputs_rise;
+  logic       soft_map_rst;
 
-  assign inputs = {pb[7], pb[6], pb[5], pb[10]};
+  assign inputs      = {pb[7], pb[6], pb[5], pb[10]};
+  assign inputs_any  = |inputs;
+  assign inputs_rise = inputs_any && !inputs_any_d;
+  // One-cycle maze reload pulse on button press from OVER/WIN (not level hold).
+  assign soft_map_rst = (game_state == 2'd2 || game_state == 2'd3) && inputs_rise;
+
+  always_ff @(posedge hz100 or posedge reset) begin
+    if (reset)
+      inputs_any_d <= 1'b0;
+    else
+      inputs_any_d <= inputs_any;
+  end
+
   assign rom_x_a = (game_state == 2'b0) ? reload_rom_x : pac_rom_x;
   assign rom_y_a = (game_state == 2'b0) ? reload_rom_y : pac_rom_y;
   assign reload_rom_data = rom_tile_a;
@@ -173,7 +189,7 @@ module top (
   game_fsm game_fsm(
     .clk          (hz100),
     .reset        (reset),
-    .map_rst      ((game_state == 2'd2 || game_state == 2'd3) && |inputs),
+    .map_rst      (soft_map_rst),
     .reload_done  (map_loaded),
     .lives        (lives),
     .pellets      (pellets),
@@ -184,7 +200,7 @@ module top (
 maze_bram maze_ram (
       .clk           (hz100),
       .reset         (reset),
-      .map_rst       ((game_state == 2'd2 || game_state == 2'd3) && |inputs),
+      .map_rst       (soft_map_rst),
       .map_loaded    (map_loaded),
       .x_vga         (x_vga),
       .y_vga         (y_vga),
