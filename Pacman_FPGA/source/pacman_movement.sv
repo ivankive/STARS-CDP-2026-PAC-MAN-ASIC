@@ -1,7 +1,7 @@
 module pacman_movement (
     input  logic       clk,
     input  logic       reset,
-    input  logic       game_rst,  // soft restart (WIN/OVER -> STARTING)
+    input  logic [1:0] game_state,  // 2'd0 = GAME_STARTING -> restore spawn
 
     input  logic       enable,
     input  logic [3:0] pb,
@@ -22,6 +22,8 @@ module pacman_movement (
     localparam logic [1:0] LEFT  = 2'd1;
     localparam logic [1:0] DOWN  = 2'd2;
     localparam logic [1:0] RIGHT = 2'd3;
+
+    localparam logic [1:0] GAME_STARTING = 2'd0;
 
     typedef enum logic [1:0] {
         S_IDLE,
@@ -76,7 +78,7 @@ module pacman_movement (
             test_dir   <= RIGHT;
             count      <= 3'd0;
             state      <= S_IDLE;
-        end else if (game_rst || pacman_hit) begin
+        end else if ((game_state == GAME_STARTING) || pacman_hit) begin
             xpos       <= 5'd14;
             ypos       <= 5'd17;
             dir        <= RIGHT;

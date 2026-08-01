@@ -4,7 +4,7 @@ module pacman_movement_tb;
 
     logic       clk;
     logic       reset;
-    logic       game_rst;
+    logic [1:0] game_state;
     logic       enable;
     logic [3:0] pb;
     logic       pacman_hit;
@@ -23,6 +23,9 @@ module pacman_movement_tb;
     localparam logic [1:0] DOWN  = 2'd2;
     localparam logic [1:0] RIGHT = 2'd3;
 
+    localparam logic [1:0] GAME_STARTING = 2'd0;
+    localparam logic [1:0] GAME_PLAYING  = 2'd1;
+
     // Open maze except a wall tile used for blocked-turn tests
     logic       force_wall;
     logic [4:0] wall_x;
@@ -38,7 +41,7 @@ module pacman_movement_tb;
     pacman_movement dut (
         .clk(clk),
         .reset(reset),
-        .game_rst(game_rst),
+        .game_state(game_state),
         .enable(enable),
         .pb(pb),
         .pacman_hit(pacman_hit),
@@ -76,7 +79,7 @@ module pacman_movement_tb;
         pass_count  = 0;
         fail_count  = 0;
         reset       = 1'b1;
-        game_rst    = 1'b0;
+        game_state  = GAME_PLAYING;
         enable      = 1'b0;
         pb          = 4'b0;
         pacman_hit  = 1'b0;
@@ -182,7 +185,7 @@ module pacman_movement_tb;
         pb = 4'b0;
         check("disabled holds spawn", (xpos === 5'd14) && (ypos === 5'd17));
 
-        // Soft restart (game_rst) restores spawn from an arbitrary pose
+        // Soft restart (GAME_STARTING) restores spawn from an arbitrary pose
         enable = 1'b1;
         force dut.xpos = 5'd20;
         force dut.ypos = 5'd10;
@@ -191,10 +194,10 @@ module pacman_movement_tb;
         release dut.xpos;
         release dut.ypos;
         release dut.dir;
-        game_rst = 1'b1;
+        game_state = GAME_STARTING;
         tick(1);
-        game_rst = 1'b0;
-        check("game_rst restores spawn",
+        game_state = GAME_PLAYING;
+        check("GAME_STARTING restores spawn",
               (xpos === 5'd14) && (ypos === 5'd17) && (direction === RIGHT));
 
         $display("\npacman_movement_tb: %0d PASS, %0d FAIL", pass_count, fail_count);

@@ -99,6 +99,7 @@ module top (
   pacman_movement pacman_movement(
     .clk          (new_clock),
     .reset        (reset),
+    .game_state   (game_state),
     .enable       ((game_state == 2'b01) && map_loaded),
     .pb           (inputs),
     .rom_x        (pac_rom_x),
@@ -107,8 +108,7 @@ module top (
     .xpos         (pacman_x),
     .ypos         (pacman_y),
     .direction    (pacman_dir),
-    .pacman_hit   (pacman_hit),
-    .game_rst     (game_state == 2'd0)
+    .pacman_hit   (pacman_hit)
   );
 
   pacman_collision pacman_collision_inst (
