@@ -163,6 +163,7 @@ module ghost_movement_tb;
               (next_x === 5'd10) && (next_y === 5'd10));
 
         $display("\nghost_movement_tb: %0d PASS, %0d FAIL", pass_count, fail_count);
+        if (fail_count != 0) $fatal(1);
         $finish;
     end
 

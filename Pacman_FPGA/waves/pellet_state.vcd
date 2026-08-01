@@ -1,0 +1,132 @@
+$date
+	Sat Aug  1 22:09:52 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module pellet_state_tb $end
+$var wire 1 ! rd_bit_b $end
+$var wire 1 " rd_bit_a $end
+$var reg 1 # clear $end
+$var reg 1 $ clk $end
+$var reg 8 % rd_index_a [7:0] $end
+$var reg 8 & rd_index_b [7:0] $end
+$var reg 1 ' reset $end
+$var reg 1 ( set_en $end
+$var reg 8 ) set_index [7:0] $end
+$var integer 32 * fail_count [31:0] $end
+$var integer 32 + pass_count [31:0] $end
+$scope module dut $end
+$var wire 1 # clear $end
+$var wire 1 $ clk $end
+$var wire 8 , rd_index_a [7:0] $end
+$var wire 8 - rd_index_b [7:0] $end
+$var wire 1 ' reset $end
+$var wire 1 ( set_en $end
+$var wire 8 . set_index [7:0] $end
+$var parameter 32 / NUM_PELLETS $end
+$var reg 186 0 eaten [185:0] $end
+$var reg 1 " rd_bit_a $end
+$var reg 1 ! rd_bit_b $end
+$upscope $end
+$scope task check $end
+$upscope $end
+$scope task sample $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b10111010 /
+$end
+#0
+$dumpvars
+b0 0
+b0 .
+b1 -
+b0 ,
+b0 +
+b0 *
+b0 )
+0(
+1'
+b1 &
+b0 %
+0$
+0#
+0"
+0!
+$end
+#5000
+1$
+#10000
+0'
+0$
+#15000
+1$
+#16000
+b1 +
+#20000
+1"
+b1010 %
+b1010 ,
+b1010 )
+b1010 .
+1(
+0$
+#25000
+b10000000000 0
+1$
+#26000
+b10 +
+#30000
+0(
+0$
+#35000
+1$
+#36000
+1!
+b1010 &
+b1010 -
+b11 +
+#37000
+0"
+b1011 %
+b1011 ,
+b100 +
+#38000
+b101 +
+#40000
+b11001000 )
+b11001000 .
+1(
+0$
+#45000
+1$
+#50000
+b11001000 %
+b11001000 ,
+0(
+0$
+#51000
+b110 +
+#55000
+1$
+#60000
+1#
+0$
+#65000
+0!
+b0 0
+1$
+#66000
+b1010 %
+b1010 ,
+#67000
+b111 +
+#70000
+0#
+0$

@@ -4,10 +4,9 @@ module game_fsm_tb;
 
     logic       clk;
     logic       reset;
-    logic       map_rst;
-    logic       reload_done;
     logic [1:0] lives;
-    logic [8:0] pellets;
+    logic [7:0] pellets;
+    logic [3:0] inputs;
     logic [1:0] game_state;
 
     int pass_count;
@@ -16,14 +15,14 @@ module game_fsm_tb;
     localparam logic [1:0] GAME_STARTING = 2'd0;
     localparam logic [1:0] GAME_PLAYING  = 2'd1;
     localparam logic [1:0] GAME_OVER     = 2'd2;
+    localparam logic [1:0] GAME_WIN      = 2'd3;
 
     game_fsm dut (
         .clk(clk),
         .reset(reset),
-        .map_rst(map_rst),
-        .reload_done(reload_done),
         .lives(lives),
         .pellets(pellets),
+        .inputs(inputs),
         .game_state(game_state)
     );
 
@@ -40,109 +39,100 @@ module game_fsm_tb;
         end
     endtask
 
-    // Drive on negedge, sample after posedge
-    task automatic cycle;
-        @(negedge clk);
-    endtask
-
     task automatic sample;
         @(posedge clk);
         #1;
     endtask
 
+    // Hold inputs low long enough for start_armed (~5 cycles).
+    task automatic wait_armed;
+        inputs = 4'b0000;
+        repeat (8) sample();
+    endtask
+
+    task automatic press_once;
+        @(negedge clk);
+        inputs = 4'b0001;
+        sample();
+        @(negedge clk);
+        inputs = 4'b0000;
+        sample();
+    endtask
+
     initial begin
-        pass_count  = 0;
-        fail_count  = 0;
-        reset       = 1'b1;
-        map_rst     = 1'b0;
-        reload_done = 1'b0;
-        lives       = 2'd3;
-        pellets     = 9'd288;
+        pass_count = 0;
+        fail_count = 0;
+        reset      = 1'b1;
+        lives      = 2'd3;
+        pellets    = 8'd186;
+        inputs     = 4'b0000;
 
         $dumpfile("waves/game_fsm.vcd");
         $dumpvars(0, game_fsm_tb);
 
         sample();
         sample();
-        cycle();
+        @(negedge clk);
         reset = 1'b0;
         sample();
         check("reset -> STARTING", game_state === GAME_STARTING);
 
+        // Press before arming must be ignored.
+        @(negedge clk);
+        inputs = 4'b0001;
         sample();
-        sample();
-        check("wait without reload", game_state === GAME_STARTING);
+        check("press before arm ignored", game_state === GAME_STARTING);
+        wait_armed();
+        check("still STARTING after release", game_state === GAME_STARTING);
 
-        cycle();
-        reload_done = 1'b1;
-        sample();
-        check("reload_done -> PLAYING", game_state === GAME_PLAYING);
-        cycle();
-        reload_done = 1'b0;
+        press_once();
+        check("armed press -> PLAYING", game_state === GAME_PLAYING);
 
-        cycle();
+        @(negedge clk);
         lives = 2'd0;
         sample();
         check("lives==0 -> OVER", game_state === GAME_OVER);
 
-        cycle();
-        map_rst = 1'b1;
+        // Same held press must not chain OVER -> STARTING -> PLAYING.
+        @(negedge clk);
+        inputs = 4'b0010;
         sample();
-        cycle();
-        map_rst = 1'b0;
-        check("map_rst from OVER -> STARTING", game_state === GAME_STARTING);
+        check("OVER press -> STARTING", game_state === GAME_STARTING);
+        sample();
+        sample();
+        check("held press stays STARTING", game_state === GAME_STARTING);
 
-        cycle();
-        lives       = 2'd3;
-        pellets     = 9'd10;
-        reload_done = 1'b1;
-        sample();
-        cycle();
-        reload_done = 1'b0;
-        check("reload again -> PLAYING", game_state === GAME_PLAYING);
+        wait_armed();
+        lives   = 2'd3;
+        pellets = 8'd10;
+        press_once();
+        check("restart -> PLAYING", game_state === GAME_PLAYING);
 
-        cycle();
-        pellets = 9'd0;
+        @(negedge clk);
+        pellets = 8'd0;
         sample();
-        check("pellets==0 -> OVER", game_state === GAME_OVER);
+        check("pellets==0 -> WIN", game_state === GAME_WIN);
 
-        cycle();
-        map_rst = 1'b1;
+        press_once();
+        check("WIN press -> STARTING", game_state === GAME_STARTING);
         sample();
-        cycle();
-        map_rst = 1'b0;
-        check("map_rst from OVER path -> STARTING", game_state === GAME_STARTING);
+        check("no bounce into PLAYING", game_state === GAME_STARTING);
 
-        cycle();
-        pellets     = 9'd5;
-        lives       = 2'd2;
-        reload_done = 1'b1;
-        sample();
-        cycle();
-        reload_done = 1'b0;
-        check("playing again", game_state === GAME_PLAYING);
+        wait_armed();
+        pellets = 8'd5;
+        press_once();
+        check("play again after WIN", game_state === GAME_PLAYING);
 
-        cycle();
-        map_rst = 1'b1;
-        sample();
-        cycle();
-        map_rst = 1'b0;
-        check("map_rst from PLAYING -> STARTING", game_state === GAME_STARTING);
-
-        cycle();
-        reload_done = 1'b1;
-        sample();
-        cycle();
-        reload_done = 1'b0;
-        cycle();
+        @(negedge clk);
         reset = 1'b1;
         sample();
-        cycle();
+        @(negedge clk);
         reset = 1'b0;
         sample();
         check("sync reset -> STARTING", game_state === GAME_STARTING);
 
         $display("\ngame_fsm_tb: %0d PASS, %0d FAIL", pass_count, fail_count);
+        if (fail_count != 0) $fatal(1);
         $finish;
     end
 

@@ -86,6 +86,7 @@ module ghost_mode_controller_tb;
         reset = 1'b0;
 
         $display("\nghost_mode_controller_tb: %0d PASS, %0d FAIL", pass_count, fail_count);
+        if (fail_count != 0) $fatal(1);
         $finish;
     end
 
