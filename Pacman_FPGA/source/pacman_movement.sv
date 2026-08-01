@@ -1,0 +1,164 @@
+// pacman_movement - tapeout version
+//
+// Changes vs FPGA version:
+//  * Maze lookups now go through maze_query_arbiter: the module presents
+//    (rom_x, rom_y) and must see rom_valid high before consuming
+//    rom_can_move. The check states hold until the response is valid.
+//    (In practice the arbiter answers within a few fast-clock cycles, long
+//    before the next 60 Hz tick, so gameplay timing is identical.)
+//  * Dead game_rst output removed.
+
+module pacman_movement (
+    input  logic       clk,
+    input  logic       reset,
+
+    input  logic       enable,
+    input  logic [3:0] pb,
+
+    input  logic       pacman_hit,
+
+    // Shared maze lookup via arbiter
+    output logic [4:0] rom_x,
+    output logic [4:0] rom_y,
+    input  logic       rom_valid,
+    input  logic       rom_can_move,
+
+    output logic [4:0] xpos,
+    output logic [4:0] ypos,
+    output logic [1:0] direction
+);
+
+    localparam logic [1:0] UP    = 2'd0;
+    localparam logic [1:0] LEFT  = 2'd1;
+    localparam logic [1:0] DOWN  = 2'd2;
+    localparam logic [1:0] RIGHT = 2'd3;
+
+    typedef enum logic [1:0] {
+        S_IDLE,
+        S_CHECK_TURN,
+        S_CHECK_FORWARD
+    } state_t;
+
+    state_t state;
+
+    logic [1:0] dir;
+    logic [1:0] stored_dir;
+    logic [1:0] test_dir;
+
+    logic [2:0] count;
+
+    assign direction = dir;
+
+    // Tile currently being tested through the arbiter.
+    always_comb begin
+        rom_x = xpos;
+        rom_y = ypos;
+        case (test_dir)
+            LEFT: begin
+                rom_x = xpos - 5'd1;
+                rom_y = ypos;
+            end
+            RIGHT: begin
+                rom_x = xpos + 5'd1;
+                rom_y = ypos;
+            end
+            UP: begin
+                rom_x = xpos;
+                rom_y = ypos - 5'd1;
+            end
+            DOWN: begin
+                rom_x = xpos;
+                rom_y = ypos + 5'd1;
+            end
+            default: begin
+                rom_x = xpos;
+                rom_y = ypos;
+            end
+        endcase
+    end
+
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            xpos       <= 5'd14;
+            ypos       <= 5'd17;
+            dir        <= RIGHT;
+            stored_dir <= RIGHT;
+            test_dir   <= RIGHT;
+            count      <= 3'd0;
+            state      <= S_IDLE;
+        end else if (pacman_hit) begin
+            xpos       <= 5'd14;
+            ypos       <= 5'd17;
+            dir        <= RIGHT;
+            stored_dir <= RIGHT;
+            test_dir   <= RIGHT;
+            count      <= 3'd0;
+            state      <= S_IDLE;
+        end else begin
+            if (pb[0])
+                stored_dir <= UP;
+            else if (pb[1])
+                stored_dir <= RIGHT;
+            else if (pb[2])
+                stored_dir <= DOWN;
+            else if (pb[3])
+                stored_dir <= LEFT;
+
+            if (!enable) begin
+                count <= 3'd0;
+                state <= S_IDLE;
+            end else begin
+                case (state)
+
+                    S_IDLE: begin
+                        if (count == 3'd7) begin
+                            count    <= 3'd0;
+                            test_dir <= stored_dir;
+                            state    <= S_CHECK_TURN;
+                        end else begin
+                            count <= count + 3'd1;
+                        end
+                    end
+
+                    // Wait for a valid arbiter response before acting.
+                    S_CHECK_TURN: begin
+                        if (rom_valid) begin
+                            if (rom_can_move) begin
+                                dir  <= test_dir;
+                                xpos <= rom_x;
+                                ypos <= rom_y;
+                                state <= S_IDLE;
+                            end else begin
+                                test_dir <= dir;
+                                state    <= S_CHECK_FORWARD;
+                            end
+                        end
+                    end
+
+                    S_CHECK_FORWARD: begin
+                        // Tunnel teleports need no maze lookup.
+                        if (xpos == 5'd0 && ypos == 5'd14 && dir == LEFT) begin
+                            xpos  <= 5'd27;
+                            state <= S_IDLE;
+                        end else if (xpos == 5'd27 && ypos == 5'd14 && dir == RIGHT) begin
+                            xpos  <= 5'd0;
+                            state <= S_IDLE;
+                        end else if (rom_valid) begin
+                            if (rom_can_move) begin
+                                xpos <= rom_x;
+                                ypos <= rom_y;
+                            end
+                            state <= S_IDLE;
+                        end
+                    end
+
+                    default: begin
+                        state <= S_IDLE;
+                    end
+
+                endcase
+            end
+        end
+    end
+
+endmodule
