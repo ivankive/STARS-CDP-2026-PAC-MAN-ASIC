@@ -49,7 +49,7 @@ module ghost_controller (
     localparam logic [4:0] PINKY_START_X = 5'd14;
     localparam logic [4:0] PINKY_START_Y = 5'd14;
 
-    localparam logic [2:0] GHOST_MOVE_COUNT = 3'd1;
+    logic [2:0] GHOST_MOVE_COUNT;
 
     logic [2:0] move_counter;
 
@@ -62,6 +62,8 @@ module ghost_controller (
     logic [1:0] ghost_can_move;
     logic [1:0] frightened_start;
     logic [1:0] pending_reverse;
+
+    assign GHOST_MOVE_COUNT = power_pellet_active ? 3'd7:3'd0;
 
     ghost_fsm blinky_fsm (
         .clk                  (clk),
