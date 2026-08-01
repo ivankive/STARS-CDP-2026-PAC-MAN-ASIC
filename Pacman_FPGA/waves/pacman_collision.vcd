@@ -1,0 +1,373 @@
+$date
+	Sat Aug  1 22:09:52 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module pacman_collision_tb $end
+$var wire 1 ! power_pellet_eaten $end
+$var wire 8 " pellets [7:0] $end
+$var wire 8 # pellet_set_index [7:0] $end
+$var wire 1 $ pellet_set_en $end
+$var wire 1 % pellet_eaten $end
+$var wire 1 & pacman_hit $end
+$var wire 2 ' lives [1:0] $end
+$var wire 2 ( ghost_eaten [1:0] $end
+$var wire 5 ) col_y [4:0] $end
+$var wire 5 * col_x [4:0] $end
+$var reg 5 + blinky_x [4:0] $end
+$var reg 5 , blinky_y [4:0] $end
+$var reg 1 - clk $end
+$var reg 1 . col_collectible $end
+$var reg 1 / col_is_power $end
+$var reg 8 0 col_pellet_index [7:0] $end
+$var reg 1 1 col_valid $end
+$var reg 2 2 dangerous_to_pacman [1:0] $end
+$var reg 256 3 eaten_bits [255:0] $end
+$var reg 1 4 game_running $end
+$var reg 1 5 game_starting $end
+$var reg 1 6 game_tick $end
+$var reg 5 7 pacman_x [4:0] $end
+$var reg 5 8 pacman_y [4:0] $end
+$var reg 1 9 pellet_already_eaten $end
+$var reg 5 : pinky_x [4:0] $end
+$var reg 5 ; pinky_y [4:0] $end
+$var reg 1 < power_pellet_active $end
+$var reg 1 = reset $end
+$var reg 2 > vulnerable_to_pacman [1:0] $end
+$var integer 32 ? fail_count [31:0] $end
+$var integer 32 @ guard [31:0] $end
+$var integer 32 A pass_count [31:0] $end
+$scope module dut $end
+$var wire 5 B blinky_x [4:0] $end
+$var wire 5 C blinky_y [4:0] $end
+$var wire 1 - clk $end
+$var wire 1 . col_collectible $end
+$var wire 1 / col_is_power $end
+$var wire 8 D col_pellet_index [7:0] $end
+$var wire 1 1 col_valid $end
+$var wire 2 E dangerous_to_pacman [1:0] $end
+$var wire 1 4 game_running $end
+$var wire 1 5 game_starting $end
+$var wire 1 6 game_tick $end
+$var wire 5 F pacman_x [4:0] $end
+$var wire 5 G pacman_y [4:0] $end
+$var wire 1 9 pellet_already_eaten $end
+$var wire 5 H pinky_x [4:0] $end
+$var wire 5 I pinky_y [4:0] $end
+$var wire 1 < power_pellet_active $end
+$var wire 1 = reset $end
+$var wire 2 J vulnerable_to_pacman [1:0] $end
+$var reg 5 K col_x [4:0] $end
+$var reg 5 L col_y [4:0] $end
+$var reg 1 M collide_blinky $end
+$var reg 1 N collide_pinky $end
+$var reg 2 O ghost_eaten [1:0] $end
+$var reg 2 P lives [1:0] $end
+$var reg 1 & pacman_hit $end
+$var reg 1 % pellet_eaten $end
+$var reg 1 $ pellet_set_en $end
+$var reg 8 Q pellet_set_index [7:0] $end
+$var reg 8 R pellets [7:0] $end
+$var reg 1 ! power_pellet_eaten $end
+$upscope $end
+$scope task check $end
+$upscope $end
+$scope task clear_ghosts $end
+$upscope $end
+$scope task pulse_game_tick_and_sample $end
+$upscope $end
+$scope task release_game_tick $end
+$upscope $end
+$scope task sample $end
+$upscope $end
+$scope task wait_set_en $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b10111010 R
+b0 Q
+b11 P
+b0 O
+0N
+0M
+b101 L
+b101 K
+b0 J
+b1 I
+b1 H
+b101 G
+b101 F
+b0 E
+b0 D
+b0 C
+b0 B
+b0 A
+b0 @
+b0 ?
+b0 >
+1=
+0<
+b1 ;
+b1 :
+09
+b101 8
+b101 7
+06
+05
+04
+b0 3
+b0 2
+01
+b0 0
+0/
+0.
+0-
+b0 ,
+b0 +
+b101 *
+b101 )
+b0 (
+b11 '
+0&
+0%
+0$
+b0 #
+b10111010 "
+0!
+$end
+#5000
+1-
+#10000
+0-
+#15000
+1-
+#20000
+0=
+0-
+#25000
+1-
+#26000
+b111 0
+b111 D
+1.
+11
+b11 A
+#30000
+0-
+#35000
+1-
+#40000
+0-
+#45000
+1-
+#50000
+0-
+#55000
+1-
+#60000
+0-
+#65000
+1-
+#66000
+b101 A
+#70000
+14
+0-
+#75000
+19
+1%
+b10111001 "
+b10111001 R
+b111 #
+b111 Q
+1$
+1-
+#76000
+b1001 A
+b1 @
+#80000
+0-
+#85000
+b10000000 3
+0%
+0$
+1-
+#86000
+b1011 A
+#90000
+09
+b0 @
+1/
+b1000 0
+b1000 D
+0-
+#95000
+19
+1%
+1!
+b10111000 "
+b10111000 R
+b1000 #
+b1000 Q
+1$
+1-
+#96000
+b1110 A
+b1 @
+#100000
+0/
+0.
+0-
+#105000
+b110000000 3
+0%
+0$
+1-
+#110000
+16
+0-
+#115000
+0!
+1-
+#116000
+b1111 A
+#120000
+06
+0-
+#125000
+1-
+#130000
+1M
+b1 2
+b1 E
+b101 ,
+b101 C
+b101 +
+b101 B
+0-
+#135000
+b10 '
+b10 P
+1&
+1-
+#136000
+b10001 A
+#140000
+0-
+#145000
+1-
+#150000
+0-
+#155000
+1-
+#156000
+b10010 A
+#160000
+0M
+b0 2
+b0 E
+b0 ,
+b0 C
+b0 +
+b0 B
+0-
+#165000
+1-
+#170000
+16
+0-
+#175000
+0&
+1-
+#176000
+b10011 A
+#180000
+06
+0-
+#185000
+1-
+#190000
+1N
+b10 >
+b10 J
+b101 ;
+b101 I
+b101 :
+b101 H
+0-
+#195000
+b10 (
+b10 O
+1-
+#196000
+b10100 A
+#200000
+0N
+b0 >
+b0 J
+b1 ;
+b1 I
+b1 :
+b1 H
+0-
+#205000
+1-
+#210000
+16
+0-
+#215000
+b0 (
+b0 O
+1-
+#216000
+b10101 A
+#220000
+06
+0-
+#225000
+1-
+#230000
+1M
+1<
+b101 ,
+b101 C
+b101 +
+b101 B
+0-
+#235000
+b1 (
+b1 O
+1-
+#236000
+b10110 A
+#240000
+0M
+15
+0<
+b0 ,
+b0 C
+b0 +
+b0 B
+0-
+#245000
+09
+b0 3
+b10111010 "
+b10111010 R
+b11 '
+b11 P
+b0 (
+b0 O
+1-
+#246000
+05
+b11000 A

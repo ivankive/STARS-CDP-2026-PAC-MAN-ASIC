@@ -6,48 +6,59 @@ module pacman_collision_tb;
     logic       reset;
     logic       game_tick;
     logic       game_running;
+    logic       game_starting;
 
-    logic [4:0] pacman_x;
-    logic [4:0] pacman_y;
-    logic [4:0] blinky_x;
-    logic [4:0] blinky_y;
-    logic [4:0] pinky_x;
-    logic [4:0] pinky_y;
+    logic [4:0] pacman_x, pacman_y;
+    logic [4:0] blinky_x, blinky_y;
+    logic [4:0] pinky_x, pinky_y;
 
     logic [1:0] dangerous_to_pacman;
     logic [1:0] vulnerable_to_pacman;
     logic       power_pellet_active;
 
-    logic [4:0] x_central;
-    logic [4:0] y_central;
-    logic       write_en;
-    logic [1:0] rdata_central;
+    logic [4:0] col_x, col_y;
+    logic       col_valid;
+    logic       col_collectible;
+    logic       col_is_power;
+    logic [7:0] col_pellet_index;
+
+    logic       pellet_already_eaten;
+    logic       pellet_set_en;
+    logic [7:0] pellet_set_index;
 
     logic       pellet_eaten;
     logic       power_pellet_eaten;
     logic       pacman_hit;
-    // logic [9:0] score;
     logic [1:0] ghost_eaten;
     logic [1:0] lives;
-    logic [8:0] pellets;
+    logic [7:0] pellets;
 
     int pass_count;
     int fail_count;
     int guard;
 
-    localparam logic [1:0] TILE_BLANK        = 2'b00;
-    localparam logic [1:0] TILE_PELLET       = 2'b10;
-    localparam logic [1:0] TILE_POWER_PELLET = 2'b11;
+    // Simple eaten-bit model for the DUT's write/read handshake.
+    logic [255:0] eaten_bits;
 
-    logic [1:0] stub_tile;
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset || game_starting)
+            eaten_bits <= '0;
+        else if (pellet_set_en)
+            eaten_bits[pellet_set_index] <= 1'b1;
+    end
 
-    assign rdata_central = stub_tile;
+    always_comb begin
+        pellet_already_eaten = eaten_bits[col_pellet_index];
+        if (pellet_set_en && (pellet_set_index == col_pellet_index))
+            pellet_already_eaten = 1'b1;
+    end
 
     pacman_collision dut (
         .clk(clk),
         .reset(reset),
         .game_tick(game_tick),
         .game_running(game_running),
+        .game_starting(game_starting),
         .pacman_x(pacman_x),
         .pacman_y(pacman_y),
         .blinky_x(blinky_x),
@@ -57,14 +68,18 @@ module pacman_collision_tb;
         .dangerous_to_pacman(dangerous_to_pacman),
         .vulnerable_to_pacman(vulnerable_to_pacman),
         .power_pellet_active(power_pellet_active),
-        .x_central(x_central),
-        .y_central(y_central),
-        .write_en(write_en),
-        .rdata_central(rdata_central),
+        .col_x(col_x),
+        .col_y(col_y),
+        .col_valid(col_valid),
+        .col_collectible(col_collectible),
+        .col_is_power(col_is_power),
+        .col_pellet_index(col_pellet_index),
+        .pellet_already_eaten(pellet_already_eaten),
+        .pellet_set_en(pellet_set_en),
+        .pellet_set_index(pellet_set_index),
         .pellet_eaten(pellet_eaten),
         .power_pellet_eaten(power_pellet_eaten),
         .pacman_hit(pacman_hit),
-        // .score(score),
         .ghost_eaten(ghost_eaten),
         .lives(lives),
         .pellets(pellets)
@@ -79,9 +94,9 @@ module pacman_collision_tb;
             $display("PASS: %s", name);
         end else begin
             fail_count++;
-            $display("FAIL: %s (lives=%0d hit=%b ge=%b we=%b pe=%b ppe=%b)",
-                     name, lives, pacman_hit, ghost_eaten, write_en,
-                     pellet_eaten, power_pellet_eaten);
+            $display("FAIL: %s (lives=%0d hit=%b ge=%b se=%b pe=%b ppe=%b pellets=%0d)",
+                     name, lives, pacman_hit, ghost_eaten, pellet_set_en,
+                     pellet_eaten, power_pellet_eaten, pellets);
         end
     endtask
 
@@ -90,16 +105,14 @@ module pacman_collision_tb;
         #1;
     endtask
 
-    task automatic wait_write_en;
+    task automatic wait_set_en;
         guard = 0;
-        while ((write_en !== 1'b1) && (guard < 20)) begin
+        while ((pellet_set_en !== 1'b1) && (guard < 20)) begin
             sample();
             guard++;
         end
     endtask
 
-    // Pulse game_tick for one cycle; sample while it is high so clears are visible
-    // before gameplay can re-assert the same flags.
     task automatic pulse_game_tick_and_sample;
         @(negedge clk);
         game_tick = 1'b1;
@@ -129,10 +142,14 @@ module pacman_collision_tb;
         reset                 = 1'b1;
         game_tick             = 1'b0;
         game_running          = 1'b0;
+        game_starting         = 1'b0;
         pacman_x              = 5'd5;
         pacman_y              = 5'd5;
         clear_ghosts();
-        stub_tile             = TILE_BLANK;
+        col_valid             = 1'b0;
+        col_collectible       = 1'b0;
+        col_is_power          = 1'b0;
+        col_pellet_index      = 8'd0;
 
         $dumpfile("waves/pacman_collision.vcd");
         $dumpvars(0, pacman_collision_tb);
@@ -143,38 +160,40 @@ module pacman_collision_tb;
         reset = 1'b0;
         sample();
         check("reset lives=3", lives === 2'd3);
-        check("reset pellets=288", pellets === 9'd288);
-        // check("reset score=0", score === 10'd0);
-        check("central addr tracks pacman", (x_central === pacman_x) && (y_central === pacman_y));
+        check("reset pellets=186", pellets === 8'd186);
+        check("col addr tracks pacman", (col_x === pacman_x) && (col_y === pacman_y));
 
-        stub_tile    = TILE_PELLET;
-        game_running = 1'b0;
+        col_valid       = 1'b1;
+        col_collectible = 1'b1;
+        col_is_power    = 1'b0;
+        col_pellet_index = 8'd7;
+        game_running    = 1'b0;
         repeat (4) sample();
-        check("idle no write_en", write_en === 1'b0);
-        check("idle pellets unchanged", pellets === 9'd288);
+        check("idle no set_en", pellet_set_en === 1'b0);
+        check("idle pellets unchanged", pellets === 8'd186);
 
         @(negedge clk);
         game_running = 1'b1;
-        stub_tile    = TILE_PELLET;
-        wait_write_en();
-        check("pellet write_en", write_en === 1'b1);
+        wait_set_en();
+        check("pellet set_en", pellet_set_en === 1'b1);
+        check("pellet set_index", pellet_set_index === 8'd7);
         check("pellet_eaten pulse", pellet_eaten === 1'b1);
-        check("pellets decremented", pellets === 9'd287);
-        // check("score +2", score === 10'd2);
+        check("pellets decremented", pellets === 8'd185);
         sample();
         check("pellet_eaten clears", pellet_eaten === 1'b0);
+        check("already eaten blocks re-eat", pellet_set_en === 1'b0);
 
         @(negedge clk);
-        stub_tile = TILE_POWER_PELLET;
-        wait_write_en();
-        check("power write_en", write_en === 1'b1);
+        col_pellet_index = 8'd8;
+        col_is_power     = 1'b1;
+        wait_set_en();
+        check("power set_en", pellet_set_en === 1'b1);
         check("power_pellet_eaten set", power_pellet_eaten === 1'b1);
-        check("pellets after power", pellets === 9'd286);
-        // check("score +15", score === 10'd17);
+        check("pellets after power", pellets === 8'd184);
 
-        // Leave pellet tile blank so later checks are not disturbed
         @(negedge clk);
-        stub_tile = TILE_BLANK;
+        col_collectible = 1'b0;
+        col_is_power    = 1'b0;
         clear_ghosts();
         pulse_game_tick_and_sample();
         check("game_tick clears power flag", power_pellet_eaten === 1'b0);
@@ -191,7 +210,6 @@ module pacman_collision_tb;
         sample();
         check("hit held until game_tick", pacman_hit === 1'b1);
 
-        // Move Blinky away before clear so hit cannot re-assert
         @(negedge clk);
         clear_ghosts();
         pulse_game_tick_and_sample();
@@ -204,10 +222,6 @@ module pacman_collision_tb;
         vulnerable_to_pacman = 2'b10;
         sample();
         check("pinky eaten flag", ghost_eaten === 2'b10);
-        // check("score +50 for ghost", score === 10'd67);
-        sample();
-        sample();
-        // check("no double ghost score", score === 10'd67);
 
         @(negedge clk);
         clear_ghosts();
@@ -221,9 +235,17 @@ module pacman_collision_tb;
         power_pellet_active = 1'b1;
         sample();
         check("eat blinky under power", ghost_eaten[0] === 1'b1);
-        // check("score +50 blinky", score === 10'd117);
+
+        @(negedge clk);
+        clear_ghosts();
+        game_starting = 1'b1;
+        sample();
+        check("game_starting restores pellets", pellets === 8'd186);
+        check("game_starting restores lives", lives === 2'd3);
+        game_starting = 1'b0;
 
         $display("\npacman_collision_tb: %0d PASS, %0d FAIL", pass_count, fail_count);
+        if (fail_count != 0) $fatal(1);
         $finish;
     end
 

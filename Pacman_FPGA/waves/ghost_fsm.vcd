@@ -1,0 +1,293 @@
+$date
+	Sat Aug  1 22:09:53 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module ghost_fsm_tb $end
+$var wire 1 ! vulnerable_to_pacman $end
+$var wire 2 " ghost_state [1:0] $end
+$var wire 1 # ghost_can_move $end
+$var wire 1 $ frightened_start $end
+$var wire 1 % dangerous_to_pacman $end
+$var parameter 2 & GAME_OVER $end
+$var parameter 2 ' GAME_PLAYING $end
+$var parameter 2 ( GAME_STARTING $end
+$var parameter 2 ) G_CAGED $end
+$var parameter 2 * G_CHASE $end
+$var parameter 2 + G_FRIGHTENED $end
+$var parameter 2 , G_SCATTER $end
+$var reg 1 - clk $end
+$var reg 2 . game_state [1:0] $end
+$var reg 1 / ghost_eaten $end
+$var reg 1 0 global_ghost_mode $end
+$var reg 1 1 power_pellet_active $end
+$var reg 1 2 reset $end
+$var integer 32 3 fail_count [31:0] $end
+$var integer 32 4 pass_count [31:0] $end
+$scope module dut $end
+$var wire 1 - clk $end
+$var wire 2 5 game_state [1:0] $end
+$var wire 1 / ghost_eaten $end
+$var wire 2 6 ghost_state [1:0] $end
+$var wire 1 0 global_ghost_mode $end
+$var wire 1 1 power_pellet_active $end
+$var wire 1 2 reset $end
+$var parameter 2 7 GAME_OVER $end
+$var parameter 2 8 GAME_PLAYING $end
+$var parameter 2 9 GAME_STARTING $end
+$var parameter 1 : GLOBAL_CHASE $end
+$var parameter 1 ; GLOBAL_SCATTER $end
+$var parameter 2 < G_CAGED $end
+$var parameter 2 = G_CHASE $end
+$var parameter 2 > G_FRIGHTENED $end
+$var parameter 2 ? G_SCATTER $end
+$var reg 1 % dangerous_to_pacman $end
+$var reg 1 $ frightened_start $end
+$var reg 1 # ghost_can_move $end
+$var reg 2 @ next_state [1:0] $end
+$var reg 2 A state [1:0] $end
+$var reg 1 ! vulnerable_to_pacman $end
+$upscope $end
+$scope task check $end
+$upscope $end
+$scope task cycle $end
+$upscope $end
+$scope task sample $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b1 ?
+b11 >
+b10 =
+b0 <
+0;
+1:
+b0 9
+b1 8
+b10 7
+b1 ,
+b11 +
+b10 *
+b0 )
+b0 (
+b1 '
+b10 &
+$end
+#0
+$dumpvars
+b0 A
+b0 @
+b0 6
+b0 5
+b0 4
+b0 3
+12
+01
+00
+0/
+b0 .
+0-
+0%
+0$
+0#
+b0 "
+0!
+$end
+#5000
+1-
+#10000
+0-
+#15000
+1-
+#20000
+02
+0-
+#25000
+1-
+#26000
+b11 4
+#30000
+10
+b10 .
+b10 5
+0-
+#35000
+1-
+#40000
+0-
+#45000
+1-
+#46000
+b100 4
+#50000
+b1 @
+00
+b1 .
+b1 5
+0-
+#55000
+1%
+1#
+b1 "
+b1 6
+b1 A
+1-
+#56000
+b1000 4
+#60000
+b10 @
+10
+0-
+#65000
+b10 "
+b10 6
+b10 A
+1-
+#66000
+b1010 4
+#70000
+1!
+0%
+b11 @
+11
+0-
+#75000
+1$
+b11 "
+b11 6
+b11 A
+1-
+#76000
+b1111 4
+#80000
+0-
+#85000
+0$
+1-
+#86000
+b10000 4
+#90000
+0-
+#95000
+1-
+#100000
+0-
+#105000
+1-
+#110000
+0-
+#115000
+1-
+#116000
+b10001 4
+#120000
+b10 @
+01
+0-
+#125000
+0!
+1%
+b10 "
+b10 6
+b10 A
+1-
+#126000
+b10010 4
+#130000
+1!
+0%
+b11 @
+11
+0-
+#135000
+1$
+b11 "
+b11 6
+b11 A
+1-
+#136000
+b10011 4
+#140000
+b0 @
+1/
+0-
+#145000
+0!
+0#
+0$
+b0 "
+b0 6
+b0 A
+1-
+#150000
+b10100 4
+0/
+0-
+#155000
+1-
+#160000
+0-
+#165000
+1-
+#166000
+b10101 4
+#170000
+b1 @
+00
+01
+0-
+#175000
+1%
+1#
+b1 "
+b1 6
+b1 A
+1-
+#176000
+b10110 4
+#180000
+1!
+0%
+b11 @
+11
+0-
+#185000
+1$
+b11 "
+b11 6
+b11 A
+1-
+#190000
+b1 @
+01
+0-
+#195000
+0!
+1%
+0$
+b1 "
+b1 6
+b1 A
+1-
+#196000
+b10111 4
+#200000
+b0 @
+b0 .
+b0 5
+0-
+#205000
+0%
+0#
+b0 "
+b0 6
+b0 A
+1-
+#206000
+b11000 4

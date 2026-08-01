@@ -1,0 +1,331 @@
+$date
+	Sat Aug  1 22:09:52 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module maze_query_arbiter_tb $end
+$var wire 5 ! rom_y [4:0] $end
+$var wire 5 " rom_x [4:0] $end
+$var wire 2 # rdata_vga [1:0] $end
+$var wire 8 $ pellet_rd_index [7:0] $end
+$var wire 1 % pellet_rd_bit $end
+$var wire 1 & pac_valid $end
+$var wire 1 ' pac_can_move $end
+$var wire 1 ( ghost_valid $end
+$var wire 1 ) ghost_can_move $end
+$var wire 1 * col_valid $end
+$var wire 8 + col_pellet_index [7:0] $end
+$var wire 1 , col_is_power $end
+$var wire 1 - col_collectible $end
+$var reg 1 . clk $end
+$var reg 5 / col_x [4:0] $end
+$var reg 5 0 col_y [4:0] $end
+$var reg 5 1 ghost_x [4:0] $end
+$var reg 5 2 ghost_y [4:0] $end
+$var reg 5 3 pac_x [4:0] $end
+$var reg 5 4 pac_y [4:0] $end
+$var reg 1 5 reset $end
+$var reg 1 6 rom_can_move_ghost $end
+$var reg 1 7 rom_can_move_pac $end
+$var reg 1 8 rom_collectible $end
+$var reg 8 9 rom_pellet_index [7:0] $end
+$var reg 2 : rom_tile [1:0] $end
+$var reg 1 ; vga_active $end
+$var reg 5 < vga_x [4:0] $end
+$var reg 5 = vga_y [4:0] $end
+$var integer 32 > fail_count [31:0] $end
+$var integer 32 ? pass_count [31:0] $end
+$scope module dut $end
+$var wire 1 . clk $end
+$var wire 5 @ col_x [4:0] $end
+$var wire 5 A col_y [4:0] $end
+$var wire 5 B ghost_x [4:0] $end
+$var wire 5 C ghost_y [4:0] $end
+$var wire 5 D pac_x [4:0] $end
+$var wire 5 E pac_y [4:0] $end
+$var wire 1 % pellet_rd_bit $end
+$var wire 8 F pellet_rd_index [7:0] $end
+$var wire 1 5 reset $end
+$var wire 1 6 rom_can_move_ghost $end
+$var wire 1 7 rom_can_move_pac $end
+$var wire 1 8 rom_collectible $end
+$var wire 8 G rom_pellet_index [7:0] $end
+$var wire 2 H rom_tile [1:0] $end
+$var wire 1 ; vga_active $end
+$var wire 5 I vga_x [4:0] $end
+$var wire 5 J vga_y [4:0] $end
+$var wire 1 & pac_valid $end
+$var wire 1 ( ghost_valid $end
+$var wire 1 * col_valid $end
+$var parameter 2 K PATH_TILE $end
+$var parameter 2 L RR_COL $end
+$var parameter 2 M RR_GHO $end
+$var parameter 2 N RR_PAC $end
+$var parameter 2 O WALL_TILE $end
+$var reg 1 - col_collectible $end
+$var reg 1 , col_is_power $end
+$var reg 8 P col_pellet_index [7:0] $end
+$var reg 10 Q col_served_addr [9:0] $end
+$var reg 1 ) ghost_can_move $end
+$var reg 10 R ghost_served_addr [9:0] $end
+$var reg 1 ' pac_can_move $end
+$var reg 10 S pac_served_addr [9:0] $end
+$var reg 2 T rdata_vga [1:0] $end
+$var reg 5 U rom_x [4:0] $end
+$var reg 5 V rom_y [4:0] $end
+$var reg 2 W rr [1:0] $end
+$upscope $end
+$scope task check $end
+$upscope $end
+$scope task sample $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b1 O
+b1 N
+b10 M
+b0 L
+b0 K
+$end
+#0
+$dumpvars
+b0 W
+b110 V
+b110 U
+b1 T
+b1111111111 S
+b1111111111 R
+b1111111111 Q
+b0 P
+b101 J
+b101 I
+b11 H
+b100 G
+b100 F
+b1 E
+b1 D
+b1 C
+b0 B
+b110 A
+b110 @
+b0 ?
+b0 >
+b101 =
+b101 <
+0;
+b11 :
+b100 9
+18
+17
+16
+15
+b1 4
+b1 3
+b1 2
+b0 1
+b110 0
+b110 /
+0.
+0-
+0,
+b0 +
+0*
+0)
+0(
+0'
+0&
+0%
+b100 $
+b1 #
+b110 "
+b110 !
+$end
+#5000
+1.
+#10000
+05
+0.
+#15000
+b0 $
+b0 F
+b0 9
+b0 G
+08
+b0 :
+b0 H
+b1 !
+b1 V
+b1 "
+b1 U
+b1 W
+1*
+b11000110 Q
+b100 +
+b100 P
+1,
+1-
+1.
+#16000
+b11 ?
+#20000
+0.
+#25000
+06
+07
+b1 :
+b1 H
+b0 "
+b0 U
+b10 W
+1&
+b100001 S
+1'
+1.
+#26000
+b101 ?
+#30000
+0.
+#35000
+b100 $
+b100 F
+b100 9
+b100 G
+18
+16
+17
+b11 :
+b11 H
+b110 !
+b110 V
+b110 "
+b110 U
+b0 W
+1(
+b1 R
+1.
+#36000
+b111 ?
+#40000
+1%
+b11 $
+b11 F
+b11 9
+b11 G
+18
+b10 :
+b10 H
+b101 !
+b101 V
+b101 "
+b101 U
+1;
+0.
+#45000
+b0 #
+b0 T
+1.
+#46000
+b1001 ?
+#50000
+0%
+b100 $
+b100 F
+b100 9
+b100 G
+18
+b11 :
+b11 H
+b110 !
+b110 V
+b110 "
+b110 U
+b110 =
+b110 J
+b110 <
+b110 I
+0.
+#55000
+b11 #
+b11 T
+1.
+#56000
+b1010 ?
+#60000
+0&
+b10 3
+b10 D
+0;
+0.
+#61000
+b1011 ?
+#65000
+b0 $
+b0 F
+b0 9
+b0 G
+08
+b0 :
+b0 H
+b1 !
+b1 V
+b10 "
+b10 U
+b1 W
+b1 #
+b1 T
+1.
+#70000
+0.
+#75000
+06
+07
+b1 :
+b1 H
+b0 "
+b0 U
+b10 W
+1&
+b1000001 S
+1.
+#80000
+0.
+#85000
+b100 $
+b100 F
+b100 9
+b100 G
+18
+16
+17
+b11 :
+b11 H
+b110 !
+b110 V
+b110 "
+b110 U
+b0 W
+1.
+#90000
+0.
+#95000
+b0 $
+b0 F
+b0 9
+b0 G
+08
+b0 :
+b0 H
+b1 !
+b1 V
+b10 "
+b10 U
+b1 W
+1.
+#96000
+b1100 ?

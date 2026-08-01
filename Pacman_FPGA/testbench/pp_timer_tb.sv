@@ -86,6 +86,7 @@ module pp_timer_tb;
         tick(1);
 
         $display("\npp_timer_tb: %0d PASS, %0d FAIL", pass_count, fail_count);
+        if (fail_count != 0) $fatal(1);
         $finish;
     end
 

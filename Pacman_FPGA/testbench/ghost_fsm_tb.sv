@@ -163,6 +163,7 @@ module ghost_fsm_tb;
         check("starting forces CAGED", ghost_state === G_CAGED);
 
         $display("\nghost_fsm_tb: %0d PASS, %0d FAIL", pass_count, fail_count);
+        if (fail_count != 0) $fatal(1);
         $finish;
     end
 

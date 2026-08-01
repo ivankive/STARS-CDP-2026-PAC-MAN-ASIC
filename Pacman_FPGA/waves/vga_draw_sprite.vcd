@@ -1,0 +1,188 @@
+$date
+	Sat Aug  1 22:09:53 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module vga_draw_sprite_tb $end
+$var wire 3 ! output_rgb [2:0] $end
+$var reg 2 " blinky_dir [1:0] $end
+$var reg 5 # blinky_x [4:0] $end
+$var reg 5 $ blinky_y [4:0] $end
+$var reg 10 % h_count [9:0] $end
+$var reg 3 & input_rgb [2:0] $end
+$var reg 2 ' lives [1:0] $end
+$var reg 2 ( pacman_dir [1:0] $end
+$var reg 5 ) pacman_x [4:0] $end
+$var reg 5 * pacman_y [4:0] $end
+$var reg 2 + pinky_dir [1:0] $end
+$var reg 5 , pinky_x [4:0] $end
+$var reg 5 - pinky_y [4:0] $end
+$var reg 1 . pp_active $end
+$var reg 10 / v_count [9:0] $end
+$var reg 1 0 video_on $end
+$var integer 32 1 fail_count [31:0] $end
+$var integer 32 2 pass_count [31:0] $end
+$scope module dut $end
+$var wire 2 3 blinky_dir [1:0] $end
+$var wire 5 4 blinky_x [4:0] $end
+$var wire 5 5 blinky_y [4:0] $end
+$var wire 1 6 draw_blinky $end
+$var wire 1 7 draw_pacman $end
+$var wire 1 8 draw_pinky $end
+$var wire 10 9 h_count [9:0] $end
+$var wire 3 : input_rgb [2:0] $end
+$var wire 2 ; lives [1:0] $end
+$var wire 2 < pacman_dir [1:0] $end
+$var wire 5 = pacman_x [4:0] $end
+$var wire 5 > pacman_y [4:0] $end
+$var wire 2 ? pinky_dir [1:0] $end
+$var wire 5 @ pinky_x [4:0] $end
+$var wire 5 A pinky_y [4:0] $end
+$var wire 1 . pp_active $end
+$var wire 10 B v_count [9:0] $end
+$var wire 1 0 video_on $end
+$var wire 5 C tile_y [4:0] $end
+$var wire 5 D tile_x [4:0] $end
+$var wire 3 E pixel_y [2:0] $end
+$var wire 3 F pixel_x [2:0] $end
+$var reg 3 G output_rgb [2:0] $end
+$upscope $end
+$scope task check $end
+$upscope $end
+$scope task set_pixel $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b1 G
+b0 F
+b0 E
+b1 D
+b10011 C
+b11011000 B
+b10011 A
+b1001 @
+b1 ?
+b10011 >
+b101 =
+b11 <
+b0 ;
+b1 :
+b1000 9
+08
+07
+06
+b10011 5
+b1000 4
+b1 3
+b0 2
+b0 1
+10
+b11011000 /
+0.
+b10011 -
+b1001 ,
+b1 +
+b10011 *
+b101 )
+b11 (
+b0 '
+b1 &
+b1000 %
+b10011 $
+b1000 #
+b1 "
+b1 !
+$end
+#1000
+b110 !
+b110 G
+17
+b10 E
+b101 D
+b10 F
+b11011010 /
+b11011010 B
+b101010 %
+b101010 9
+b1 2
+#2000
+b100 !
+b100 G
+07
+16
+b1000 D
+b1000010 %
+b1000010 9
+b10 2
+#3000
+b101 !
+b101 G
+06
+18
+b1001 D
+b1001010 %
+b1001010 9
+b11 2
+#4000
+16
+08
+b1000 D
+b11 !
+b11 G
+b1000010 %
+b1000010 9
+1.
+b100 2
+#5000
+06
+18
+b1001 D
+b1001010 %
+b1001010 9
+b101 2
+#6000
+b11000 C
+08
+b100 E
+b0 D
+b11 F
+b110 !
+b110 G
+b100000100 /
+b100000100 B
+b11 %
+b11 9
+b0 &
+b0 :
+b1 '
+b1 ;
+0.
+b110 2
+#7000
+17
+b10011 C
+b10 E
+b101 D
+b10 F
+b0 !
+b0 G
+b11011010 /
+b11011010 B
+b101010 %
+b101010 9
+00
+b111 2
+#8000
+b0 '
+b0 ;
+#9000
+b1000 2

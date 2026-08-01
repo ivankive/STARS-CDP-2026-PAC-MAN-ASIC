@@ -52,6 +52,18 @@ check_env:
 # COMPILATION & SIMULATION TARGETS
 # *******************************************************************************
 
+# Compile + simulate one TB without opening gtkwave
+.PHONY: tb_%
+tb_%:
+	@mkdir -p $(BUILD) waves
+	@iverilog -g2012 -o $(BUILD)/$*_tb -Y .sv -y $(SRC) $(TB)/$*_tb.sv
+	@vvp $(BUILD)/$*_tb
+
+# Run the full regression (no waveforms)
+.PHONY: tb_all
+tb_all:
+	@bash run_tb.sh
+
 # Source Compilation and simulation of Design
 .PHONY: sim_%_src
 sim_%_src: 

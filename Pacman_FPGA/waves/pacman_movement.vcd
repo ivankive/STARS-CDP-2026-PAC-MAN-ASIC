@@ -1,0 +1,583 @@
+$date
+	Sat Aug  1 22:09:52 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module pacman_movement_tb $end
+$var wire 1 ! rom_valid $end
+$var wire 5 " ypos [4:0] $end
+$var wire 5 # xpos [4:0] $end
+$var wire 5 $ rom_y [4:0] $end
+$var wire 5 % rom_x [4:0] $end
+$var wire 2 & direction [1:0] $end
+$var parameter 2 ' DOWN $end
+$var parameter 2 ( LEFT $end
+$var parameter 2 ) RIGHT $end
+$var parameter 2 * UP $end
+$var reg 1 + clk $end
+$var reg 1 , enable $end
+$var reg 1 - force_wall $end
+$var reg 1 . game_starting $end
+$var reg 1 / pacman_hit $end
+$var reg 4 0 pb [3:0] $end
+$var reg 1 1 reset $end
+$var reg 1 2 rom_can_move $end
+$var reg 5 3 wall_x [4:0] $end
+$var reg 5 4 wall_y [4:0] $end
+$var integer 32 5 fail_count [31:0] $end
+$var integer 32 6 pass_count [31:0] $end
+$scope module dut $end
+$var wire 1 + clk $end
+$var wire 2 7 direction [1:0] $end
+$var wire 1 , enable $end
+$var wire 1 . game_starting $end
+$var wire 1 / pacman_hit $end
+$var wire 4 8 pb [3:0] $end
+$var wire 1 1 reset $end
+$var wire 1 2 rom_can_move $end
+$var wire 1 ! rom_valid $end
+$var parameter 2 9 DOWN $end
+$var parameter 2 : LEFT $end
+$var parameter 2 ; RIGHT $end
+$var parameter 2 < UP $end
+$var reg 3 = count [2:0] $end
+$var reg 2 > dir [1:0] $end
+$var reg 5 ? rom_x [4:0] $end
+$var reg 5 @ rom_y [4:0] $end
+$var reg 2 A state [1:0] $end
+$var reg 2 B stored_dir [1:0] $end
+$var reg 2 C test_dir [1:0] $end
+$var reg 5 D xpos [4:0] $end
+$var reg 5 E ypos [4:0] $end
+$upscope $end
+$scope task check $end
+$upscope $end
+$scope task tick $end
+$upscope $end
+$scope task wait_move_cycle $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+b0 <
+b11 ;
+b1 :
+b10 9
+b0 *
+b11 )
+b1 (
+b10 '
+$end
+#0
+$dumpvars
+b10011 E
+b1011 D
+b11 C
+b11 B
+b0 A
+b10011 @
+b1100 ?
+b11 >
+b0 =
+b0 8
+b11 7
+b0 6
+b0 5
+b0 4
+b0 3
+12
+11
+b0 0
+0/
+0.
+0-
+0,
+0+
+b11 &
+b1100 %
+b10011 $
+b1011 #
+b10011 "
+1!
+$end
+#5000
+1+
+#10000
+0+
+#15000
+01
+1+
+#20000
+0+
+#25000
+b1 =
+1,
+b10 6
+1+
+#30000
+0+
+#35000
+b10 =
+1+
+#40000
+0+
+#45000
+b11 =
+1+
+#50000
+0+
+#55000
+b100 =
+1+
+#60000
+0+
+#65000
+b101 =
+1+
+#70000
+0+
+#75000
+b110 =
+1+
+#80000
+0+
+#85000
+b111 =
+1+
+#90000
+0+
+#95000
+b1 A
+b0 =
+1+
+#100000
+0+
+#105000
+b1101 %
+b1101 ?
+b0 A
+b1100 #
+b1100 D
+1+
+#110000
+0+
+#115000
+b1 =
+1+
+#120000
+0+
+#125000
+b10 =
+b0 B
+b1 0
+b1 8
+b11 6
+1+
+#130000
+0+
+#135000
+b11 =
+b0 0
+b0 8
+1+
+#140000
+0+
+#145000
+b100 =
+1+
+#150000
+0+
+#155000
+b101 =
+1+
+#160000
+0+
+#165000
+b110 =
+1+
+#170000
+0+
+#175000
+b111 =
+1+
+#180000
+0+
+#185000
+b10010 $
+b10010 @
+b1100 %
+b1100 ?
+b1 A
+b0 C
+b0 =
+1+
+#190000
+0+
+#195000
+b10001 $
+b10001 @
+b0 A
+b10010 "
+b10010 E
+b0 &
+b0 7
+b0 >
+1+
+#200000
+0+
+#205000
+b1 =
+1+
+#210000
+0+
+#215000
+b10 =
+1+
+#220000
+0+
+#225000
+b11 =
+1+
+#230000
+0+
+#235000
+b100 =
+b1 B
+b1000 0
+b1000 8
+b10010 4
+b1011 3
+1-
+b100 6
+1+
+#240000
+0+
+#245000
+b101 =
+b0 0
+b0 8
+1+
+#250000
+0+
+#255000
+b110 =
+1+
+#260000
+0+
+#265000
+b111 =
+1+
+#270000
+0+
+#275000
+02
+b1011 %
+b1011 ?
+b10010 $
+b10010 @
+b1 A
+b1 C
+b0 =
+1+
+#280000
+0+
+#285000
+12
+b10001 $
+b10001 @
+b1100 %
+b1100 ?
+b10 A
+b0 C
+1+
+#290000
+0+
+#295000
+b10000 $
+b10000 @
+b0 A
+b10001 "
+b10001 E
+1+
+#300000
+0+
+#305000
+b1 =
+1+
+#310000
+0+
+#315000
+b10 =
+1+
+#320000
+0+
+#325000
+b11 =
+1+
+#330000
+0+
+#335000
+b100 =
+1+
+#340000
+0+
+#345000
+b1101 $
+b1101 @
+b11111 %
+b11111 ?
+b0 =
+b0 A
+b1 C
+b1 B
+b1 &
+b1 7
+b1 >
+b1101 "
+b1101 E
+b0 #
+b0 D
+0-
+b101 6
+1+
+#350000
+0+
+#355000
+02
+b1101 4
+b11111 3
+1-
+b1 =
+b1 C
+b1 >
+b1101 "
+b1101 E
+b0 #
+b0 D
+1+
+#360000
+0+
+#365000
+b10 =
+1+
+#370000
+0+
+#375000
+b11 =
+1+
+#380000
+0+
+#385000
+b100 =
+1+
+#390000
+0+
+#395000
+b101 =
+1+
+#400000
+0+
+#405000
+b110 =
+1+
+#410000
+0+
+#415000
+b111 =
+1+
+#420000
+0+
+#425000
+b1 A
+b0 =
+1+
+#430000
+0+
+#435000
+b10 A
+1+
+#440000
+0+
+#445000
+12
+b10110 %
+b10110 ?
+b0 A
+b10111 #
+b10111 D
+1+
+#450000
+0+
+#455000
+b11000 %
+b11000 ?
+b0 =
+b0 A
+b11 C
+b11 B
+b11 &
+b11 7
+b11 >
+b1101 "
+b1101 E
+b10111 #
+b10111 D
+0-
+b110 6
+1+
+#460000
+0+
+#465000
+02
+b11000 3
+1-
+b1 =
+b11 C
+b11 B
+b11 >
+1+
+#470000
+0+
+#475000
+b10 =
+1+
+#480000
+0+
+#485000
+b11 =
+1+
+#490000
+0+
+#495000
+b100 =
+1+
+#500000
+0+
+#505000
+b101 =
+1+
+#510000
+0+
+#515000
+b110 =
+1+
+#520000
+0+
+#525000
+b111 =
+1+
+#530000
+0+
+#535000
+b1 A
+b0 =
+1+
+#540000
+0+
+#545000
+b10 A
+1+
+#550000
+0+
+#555000
+12
+b1 %
+b1 ?
+b0 A
+b0 #
+b0 D
+1+
+#560000
+0+
+#565000
+b10011 $
+b10011 @
+b1100 %
+b1100 ?
+b10011 "
+b10011 E
+b1011 #
+b1011 D
+1/
+0-
+b111 6
+1+
+#570000
+0+
+#575000
+b1 =
+b1000 6
+0/
+1+
+#580000
+0+
+#585000
+b10 =
+1+
+#590000
+0+
+#595000
+b11 =
+1+
+#600000
+0+
+#605000
+b100 =
+1+
+#610000
+0+
+#615000
+b101 =
+1+
+#620000
+0+
+#625000
+b110 =
+1+
+#630000
+0+
+#635000
+b111 =
+1+
+#640000
+0+
+#645000
+b1 A
+b0 =
+1+
+#650000
+0+
+#655000
+b1101 %
+b1101 ?
+b0 A
+b1100 #
+b1100 D
+1+
+#660000
+0+
+#665000
+b1 =
+1+
+#670000
+0+
+#675000
+b1100 %
+b1100 ?
+b0 =
+b1011 #
+b1011 D
+1.
+1+
+#680000
+0+
+#685000
+b1 =
+b1001 6
+0.
+1+
