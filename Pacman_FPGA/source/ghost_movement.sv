@@ -53,20 +53,20 @@ module ghost_movement (
             end
 
             // Move toward the target without reversing.
-            else if ((target_x > ghost_x) && can_right && (reverse_dir != DIR_RIGHT)) begin
-                next_dir = DIR_RIGHT;
-            end
-
-            else if ((target_x < ghost_x) && can_left && (reverse_dir != DIR_LEFT)) begin
-                next_dir = DIR_LEFT;
-            end
-
             else if ((target_y > ghost_y) && can_down && (reverse_dir != DIR_DOWN)) begin
                 next_dir = DIR_DOWN;
             end
 
             else if ((target_y < ghost_y) && can_up && (reverse_dir != DIR_UP)) begin
                 next_dir = DIR_UP;
+            end
+
+            else if ((target_x > ghost_x) && can_right && (reverse_dir != DIR_RIGHT)) begin
+                next_dir = DIR_RIGHT;
+            end
+
+            else if ((target_x < ghost_x) && can_left && (reverse_dir != DIR_LEFT)) begin
+                next_dir = DIR_LEFT;
             end
 
             // Continue straight when possible.
