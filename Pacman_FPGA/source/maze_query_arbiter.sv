@@ -38,7 +38,7 @@ module maze_query_arbiter (
     output logic       col_valid,
     output logic       col_collectible,   // original tile is pellet/power
     output logic       col_is_power,      // original tile is power pellet
-    output logic [8:0] col_pellet_index,
+    output logic [7:0] col_pellet_index,
 
     // ---- Pac-Man movement port ----
     input  logic [4:0] pac_x,
@@ -57,12 +57,12 @@ module maze_query_arbiter (
     output logic [4:0] rom_y,
     input  logic [1:0] rom_tile,
     input  logic       rom_collectible,
-    input  logic [8:0] rom_pellet_index,
+    input  logic [7:0] rom_pellet_index,
     input  logic       rom_can_move_pac,
     input  logic       rom_can_move_ghost,
 
     // ---- pellet_state VGA read port ----
-    output logic [8:0] pellet_rd_index,
+    output logic [7:0] pellet_rd_index,
     input  logic       pellet_rd_bit
 );
 
@@ -109,7 +109,7 @@ module maze_query_arbiter (
             ghost_served_addr <= 10'h3FF;
             col_collectible   <= 1'b0;
             col_is_power      <= 1'b0;
-            col_pellet_index  <= 9'd0;
+            col_pellet_index  <= 8'd0;
             pac_can_move      <= 1'b0;
             ghost_can_move    <= 1'b0;
         end else begin

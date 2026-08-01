@@ -5,12 +5,12 @@ module pellet_state (
     input  logic       clear,        // synchronous clear-all (new game)
 
     input  logic       set_en,       // mark pellet as eaten
-    input  logic [8:0] set_index,
+    input  logic [7:0] set_index,
 
-    input  logic [8:0] rd_index_a,   // collision
+    input  logic [7:0] rd_index_a,   // collision
     output logic       rd_bit_a,
 
-    input  logic [8:0] rd_index_b,   // VGA
+    input  logic [7:0] rd_index_b,   // VGA
     output logic       rd_bit_b
 );
 
@@ -23,7 +23,7 @@ module pellet_state (
             eaten <= '0;
         else if (clear)
             eaten <= '0;
-        else if (set_en && (set_index < 9'(NUM_PELLETS)))
+        else if (set_en && (set_index < 8'(NUM_PELLETS)))
             eaten[set_index] <= 1'b1;
     end
 

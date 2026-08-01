@@ -1,13 +1,3 @@
-// pacman_movement - tapeout version
-//
-// Changes vs FPGA version:
-//  * Maze lookups now go through maze_query_arbiter: the module presents
-//    (rom_x, rom_y) and must see rom_valid high before consuming
-//    rom_can_move. The check states hold until the response is valid.
-//    (In practice the arbiter answers within a few fast-clock cycles, long
-//    before the next 60 Hz tick, so gameplay timing is identical.)
-//  * Dead game_rst output removed.
-
 module pacman_movement (
     input  logic       clk,
     input  logic       reset,
@@ -79,16 +69,16 @@ module pacman_movement (
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
-            xpos       <= 5'd14;
-            ypos       <= 5'd17;
+            xpos       <= 5'd12;
+            ypos       <= 5'd19;
             dir        <= RIGHT;
             stored_dir <= RIGHT;
             test_dir   <= RIGHT;
             count      <= 3'd0;
             state      <= S_IDLE;
         end else if (pacman_hit) begin
-            xpos       <= 5'd14;
-            ypos       <= 5'd17;
+            xpos       <= 5'd12;
+            ypos       <= 5'd19;
             dir        <= RIGHT;
             stored_dir <= RIGHT;
             test_dir   <= RIGHT;

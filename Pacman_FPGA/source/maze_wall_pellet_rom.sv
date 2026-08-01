@@ -4,7 +4,7 @@ module maze_wall_pellet_rom (
 
     output logic [1:0] tile,
     output logic       collectible,
-    output logic [8:0] pellet_index,
+    output logic [7:0] pellet_index,
 
     output logic       can_move_pac,
     output logic       can_move_ghost
@@ -53,36 +53,36 @@ module maze_wall_pellet_rom (
 
     // Number of collectibles in all rows before the selected row.
     // Total number of collectibles = 186.
-    function automatic logic [8:0] row_base (
+    function automatic logic [7:0] row_base (
         input logic [4:0] yy
     );
         begin
             case (yy)
-                5'd0:  row_base = 9'd0;
-                5'd1:  row_base = 9'd0;
-                5'd2:  row_base = 9'd20;
-                5'd3:  row_base = 9'd26;
-                5'd4:  row_base = 9'd32;
-                5'd5:  row_base = 9'd54;
-                5'd6:  row_base = 9'd60;
-                5'd7:  row_base = 9'd66;
-                5'd8:  row_base = 9'd82;
-                5'd9:  row_base = 9'd86;
-                5'd10: row_base = 9'd90;
-                5'd11: row_base = 9'd92;
-                5'd12: row_base = 9'd94;
-                5'd13: row_base = 9'd96;
-                5'd14: row_base = 9'd98;
-                5'd15: row_base = 9'd100;
-                5'd16: row_base = 9'd102;
-                5'd17: row_base = 9'd122;
-                5'd18: row_base = 9'd128;
-                5'd19: row_base = 9'd134;
-                5'd20: row_base = 9'd156;
-                5'd21: row_base = 9'd160;
-                5'd22: row_base = 9'd164;
-                5'd23: row_base = 9'd186;
-                default: row_base = 9'd0;
+                5'd0:  row_base =   8'd0;
+                5'd1:  row_base =   8'd0;
+                5'd2:  row_base =   8'd20;
+                5'd3:  row_base =   8'd26;
+                5'd4:  row_base =   8'd32;
+                5'd5:  row_base =   8'd54;
+                5'd6:  row_base =   8'd60;
+                5'd7:  row_base =   8'd66;
+                5'd8:  row_base =   8'd82;
+                5'd9:  row_base =   8'd86;
+                5'd10: row_base =   8'd90;
+                5'd11: row_base =   8'd92;
+                5'd12: row_base =   8'd94;
+                5'd13: row_base =   8'd96;
+                5'd14: row_base =   8'd98;
+                5'd15: row_base =   8'd100;
+                5'd16: row_base =   8'd102;
+                5'd17: row_base =   8'd122;
+                5'd18: row_base =   8'd128;
+                5'd19: row_base =   8'd134;
+                5'd20: row_base =   8'd156;
+                5'd21: row_base =   8'd160;
+                5'd22: row_base =   8'd164;
+                5'd23: row_base =   8'd186;
+                default: row_base = 8'd0;
             endcase
         end
     endfunction
@@ -105,14 +105,14 @@ module maze_wall_pellet_rom (
     // Contains only collectibles strictly left of x.
     logic [23:0] prefix_mask;
 
-    logic [4:0] prefix_count;
+    logic [3:0] prefix_count;
 
     always_comb begin
         row = row_data(y);
 
         collect_mask = 24'd0;
         prefix_mask  = 24'd0;
-        prefix_count = 5'd0;
+        prefix_count = 4'd0;
 
         // The MSB of each tile is 1 for both 10 and 11.
         for (int i = 0; i < 24; i++) begin
@@ -140,25 +140,12 @@ module maze_wall_pellet_rom (
                 {{4{1'b0}}, prefix_count};
         end else begin
             tile         = WALL_TILE;
-            pellet_index = 9'd0;
+            pellet_index = 8'd0;
         end
 
         collectible = tile[1];
 
-        // Pac-Man cannot enter the two center ghost-house door tiles.
-        can_move_pac =
-            (tile != WALL_TILE) &&
-            !((y == 5'd11) &&
-              ((x == 5'd11) || (x == 5'd12)));
-
-        // Ghosts cannot pass through the side walls of the ghost house.
-        can_move_ghost =
-            (tile != WALL_TILE) &&
-            !((x == 5'd8) &&
-              (y >= 5'd11) &&
-              (y <= 5'd15)) &&
-            !((x == 5'd15) &&
-              (y >= 5'd11) &&
-              (y <= 5'd15));
+        can_move_pac = (tile != WALL_TILE && (!(x == 11 && y == 12) && !(x == 12 && y == 12)));
+        can_move_ghost = (tile != WALL_TILE && (!(x == 10 && (y >= 12 && y <= 14)) && !(x == 13 && (y >= 12 && y <= 14))));
     end
 endmodule

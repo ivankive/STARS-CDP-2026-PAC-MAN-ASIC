@@ -11,7 +11,7 @@ module game_fsm (
     input  logic       reset,
 
     input  logic [1:0] lives,
-    input  logic [8:0] pellets,
+    input  logic [7:0] pellets,
     input  logic [3:0] inputs,
     output logic [1:0] game_state
 );
@@ -46,7 +46,7 @@ module game_fsm (
             GAME_PLAYING: begin
                 if (lives == 2'd0)
                     next_state = GAME_OVER;
-                else if (pellets == 9'd0)
+                else if (pellets == 8'd0)
                     next_state = GAME_WIN;
             end
 

@@ -41,16 +41,16 @@ module ghost_controller (
     localparam logic [1:0] DIR_DOWN  = 2'd2;
     localparam logic [1:0] DIR_RIGHT = 2'd3;
 
-    localparam logic [4:0] GRID_MAX_X = 5'd27;
-    localparam logic [4:0] GRID_MAX_Y = 5'd30;
+    localparam logic [4:0] GRID_MAX_X = 5'd24;
+    localparam logic [4:0] GRID_MAX_Y = 5'd24;
 
-    localparam logic [4:0] BLINKY_START_X = 5'd13;
-    localparam logic [4:0] BLINKY_START_Y = 5'd14;
+    localparam logic [4:0] BLINKY_START_X = 5'd11;
+    localparam logic [4:0] BLINKY_START_Y = 5'd13;
 
-    localparam logic [4:0] PINKY_START_X = 5'd14;
-    localparam logic [4:0] PINKY_START_Y = 5'd14;
+    localparam logic [4:0] PINKY_START_X = 5'd12;
+    localparam logic [4:0] PINKY_START_Y = 5'd13;
 
-    localparam logic [2:0] GHOST_MOVE_COUNT = 3'd1;
+    logic [2:0] GHOST_MOVE_COUNT;
 
     logic [2:0] move_counter;
 
@@ -63,6 +63,8 @@ module ghost_controller (
     logic [1:0] ghost_can_move;
     logic [1:0] frightened_start;
     logic [1:0] pending_reverse;
+
+    assign GHOST_MOVE_COUNT = power_pellet_active ? 3'd7:3'd0;
 
     ghost_fsm blinky_fsm (
         .clk                  (clk),
@@ -155,16 +157,12 @@ module ghost_controller (
             case (direction)
                 DIR_UP:
                     direction_oob = (y == 0);
-
                 DIR_DOWN:
                     direction_oob = (y == GRID_MAX_Y);
-
                 DIR_LEFT:
                     direction_oob = (x == 0);
-
                 DIR_RIGHT:
                     direction_oob = (x == GRID_MAX_X);
-
                 default:
                     direction_oob = 1'b1;
             endcase
@@ -314,9 +312,6 @@ module ghost_controller (
                 end
 
                 S_CAPTURE: if (issued_oob || ghost_rom_valid) begin
-                    // Hold here until the arbiter has answered for the
-                    // address currently presented (out-of-bounds probes
-                    // are decided locally and need no lookup).
                     case (check_dir)
                         DIR_UP:
                             can_up <= issued_oob

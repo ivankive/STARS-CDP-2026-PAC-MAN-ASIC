@@ -44,7 +44,7 @@ module top (
   logic       pacman_hit;
   logic [1:0] ghost_eaten;
   logic [1:0] lives;
-  logic [8:0] pellets;
+  logic [7:0] pellets;
 
   // Arbiter VGA port
   logic       vga_active;
@@ -56,7 +56,7 @@ module top (
   logic       col_valid;
   logic       col_collectible;
   logic       col_is_power;
-  logic [8:0] col_pellet_index;
+  logic [7:0] col_pellet_index;
 
   // Arbiter pacman port
   logic [4:0] pac_rom_x, pac_rom_y;
@@ -72,15 +72,15 @@ module top (
   logic [4:0] rom_x, rom_y;
   logic [1:0] rom_tile;
   logic       rom_collectible;
-  logic [8:0] rom_pellet_index;
+  logic [7:0] rom_pellet_index;
   logic       rom_can_move_pac;
   logic       rom_can_move_ghost;
 
   // pellet_state wires
   logic       pellet_set_en;
-  logic [8:0] pellet_set_index;
+  logic [7:0] pellet_set_index;
   logic       pellet_already_eaten;
-  logic [8:0] pellet_vga_index;
+  logic [7:0] pellet_vga_index;
   logic       pellet_vga_bit;
 
   // Ghost stuff

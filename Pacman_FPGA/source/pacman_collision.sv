@@ -25,12 +25,12 @@ module pacman_collision (
     input  wire logic       col_valid,
     input  wire logic       col_collectible,
     input  wire logic       col_is_power,
-    input  wire logic [8:0] col_pellet_index,
+    input  wire logic [7:0] col_pellet_index,
 
     // pellet_state interface
     input  wire logic       pellet_already_eaten,  // eaten bit at col_pellet_index
     output logic            pellet_set_en,
-    output logic [8:0]      pellet_set_index,
+    output logic [7:0]      pellet_set_index,
 
     output logic            pellet_eaten,
     output logic            power_pellet_eaten,
@@ -62,7 +62,7 @@ module pacman_collision (
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
             pellet_set_en      <= 1'b0;
-            pellet_set_index   <= 9'd0;
+            pellet_set_index   <= 8'd0;
             pellet_eaten       <= 1'b0;
             power_pellet_eaten <= 1'b0;
             pacman_hit         <= 1'b0;
