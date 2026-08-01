@@ -260,7 +260,8 @@ module top (
     .pinky_y    (pinky_y),
     .pinky_dir  (pinky_dir),
     .pp_active  (power_pellet_active),
-    .lives      (lives)
+    .lives      (lives),
+    .game_state (game_state)
   );
 
   game_fsm game_fsm(

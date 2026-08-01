@@ -1,4 +1,4 @@
-/* module vga_draw_border(
+module vga_draw_border(
     input logic  [9:0] h_count,    //Horizontal Display Counter (max value is 640px)
     input logic  [9:0] v_count,    //Vertical Display Counter (maxvalue is 480px)
     input logic        video_on,   //video on signal from vga_counter
@@ -12,11 +12,11 @@
   //determine whether pixel is in the map
   assign black_right               = ((h_count >= 224));
   assign black_bottom              = ((v_count >= (288+24+8)) && (v_count < 480));
-  //assign black_top_between_numbers = ((v_count < 8)  && (h_count == 0 || (h_count > 39 && h_count < 48) || (h_count >= 72)));
-  assign black_top                 = ((v_count < 64) /*&&  (v_count > 7 )  ||  black_top_between_numbers*/ //); 
+  assign black_top_between_numbers = ((v_count < 8)  && (h_count == 0 || (h_count > 39 && h_count < 48) || (h_count >= 72)));
+  assign black_top                 = ((v_count < 64) &&  (v_count > 7 )  ||  black_top_between_numbers); 
   
   
-  /*
+  
 
   //pixel generator for tile
   always_comb begin
@@ -34,4 +34,4 @@
       output_rgb = input_rgb;
   end
 endmodule
- */
+

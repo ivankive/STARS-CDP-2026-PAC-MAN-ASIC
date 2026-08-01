@@ -33,7 +33,8 @@ module vga_controller_top(
     input logic [1:0] pinky_dir,
     input logic [4:0] pinky_y,
     input logic       pp_active,
-    input logic [1:0] lives
+    input logic [1:0] lives,
+    input logic [1:0] game_state
 );
     logic [9:0] hcount_raw, vcount_raw;
     logic       hsync_raw, vsync_raw;
@@ -43,7 +44,7 @@ module vga_controller_top(
     logic       hsync_d, vsync_d;
     logic       video_on_d;
 
-    logic [2:0] rgb_tile, rgb_sprite, rgb_border;
+    logic [2:0] rgb_tile, rgb_sprite, rgb_border, rgb_text;
 
     vga_counter vga_counter(
         .clk(pixel_clk),
@@ -106,19 +107,26 @@ module vga_controller_top(
         .input_rgb  (rgb_tile),   //inputs from draw_tile
         .output_rgb (rgb_sprite)  //outputs to border
     );
-/*
+
+    vga_draw_text draw_text(
+        .h_count(hcount_d),
+        .v_count(vcount_d),
+        .video_on(video_on_d),
+        .game_state(game_state),
+        .input_rgb(rgb_sprite),
+        .output_rgb(rgb_text)
+    );
+
     vga_draw_border draw_border(
         .h_count(hcount_d),        //inputs from VGA_counter
         .v_count(vcount_d),
         .video_on(video_on_d),
-        .input_rgb(rgb_sprite),  //inputs from draw_sprite
+        .input_rgb(rgb_text),  //inputs from draw_sprite
         .output_rgb(rgb_border)
     );
 
-    */
-
-    assign rgb[0] = rgb_sprite[2]; //output to VGA
-    assign rgb[1] = rgb_sprite[1];
-    assign rgb[2] = rgb_sprite[0];
+    assign rgb[0] = rgb_border[2]; //output to VGA
+    assign rgb[1] = rgb_border[1];
+    assign rgb[2] = rgb_border[0];
 
 endmodule
