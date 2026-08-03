@@ -8,7 +8,7 @@
 
 This project implements the classic Pac-Man arcade game entirely in hardware using SystemVerilog. The design targets an **iCE40 HX8K FPGA** for development and prototyping, with a final goal of **ASIC tapeout** on the **sky130** open-source PDK.
 
-The game runs on a tile-based maze rendered over VGA. Pac-Man and ghost movement, collision detection, pellet collection, scoring, and ghost AI are handled by dedicated hardware modules rather than a software CPU.
+The game runs on a tile-based maze rendered over VGA. Pac-Man and ghost movement, collision detection, pellet collection, scoring, and ghost AI are handled by dedicated hardware modules rather than a software CPU. Soft restart reloads the maze from ROM so rounds can be replayed without a board reset.
 
 The working FPGA design lives under [`Pacman_FPGA/`](Pacman_FPGA/).
 
@@ -19,14 +19,17 @@ The working FPGA design lives under [`Pacman_FPGA/`](Pacman_FPGA/).
 - [x] VGA timing generator (640 × 480)
 - [x] Tile-based maze rendering (walls, pellets, power pellets)
 - [x] Sprite rendering (Pac-Man, Blinky, Pinky; lives icons; cyan frightened ghosts)
-- [x] Maze ROM + BRAM (runtime pellet state, map reload)
+- [x] Maze ROM + BRAM (runtime pellet state, soft map reload on restart)
 - [x] Pac-Man movement with pushbutton input and wall collision
 - [x] Pellet / power-pellet collection and scoring
-- [x] On-screen SCORE text + decimal digits
+- [x] On-screen SCORE + decimal digits; PAC-MAN / U LOSE / U WIN overlays
+- [x] “Press any button” prompt on STARTING / OVER / WIN
 - [x] Lives tracking (start with 3; lose life on ghost hit)
-- [x] Ghost AI (Blinky & Pinky — chase, scatter, frightened)
-- [x] Power-pellet timer and frightened mode
+- [x] Ghost AI (Blinky & Pinky — chase, scatter, frightened; Y-before-X pathing)
+- [x] Ghost speed scaling (full speed normally; slower while frightened)
+- [x] Power-pellet timer (~3 s) and frightened mode
 - [x] Game FSM (starting → playing → game over / win → restart)
+- [x] Soft restart: button from OVER / WIN reloads the maze and returns to STARTING
 - [x] Full top-level integration on FPGA
 - [x] RTL unit testbenches for core gameplay modules
 - [ ] ASIC synthesis & tapeout
@@ -53,7 +56,7 @@ Pac-man-ASIC/
 
 ## Architecture
 
-Display, game-state, memory, and movement subsystems are integrated in `top.sv`. VGA generates pixel coordinates; the VGA controller composites tiles, sprites, border, and text. Movement and ghosts tick at **60 Hz** from a clock divider on the 100 MHz board clock. Maze BRAM holds runtime pellet state; ROM supplies the initial layout and wall checks.
+Display, game-state, memory, and movement subsystems are integrated in `top.sv`. VGA generates pixel coordinates; the VGA controller composites tiles, sprites, border, and text. Movement and ghosts tick at **60 Hz** from a clock divider on the 25.125 MHz board clock. Maze BRAM holds runtime pellet state; ROM supplies the initial layout and wall checks. A one-cycle `soft_map_rst` pulse (button edge while OVER / WIN) reloads the maze so a new round can start.
 
 ### Block Diagram
 
@@ -65,10 +68,11 @@ Display, game-state, memory, and movement subsystems are integrated in `top.sv`.
     │         ├── vga_draw_tile
     │         ├── vga_draw_sprite  (Pac-Man, ghosts, lives icons)
     │         ├── vga_draw_border
-    │         └── vga_draw_text    (PAC-MAN title, SCORE + digits)
+    │         └── vga_draw_text    (SCORE, title / lose / win, press-button)
     │
     ├──► maze_bram ◄──► pacman_collision (pellets, score, lives, hits)
-    │         ▲
+    │         ▲              ▲
+    │         │              └── soft_map_rst (OVER / WIN button edge)
     │         └── initial_maze_rom (reload + wall checks)
     │
     ├──► game_fsm  (STARTING / PLAYING / OVER / WIN)
@@ -110,25 +114,25 @@ top
 
 | Module | Role |
 |--------|------|
-| `top.sv` | Board I/O and full game integration |
+| `top.sv` | Board I/O and full game integration; derives `soft_map_rst` |
 | `clock_div.sv` | Divides 100 MHz → ~60 Hz game tick |
-| `game_fsm.sv` | Starting / playing / game-over / win states |
+| `game_fsm.sv` | Starting / playing / game-over / win; rising-edge start / restart |
 | `pacman_movement.sv` | Pac-Man grid position, direction, button input |
 | `pacman_collision.sv` | Pellets, power pellets, ghost contact, score, lives |
-| `pp_timer.sv` | Power-pellet / frightened duration |
-| `maze_bram.sv` | Dual-port BRAM for runtime maze + VGA reads |
+| `pp_timer.sv` | Power-pellet / frightened duration (~180 ticks / 3 s) |
+| `maze_bram.sv` | Dual-port BRAM for runtime maze + VGA reads; `map_rst` reload |
 | `initial_maze_rom.sv` | Static maze ROM (walls / pellets) |
 | `ghost_mode_controller.sv` | Global scatter / chase schedule |
-| `ghost_controller.sv` | Blinky & Pinky coordination |
+| `ghost_controller.sv` | Blinky & Pinky coordination; move cadence (slower when frightened) |
 | `ghost_fsm.sv` | Per-ghost: caged, scatter, chase, frightened |
 | `ghost_target.sv` | Personality-based target tiles |
-| `ghost_movement.sv` | Next direction toward target |
+| `ghost_movement.sv` | Next direction toward target (prefer vertical, then horizontal) |
 | `vga_controller_top.sv` | Composites display layers to VGA |
 | `vga_counter.sv` | VGA timing |
 | `vga_draw_tile.sv` | Tile map rendering |
 | `vga_draw_sprite.sv` | Pac-Man / ghost sprites and remaining lives |
 | `vga_draw_border.sv` | Screen border |
-| `vga_draw_text.sv` | Title screen + SCORE digits |
+| `vga_draw_text.sv` | SCORE digits; PAC-MAN / U LOSE / U WIN; press-button prompt |
 
 ### Tile encoding
 
@@ -150,7 +154,7 @@ Wired in `top.sv` as `{pb[7], pb[6], pb[5], pb[10]}` into movement / FSM start i
 | `pb[5]` | Down |
 | `pb[10]` | Left |
 
-Any of these inputs can also advance the FSM from STARTING / OVER / WIN (after map load, or to restart).
+A **rising edge** on any of these (fresh press, not a held level) advances the FSM: STARTING → PLAYING once the map is loaded, or OVER / WIN → STARTING. From OVER / WIN that same edge also pulses `soft_map_rst` so BRAM reloads pellets before the next round.
 
 ### Scoring
 
@@ -225,22 +229,22 @@ Available unit tests (run with `make sim_<name>_src`):
 
 | Testbench | Coverage |
 |-----------|----------|
-| `game_fsm` | STARTING → PLAYING → OVER / WIN; input + reload / lives / pellets |
+| `game_fsm` | STARTING → PLAYING → OVER / WIN; rising-edge input; reload / lives / pellets |
 | `pacman_movement` | Spawn, facing, turns, wall block, tunnel wrap, hit / `GAME_STARTING` |
 | `pacman_collision` | Pellet / power / ghost scoring (+2 / +15 / +20), lives, hit, `game_starting` |
-| `maze_bram` | Load, VGA / central reads, pellet clear, map reload |
+| `maze_bram` | Load, VGA / central reads, pellet clear, `map_rst` reload |
 | `initial_maze_rom` | Walls / pellets / power pellets, dual-port, door blocks, OOB |
 | `pp_timer` | Activate, 180-tick window, retrigger, async reset |
 | `clock_div` | 60 Hz single-cycle pulse, period, async reset |
 | `ghost_mode_controller` | Scatter / chase schedule and pause |
 | `ghost_fsm` | Caged / scatter / chase / frightened / eaten |
 | `ghost_target` | Blinky & Pinky targets (chase offset, clamps, frightened) |
-| `ghost_movement` | Pathing toward target, reverse, blocked / dead-end |
+| `ghost_movement` | Y-before-X pathing toward target, reverse, blocked / dead-end |
 | `ghost_controller` | Spawn, leave cage, ROM probes, frightened / eaten / hit reset |
 | `vga_counter` | 640×480 timing, hsync / vsync, video_on, frame wrap |
 | `vga_draw_tile` | Wall / pellet / power-pellet pixels, map unload, OOB |
 | `vga_draw_sprite` | Pac-Man / Blinky / Pinky colors, frightened cyan, lives icons |
-| `vga_draw_text` | SCORE glyphs / digits, title / lose / win overlays |
+| `vga_draw_text` | SCORE glyphs / digits; title / lose / win; press-button prompt |
 | `vga_draw_border` | Playfield pass-through and blackout margins |
 | `vga_controller_top` | Pipeline sync, tile addressing, layered compose |
 
@@ -256,9 +260,11 @@ Available unit tests (run with `make sim_<name>_src`):
 | Pellets / scoring | Done | Collision awards points; VGA shows SCORE |
 | Lives / respawn | Done | 3 lives; icons on screen; FSM goes OVER at 0 |
 | Win condition | Done | `GAME_WIN` when all pellets cleared |
-| Restart UX | Done | Button input returns OVER / WIN → STARTING |
-| Ghost AI | Done | Blinky & Pinky; frightened ghosts draw cyan |
-| Power pellet mode | Done | Timer + frightened / eatable ghosts |
+| Restart UX | Done | Rising-edge button: OVER / WIN → STARTING + maze reload |
+| On-screen prompts | Done | PAC-MAN / U LOSE / U WIN + press-button outside PLAYING |
+| Ghost AI | Done | Blinky & Pinky; Y-before-X; cyan when frightened |
+| Ghost speed | Done | Full speed normally; slower cadence while frightened |
+| Power pellet mode | Done | ~3 s timer + frightened / eatable ghosts |
 | Full integration | Done | Wired in `Pacman_FPGA/source/top.sv` |
 | Unit testbenches | Done | 18 module TBs under `Pacman_FPGA/testbench/` |
 | ASIC tapeout | Not started | PDK setup available via Makefile |
