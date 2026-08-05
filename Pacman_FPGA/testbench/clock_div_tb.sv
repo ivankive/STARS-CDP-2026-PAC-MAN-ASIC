@@ -35,7 +35,7 @@ module clock_div_tb;
     // Plant count just before the terminal value, then let the DUT advance.
     task automatic arm_near_terminal;
         @(negedge clk);
-        force dut.count = 19'd418748;
+        force dut.count = 19'd416665;
         @(posedge clk);
         release dut.count;
     endtask
@@ -56,7 +56,7 @@ module clock_div_tb;
 
         arm_near_terminal();
         #1;
-        check("count now 418749, pulse still low", clk_div === 1'b0);
+        check("count now 416666, pulse still low", clk_div === 1'b0);
         tick(1);
         #1;
         check("terminal count pulses high", clk_div === 1'b1);

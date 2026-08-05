@@ -2,6 +2,9 @@
 
 // top - tapeout version
 //
+// Clocking: hz100 is the 40 MHz chip/board clock. clock_40_to_25 derives
+// clk_25 (25 MHz), which clocks VGA and all former hz100 logic domains.
+//
 // Memory architecture vs the FPGA version:
 //  * maze_bram (2048-bit writable maze + ROM-to-BRAM reload FSM) and
 //    initial_maze_rom (two combinational ports) are gone.
@@ -27,7 +30,15 @@ module top (
   output logic txclk, rxclk,
   input  logic txready, rxready
 );
-  assign right[7] = hz100;
+  // hz100 is the 40 MHz chip/board clock. Derive 25 MHz for VGA + logic.
+  logic clk_25;
+  clock_40_to_25 clk_gen (
+    .clk_40 (hz100),
+    .rst    (reset),
+    .clk_25 (clk_25)
+  );
+
+  assign right[7] = clk_25;
 
   // Clock
   logic new_clock;
@@ -102,14 +113,14 @@ module top (
 
   assign inputs = {pb[7], pb[6], pb[5], pb[10]};
 
-  clock_div marcus(.clk(hz100), .rst(reset), .clk_div(new_clock));
+  clock_div marcus(.clk(clk_25), .rst(reset), .clk_div(new_clock));
 
   // Sticky spawn reset for the 60 Hz movement domain.
-  // game_fsm / pellet clear run on hz100; pacman/ghosts only tick on the
+  // game_fsm / pellet clear run on clk_25; pacman/ghosts only tick on the
   // single-cycle new_clock pulse. Hold spawn_reset through STARTING and
   // until the next game tick after leaving so positions always snap back.
   logic spawn_reset;
-  always_ff @(posedge hz100 or posedge reset) begin
+  always_ff @(posedge clk_25 or posedge reset) begin
     if (reset)
       spawn_reset <= 1'b1;
     else if (game_state == 2'd0)
@@ -134,7 +145,7 @@ module top (
   );
 
   pellet_state pellet_state_inst (
-    .clk        (hz100),
+    .clk        (clk_25),
     .reset      (reset),
     .clear      (game_state == 2'd0),   // held clear during GAME_STARTING
     .set_en     (pellet_set_en),
@@ -146,7 +157,7 @@ module top (
   );
 
   maze_query_arbiter arbiter (
-    .clk              (hz100),
+    .clk              (clk_25),
     .reset            (reset),
 
     .vga_active       (vga_active),
@@ -202,7 +213,7 @@ module top (
   );
 
   pacman_collision pacman_collision_inst (
-    .clk                   (hz100),
+    .clk                   (clk_25),
     .reset                 (reset),
     .game_tick             (new_clock),
     .game_running          (game_state == 2'd1),
@@ -241,7 +252,7 @@ module top (
   );
 
   vga_controller_top vga_controller(
-    .pixel_clk  (hz100),
+    .pixel_clk  (clk_25),
     .rst        (reset),
     .rgb        ({right[3:1]}),
     .hsync      (left[3]),
@@ -265,7 +276,7 @@ module top (
   );
 
   game_fsm game_fsm(
-    .clk          (hz100),
+    .clk          (clk_25),
     .reset        (reset),
     .lives        (lives),
     .pellets      (pellets),
