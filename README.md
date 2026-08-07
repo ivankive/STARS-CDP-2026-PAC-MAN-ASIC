@@ -276,9 +276,9 @@ make clean              # Remove build artifacts
 | State text | Done | PAC-MAN / U LOSE / U WIN (SCORE removed) |
 | Ghost AI | Done | Blinky & Pinky; cyan when frightened |
 | Power pellet mode | Done | ~3 s timer + eatable ghosts |
-| Area target | In progress | Under ~4k cells; FPGA synth ~2.5k primitives |
+| Area target | Done | Under ~4k cells; FPGA synth ~2.5k primitives |
 | Unit testbenches | Done | 17 TBs + `run_tb.sh` |
-| ASIC tapeout | Not started | PDK setup via root Makefile |
+| ASIC tapeout | Done | PDK setup via root Makefile |
 
 ---
 
