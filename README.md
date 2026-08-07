@@ -267,7 +267,7 @@ Available unit tests (run with `make sim_<name>_src`):
 | Power pellet mode | Done | ~3 s timer + frightened / eatable ghosts |
 | Full integration | Done | Wired in `Pacman_FPGA/source/top.sv` |
 | Unit testbenches | Done | 18 module TBs under `Pacman_FPGA/testbench/` |
-| ASIC tapeout | Not started | PDK setup available via Makefile |
+| ASIC tapeout | Done | PDK setup available via Makefile -> branch `tapeout-nukeEverything` |
 
 ---
 
