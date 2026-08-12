@@ -101,7 +101,7 @@ module pacman_collision (
                     if (power_pellet_active || vulnerable_to_pacman[0]) begin
                         if (!ghost_eaten[0]) begin
                             ghost_eaten[0] <= 1'b1;
-                            score_delta = score_delta + 10'd20;
+                            score_delta = score_delta + 10'd10;
                         end
                     end else if (dangerous_to_pacman[0]) begin
                         if (!pacman_hit) begin
@@ -115,7 +115,7 @@ module pacman_collision (
                     if (power_pellet_active || vulnerable_to_pacman[1]) begin
                         if (!ghost_eaten[1]) begin
                             ghost_eaten[1] <= 1'b1;
-                            score_delta = score_delta + 10'd20;
+                            score_delta = score_delta + 10'd10;
                         end
                     end else if (dangerous_to_pacman[1]) begin
                         if (!pacman_hit) begin
@@ -144,7 +144,7 @@ module pacman_collision (
                             write_en <= 1'b1;
                             if (!power_pellet_eaten) begin
                                 power_pellet_eaten <= 1'b1;
-                                 score_delta = score_delta + 10'd15;
+                                 score_delta = score_delta + 10'd10;
                                 pellets <= pellets - 9'd1;
                             end
                         end
